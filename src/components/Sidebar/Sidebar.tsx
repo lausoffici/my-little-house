@@ -42,8 +42,8 @@ const Ilustration = ({ path }: { path: string }) => {
         <Image
             className=''
             src={path === '/' ? '/assets/book.png' : `/assets${path}.png`}
-            width={250}
-            height={250}
+            width={200}
+            height={200}
             alt={path.slice(0, 1)}
         />
     );
