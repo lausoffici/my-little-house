@@ -9,7 +9,9 @@
         "lint": "next lint",
         "prepare": "husky",
         "format:check": "prettier --check \"src/**/*.(ts|tsx|js|json|yaml)\"",
-        "format:write": "prettier --write \"src/**/*.(ts|tsx|js|json|yaml)\""
+        "format:write": "prettier --write \"src/**/*.(ts|tsx|js|json|yaml)\"",
+        "lint:check": "eslint src/**/*.ts src/**/*.tsx --max-warnings 0",
+        "lint:fix": "eslint src/**/*.ts src/**/*.tsx --fix"
     },
     "dependencies": {
         "@radix-ui/react-icons": "^1.3.0",
@@ -45,7 +47,7 @@
     },
     "lint-staged": {
         "*.{js,jsx,ts,tsx}": [
-            "npm run lint",
+            "npm run lint:check",
             "npm run format:check",
             "git add"
         ]
