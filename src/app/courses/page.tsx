@@ -19,17 +19,13 @@ export default async function Courses() {
             <div
                 className={`my-5 grid auto-rows-[190px] grid-cols-[repeat(auto-fit,minmax(332px,_1fr))] gap-4 overflow-scroll h-full no-scrollbar`}
             >
-                {courses.map(({ _id, name, schedule, amount }) => (
+                {courses.map(({ _id, name, description, amount }) => (
                     <Card key={_id} className={`p-4 flex flex-col gap-1 waves min-w-[310px]`}>
                         <CardHeader className='py-2 px-0'>
                             <CardTitle className='text-lg'>{name}</CardTitle>
                         </CardHeader>
                         <CardContent className='p-0 text-sm'>
-                            <ul>
-                                {schedule.map((days, i) => (
-                                    <li key={i}>{days}</li>
-                                ))}
-                            </ul>
+                            <p>{description}</p>
                             <Badge variant='secondary' className='px-1 mt-2 w-fit text-md'>
                                 {formatCurrency(amount)}
                             </Badge>

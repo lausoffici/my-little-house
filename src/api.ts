@@ -6,7 +6,8 @@ const courses: ICourse[] = [
         creationDate: new Date(),
         active: true,
         name: 'Pre Intermediate',
-        schedule: ['Lunes y Miercoles 17.30hs', 'Martes y Jueves 16hs'],
+        description: `Lunes y Miércoles 15hs
+        Martes y Jueves 16hs `,
         amount: 12000
     },
     {
@@ -14,7 +15,8 @@ const courses: ICourse[] = [
         creationDate: new Date(),
         active: true,
         name: 'Adults',
-        schedule: ['Lunes y Miercoles 17.30hs', 'Martes y Jueves 16hs'],
+        description: `Lunes y Miércoles 15hs
+        Martes y Jueves 16hs`,
         amount: 12000
     },
     {
@@ -22,7 +24,8 @@ const courses: ICourse[] = [
         creationDate: new Date(),
         active: true,
         name: 'Pre Teens',
-        schedule: ['Lunes y Miercoles 17.30hs', 'Martes y Jueves 16hs'],
+        description: `Lunes y Miércoles 15hs
+        Martes y Jueves 16hs`,
         amount: 12000
     },
     {
@@ -30,7 +33,8 @@ const courses: ICourse[] = [
         creationDate: new Date(),
         active: true,
         name: 'Initial',
-        schedule: ['Lunes y Miercoles 17.30hs', 'Martes y Jueves 16hs'],
+        description: `Lunes y Miércoles 15hs
+        Martes y Jueves 16hs`,
         amount: 12000
     },
     {
@@ -38,7 +42,8 @@ const courses: ICourse[] = [
         creationDate: new Date(),
         active: true,
         name: 'Advanced',
-        schedule: ['Lunes y Miercoles 17.30hs', 'Martes y Jueves 16hs'],
+        description: `Lunes y Miércoles 15hs
+        Martes y Jueves 16hs`,
         amount: 12000
     }
 ];

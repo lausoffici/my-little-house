@@ -7,5 +7,5 @@ interface IEntity {
 export interface ICourse extends IEntity {
     name: string;
     amount: number;
-    schedule: string[];
+    description: string;
 }
