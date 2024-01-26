@@ -52,7 +52,7 @@ const Ilustration = ({ path }: { path: string }) => {
 export default function Sidebar() {
     const path = usePathname();
     return (
-        <div className='box-border w-72 h-full bg-slate-50 flex flex-col items-center justify-between pt-2 pb-9'>
+        <div className='box-border w-72 h-full bg-white flex flex-col items-center justify-between pt-2 pb-9'>
             <div className='w-full'>
                 <div className='py-4 mb-10'>
                     <Logo />

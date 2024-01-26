@@ -17,7 +17,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <html lang='en'>
             <body className={`${inter.className} flex`}>
                 <Sidebar />
-                <main className='bg-brand-50 w-full rounded-3xl m-1'>{children}</main>
+                <main className='bg-gray-50 w-full rounded-l-3xl'>{children}</main>
             </body>
         </html>
     );
