@@ -1,3 +1,4 @@
 export default function CashRegister() {
-  return <div></div>;
+    const a = 1;
+    return <div></div>;
 }

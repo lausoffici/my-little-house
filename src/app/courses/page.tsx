@@ -1,3 +1,4 @@
 export default function Courses() {
-  return <div></div>;
+    const a = 1;
+    return <div></div>;
 }

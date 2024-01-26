@@ -1,3 +1,3 @@
 export default function Students() {
-  return <div></div>;
+    return <div></div>;
 }
