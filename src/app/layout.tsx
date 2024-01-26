@@ -13,6 +13,7 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+    const a = 1;
     return (
         <html lang='en'>
             <body className={`${inter.className} flex`}>
