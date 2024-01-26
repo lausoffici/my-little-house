@@ -47,7 +47,7 @@
     },
     "lint-staged": {
         "*.{js,jsx,ts,tsx}": [
-            "npm run lint:check",
+            "eslint src/**/*.ts src/**/*.tsx --fix",
             "npm run format:check",
             "git add"
         ]
