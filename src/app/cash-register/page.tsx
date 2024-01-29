@@ -1,3 +1,3 @@
 export default function CashRegister() {
-  return <div></div>;
+    return <div></div>;
 }

@@ -1,6 +1,4 @@
-
 export default function Home() {
-  return (
-    <div></div>
-  )
+    const a = 2;
+    return <div></div>;
 }
