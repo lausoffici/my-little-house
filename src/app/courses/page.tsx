@@ -14,7 +14,7 @@ export default async function Courses() {
                 <h1 className='text-3xl font-bold text-brand-black-100'>Cursos</h1>
                 <Button>Agregar curso</Button>
             </div>
-            <div className='h-[830px] overflow-scroll no-scrollbar'>
+            <div className='h-[93%] overflow-y-auto no-scrollbar'>
                 <div
                     className={`grid auto-rows-[fit-content(1em)] grid-cols-[repeat(auto-fit,minmax(250px,_1fr))] gap-4 overflow-scroll no-scrollbar`}
                 >
