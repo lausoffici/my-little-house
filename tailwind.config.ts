@@ -34,7 +34,8 @@ const config = {
                         100: '#AFDAD5',
                         200: '#7AC2B9',
                         300: '#5FB6AB',
-                        400: '#2A9D8F'
+                        400: '#2A9D8F',
+                        success: '#4BB543'
                     },
 
                     blue: {

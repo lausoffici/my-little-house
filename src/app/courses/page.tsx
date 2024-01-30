@@ -1,9 +1,9 @@
 import api from '@/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { formatCurrency } from '@/lib/utils';
 import CourseCardMenu from '@/components/CourseCardMenu';
+import AddCourseDialog from '@/components/AddCourseDialog';
 
 export default async function Courses() {
     const courses = await api.getCourses();
@@ -12,7 +12,7 @@ export default async function Courses() {
         <section className='p-6 h-full '>
             <div className='flex justify-between items-center mb-6'>
                 <h1 className='text-3xl font-bold text-brand-black-100'>Cursos</h1>
-                <Button>Agregar curso</Button>
+                <AddCourseDialog />
             </div>
             <div className='h-[93%] overflow-y-auto no-scrollbar'>
                 <div

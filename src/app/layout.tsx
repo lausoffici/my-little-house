@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import Favicon from '../../public/assets/metadata/favicon.ico';
 import Sidebar from '../components/Sidebar/Sidebar';
+import { Toaster } from '@/components/ui/toaster';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -18,6 +19,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <body className={`${inter.className} flex`}>
                 <Sidebar />
                 <main className='bg-gray-50 h-full w-full rounded-l-3xl shadow'>{children}</main>
+                <Toaster />
             </body>
         </html>
     );
