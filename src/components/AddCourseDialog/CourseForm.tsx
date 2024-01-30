@@ -76,14 +76,14 @@ export default function CourseForm({ setOpen }: { setOpen: Dispatch<SetStateActi
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
+            <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
                 {inputFields.map(({ name, label, getInput }) => (
                     <FormField
                         key={name}
                         control={form.control}
                         name={name}
                         render={({ field }) => (
-                            <FormItem className={name === 'price' ? 'mt-3 relative' : ''}>
+                            <FormItem className={name === 'price' ? 'relative' : ''}>
                                 <FormLabel className='text-brand-black-100'>{label}</FormLabel>
                                 <FormControl>{getInput(field)}</FormControl>
                                 {name === 'price' ? (
@@ -96,7 +96,6 @@ export default function CourseForm({ setOpen }: { setOpen: Dispatch<SetStateActi
                 ))}
 
                 <div className='w-full flex justify-between items-center mt-4'>
-                    <Button type='submit'>Crear</Button>
                     <Button
                         type='button'
                         variant='outline'
@@ -105,6 +104,7 @@ export default function CourseForm({ setOpen }: { setOpen: Dispatch<SetStateActi
                     >
                         Descartar
                     </Button>
+                    <Button type='submit'>Crear</Button>
                 </div>
             </form>
         </Form>
