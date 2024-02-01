@@ -4,7 +4,6 @@ import { useToast } from '@/components/ui/use-toast';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Input } from '@/components/ui/input';
 import { useForm } from 'react-hook-form';
-import { Button } from '@/components/ui/button';
 import { Textarea } from '../ui/textarea';
 import { CheckIcon } from '@radix-ui/react-icons';
 import { z } from 'zod';
@@ -22,6 +21,8 @@ const formSchema = z.object({
     description: z.string()
 });
 
+export const FORM_ID = 'course-form';
+
 export default function CourseForm({ onFormSubmit }: { onFormSubmit: () => void }) {
     const { toast } = useToast();
 
@@ -29,7 +30,8 @@ export default function CourseForm({ onFormSubmit }: { onFormSubmit: () => void 
         resolver: zodResolver(formSchema),
         defaultValues: {
             course: '',
-            description: ''
+            description: '',
+            price: 0
         }
     });
 
@@ -44,7 +46,7 @@ export default function CourseForm({ onFormSubmit }: { onFormSubmit: () => void 
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-3'>
+            <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-2 py-3' id={FORM_ID}>
                 <FormField
                     control={form.control}
                     name='course'
@@ -85,13 +87,6 @@ export default function CourseForm({ onFormSubmit }: { onFormSubmit: () => void 
                         </FormItem>
                     )}
                 />
-
-                <div className='w-full flex justify-between items-center'>
-                    <Button type='button' variant='ghost' onClick={() => onFormSubmit()}>
-                        Descartar
-                    </Button>
-                    <Button type='submit'>Crear</Button>
-                </div>
             </form>
         </Form>
     );
