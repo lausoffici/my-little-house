@@ -18,7 +18,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <html lang='en'>
             <body className={`${inter.className} flex`}>
                 <Sidebar />
-                <main className='bg-gray-50 h-full w-full rounded-l-3xl shadow'>{children}</main>
+                <main className='bg-backgound rounded-l-3xl shadow h-full w-full'>{children}</main>
                 <Toaster />
             </body>
         </html>

@@ -2,28 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-    --foreground-rgb: 0, 0, 0;
-    --background-rgb: 255, 255, 255;
-}
-
-@media (prefers-color-scheme: dark) {
-    :root {
-        --foreground-rgb: 255, 255, 255;
-        --background-rgb: 255, 255, 255;
-    }
-}
-
-body {
-    color: rgb(var(--foreground-rgb));
-    background-color: rgb(var(--background-rgb));
-    padding: 0;
-    margin: 0;
-    box-sizing: border-box;
-    height: 100vh;
-    width: 100%;
-}
-
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
     -webkit-appearance: none;
@@ -35,6 +13,89 @@ input[type='number'] {
     -moz-appearance: textfield;
 }
 
+@layer base {
+    * {
+        @apply border-border;
+    }
+    body {
+        @apply bg-background text-foreground;
+        padding: 0;
+        margin: 0;
+        box-sizing: border-box;
+        height: 100vh;
+        width: 100%;
+    }
+
+    :root {
+        --background: 0 0% 100%;
+        --foreground: 240 10% 3.9%;
+
+        --card: 0 0% 100%;
+        --card-foreground: 240 10% 3.9%;
+
+        --popover: 0 0% 100%;
+        --popover-foreground: 240 10% 3.9%;
+
+        --primary: 346.8 77.2% 49.8%;
+        --primary-foreground: 355.7 100% 97.3%;
+
+        --secondary: 240 4.8% 95.9%;
+        --secondary-foreground: 240 5.9% 10%;
+
+        --muted: 240 4.8% 95.9%;
+        --muted-foreground: 240 3.8% 46.1%;
+
+        --accent: 240 4.8% 95.9%;
+        --accent-foreground: 240 5.9% 10%;
+
+        --destructive: 0 84.2% 60.2%;
+        --destructive-foreground: 0 0% 98%;
+
+        --success: 116, 63%, 43%;
+        --success-foreground: 0 0% 95%;
+
+        --border: 240 5.9% 90%;
+        --input: 240 5.9% 90%;
+
+        --ring: 346.8 77.2% 49.8%;
+        --radius: 0.5rem;
+    }
+
+    .dark {
+        --background: 20 14.3% 4.1%;
+        --foreground: 0 0% 95%;
+
+        --card: 24 9.8% 10%;
+        --card-foreground: 0 0% 95%;
+
+        --popover: 0 0% 9%;
+        --popover-foreground: 0 0% 95%;
+
+        --primary: 346.8 77.2% 49.8%;
+        --primary-foreground: 355.7 100% 97.3%;
+
+        --secondary: 240 3.7% 15.9%;
+        --secondary-foreground: 0 0% 98%;
+
+        --muted: 0 0% 15%;
+        --muted-foreground: 240 5% 64.9%;
+
+        --accent: 12 6.5% 15.1%;
+        --accent-foreground: 0 0% 98%;
+
+        --destructive: 0 62.8% 30.6%;
+        --destructive-foreground: 0 85.7% 97.3%;
+
+        --success: 116, 63%, 49%;
+        --success-foreground: 0 0% 95%;
+
+        --border: 240 3.7% 15.9%;
+        --input: 240 3.7% 15.9%;
+
+        --ring: 346.8 77.2% 49.8%;
+    }
+}
+
 @layer utilities {
     /* Chrome, Safari and Opera */
     .no-scrollbar::-webkit-scrollbar {
@@ -44,11 +105,5 @@ input[type='number'] {
     .no-scrollbar {
         -ms-overflow-style: none; /* IE and Edge */
         scrollbar-width: none; /* Firefox */
-    }
-
-    .waves {
-        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' version='1.1' xmlns:xlink='http://www.w3.org/1999/xlink' xmlns:svgjs='http://svgjs.dev/svgjs' width='1437' height='646' preserveAspectRatio='none' viewBox='0 0 1437 646'%3e%3cg mask='url(%26quot%3b%23SvgjsMask1001%26quot%3b)' fill='none'%3e%3crect width='1437' height='646' x='0' y='0' fill='rgba(255%2c 255%2c 255%2c 1)'%3e%3c/rect%3e%3cpath d='M535.42 712.05C721.94 680.67 813.92 225.58 1112.62 222.94 1411.32 220.3 1538.62 401.72 1689.82 403.82' stroke='rgba(95%2c 182%2c 171%2c 1)' stroke-width='2'%3e%3c/path%3e%3cpath d='M359.8 659.56C528.75 640.22 602.58 282.53 914.46 265.81 1226.33 249.09 1323.28 87.2 1469.11 84.93' stroke='rgba(95%2c 182%2c 171%2c 1)' stroke-width='2'%3e%3c/path%3e%3cpath d='M76.67 747.68C274.26 739.48 412.27 419.66 792.88 411.84 1173.49 404.02 1324.42 232.35 1509.09 230.96' stroke='rgba(95%2c 182%2c 171%2c 1)' stroke-width='2'%3e%3c/path%3e%3cpath d='M718.71 728.61C843.41 645.63 771.45 203.53 995.36 197.15 1219.27 190.77 1402.12 388.17 1548.66 390.95' stroke='rgba(95%2c 182%2c 171%2c 1)' stroke-width='2'%3e%3c/path%3e%3cpath d='M558.54 753.99C664.47 724.58 594.36 450.9 855 429.18 1115.64 407.46 1289.32 206.87 1447.92 203.08' stroke='rgba(95%2c 182%2c 171%2c 1)' stroke-width='2'%3e%3c/path%3e%3c/g%3e%3cdefs%3e%3cmask id='SvgjsMask1001'%3e%3crect width='1437' height='646' fill='white'%3e%3c/rect%3e%3c/mask%3e%3c/defs%3e%3c/svg%3e");
-        background-size: cover;
-        background-position: left;
     }
 }

@@ -33,7 +33,7 @@ export default function CourseCardMenu() {
                 {options.map(({ title, icon }) => (
                     <DropdownMenuItem key={title}>
                         {title}
-                        <DropdownMenuShortcut className='text-brand-black-100 '>{icon}</DropdownMenuShortcut>
+                        <DropdownMenuShortcut>{icon}</DropdownMenuShortcut>
                     </DropdownMenuItem>
                 ))}
             </DropdownMenuContent>
