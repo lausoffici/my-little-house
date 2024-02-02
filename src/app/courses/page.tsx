@@ -1,9 +1,9 @@
 import api from '@/api';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { formatCurrency } from '@/lib/utils';
-import CourseCardMenu from '@/components/CourseCardMenu';
 import AddCourseDialog from '@/components/AddCourseDialog';
+import CourseCardMenu from '@/components/CourseCardMenu';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { formatCurrency } from '@/lib/utils';
 
 export default async function Courses() {
     const courses = await api.getCourses();

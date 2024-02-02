@@ -1,11 +1,14 @@
 'use client';
-import { usePathname } from 'next/navigation';
-import { FiSmile, FiMonitor, FiLock } from 'react-icons/fi';
-import Logo from './Logo';
-import Link from 'next/link';
-import React from 'react';
+
 import Image from 'next/image';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import React from 'react';
+import { FiLock, FiMonitor, FiSmile } from 'react-icons/fi';
+
 import { cn } from '@/lib/utils';
+
+import Logo from './Logo';
 
 const LinkItems = [
     { name: 'Estudiantes', icon: <FiSmile />, href: '/students' },

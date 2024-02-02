@@ -1,3 +1,7 @@
+import { DotsVerticalIcon } from '@radix-ui/react-icons';
+import { Pencil2Icon } from '@radix-ui/react-icons';
+import { TrashIcon } from '@radix-ui/react-icons';
+
 import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
@@ -6,9 +10,6 @@ import {
     DropdownMenuShortcut,
     DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { DotsVerticalIcon } from '@radix-ui/react-icons';
-import { Pencil2Icon } from '@radix-ui/react-icons';
-import { TrashIcon } from '@radix-ui/react-icons';
 
 const options = [
     {
