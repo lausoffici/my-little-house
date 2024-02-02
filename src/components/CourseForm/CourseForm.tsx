@@ -1,12 +1,15 @@
 'use client';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { useToast } from '@/components/ui/use-toast';
+
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Input } from '@/components/ui/input';
-import { useForm } from 'react-hook-form';
-import { Textarea } from '../ui/textarea';
 import { CheckIcon } from '@radix-ui/react-icons';
+import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { useToast } from '@/components/ui/use-toast';
+
+import { Textarea } from '../ui/textarea';
 
 const formSchema = z.object({
     course: z

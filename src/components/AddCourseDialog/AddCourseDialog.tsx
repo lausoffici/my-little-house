@@ -1,18 +1,20 @@
 'use client';
 
+import { PlusCircledIcon } from '@radix-ui/react-icons';
 import { useState } from 'react';
+
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
     DialogContent,
+    DialogDescription,
+    DialogFooter,
     DialogHeader,
     DialogTitle,
-    DialogTrigger,
-    DialogFooter,
-    DialogDescription
+    DialogTrigger
 } from '@/components/ui/dialog';
+
 import CourseForm, { FORM_ID } from '../CourseForm';
-import { PlusCircledIcon } from '@radix-ui/react-icons';
 
 export default function AddCourseDialog() {
     const [openDialog, setOpenDialog] = useState(false);
