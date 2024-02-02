@@ -26,7 +26,7 @@ export default function AddCourseDialog() {
             </DialogTrigger>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle className='text-brand-black-100'>Nuevo Curso</DialogTitle>
+                    <DialogTitle>Nuevo Curso</DialogTitle>
                     <DialogDescription>Complete el formulario para crear un nuevo curso</DialogDescription>
                 </DialogHeader>
                 <CourseForm onFormSubmit={() => setOpenDialog(false)} />

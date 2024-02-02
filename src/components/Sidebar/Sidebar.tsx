@@ -26,8 +26,8 @@ const NavItem = ({ children, href, icon, path }: NavItemProps) => {
     return (
         <Link
             className={cn(
-                'flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 hover:text-gray-900',
-                isActive && 'bg-slate-100 text-gray-900'
+                'flex items-center gap-3 rounded-lg px-3 py-2 text-foreground hover:text-black',
+                isActive && 'bg-secondary text-foreground'
             )}
             href={href}
         >
@@ -52,7 +52,7 @@ const Ilustration = ({ path }: { path: string }) => {
 export default function Sidebar() {
     const path = usePathname();
     return (
-        <div className='box-border w-72 h-full bg-white flex flex-col items-center justify-between pt-2 pb-9'>
+        <div className='box-border  w-72 h-full bg-background flex flex-col items-center justify-between pt-2 pb-9'>
             <div className='w-full'>
                 <div className='py-4 mb-10'>
                     <Logo />

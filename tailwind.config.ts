@@ -13,6 +13,50 @@ const config = {
             }
         },
         extend: {
+            colors: {
+                border: 'hsl(var(--border))',
+                input: 'hsl(var(--input))',
+                ring: 'hsl(var(--ring))',
+                background: 'hsl(var(--background))',
+                foreground: 'hsl(var(--foreground))',
+                primary: {
+                    DEFAULT: 'hsl(var(--primary))',
+                    foreground: 'hsl(var(--primary-foreground))'
+                },
+                secondary: {
+                    DEFAULT: 'hsl(var(--secondary))',
+                    foreground: 'hsl(var(--secondary-foreground))'
+                },
+                destructive: {
+                    DEFAULT: 'hsl(var(--destructive))',
+                    foreground: 'hsl(var(--destructive-foreground))'
+                },
+                success: {
+                    DEFAULT: 'hsl(var(--success))',
+                    foreground: 'hsl(var(--success-foreground))'
+                },
+                muted: {
+                    DEFAULT: 'hsl(var(--muted))',
+                    foreground: 'hsl(var(--muted-foreground))'
+                },
+                accent: {
+                    DEFAULT: 'hsl(var(--accent))',
+                    foreground: 'hsl(var(--accent-foreground))'
+                },
+                popover: {
+                    DEFAULT: 'hsl(var(--popover))',
+                    foreground: 'hsl(var(--popover-foreground))'
+                },
+                card: {
+                    DEFAULT: 'hsl(var(--card))',
+                    foreground: 'hsl(var(--card-foreground))'
+                }
+            },
+            borderRadius: {
+                lg: 'var(--radius)',
+                md: 'calc(var(--radius) - 2px)',
+                sm: 'calc(var(--radius) - 4px)'
+            },
             keyframes: {
                 'accordion-down': {
                     from: { height: '0' },
@@ -26,40 +70,6 @@ const config = {
             animation: {
                 'accordion-down': 'accordion-down 0.2s ease-out',
                 'accordion-up': 'accordion-up 0.2s ease-out'
-            },
-            colors: {
-                brand: {
-                    green: {
-                        50: '#E4F3F1',
-                        100: '#AFDAD5',
-                        200: '#7AC2B9',
-                        300: '#5FB6AB',
-                        400: '#2A9D8F',
-                        success: '#4BB543'
-                    },
-
-                    blue: {
-                        50: '#9ac4eb',
-                        100: '#415D69',
-                        200: '#264653'
-                    },
-
-                    yellow: {
-                        600: '#e9c46a',
-
-                        650: '#f4a261'
-                    },
-
-                    orange: {
-                        700: '#F0A592',
-                        750: '#ED937D',
-                        800: '#e76f51'
-                    },
-
-                    black: {
-                        100: '#2B2933'
-                    }
-                }
             }
         }
     },

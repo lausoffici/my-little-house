@@ -38,7 +38,8 @@ export default function CourseForm({ onFormSubmit }: { onFormSubmit: () => void 
     function onSubmit(values: z.infer<typeof formSchema>) {
         toast({
             description: 'Curso creado exitosamente',
-            icon: <CheckIcon width='20px' height='20px' />
+            icon: <CheckIcon width='20px' height='20px' />,
+            variant: 'success'
         });
         onFormSubmit();
         console.log(values);
@@ -52,7 +53,7 @@ export default function CourseForm({ onFormSubmit }: { onFormSubmit: () => void 
                     name='course'
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel className='text-brand-black-100'>Título</FormLabel>
+                            <FormLabel>Título</FormLabel>
                             <FormControl>
                                 <Input placeholder='Ej. Intermediate' autoComplete='off' {...field} />
                             </FormControl>
@@ -65,7 +66,7 @@ export default function CourseForm({ onFormSubmit }: { onFormSubmit: () => void 
                     name='price'
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel className='text-brand-black-100'>Precio ($)</FormLabel>
+                            <FormLabel>Precio ($)</FormLabel>
                             <FormControl>
                                 <Input type='number' placeholder='12.000' autoComplete='off' {...field} />
                             </FormControl>
@@ -78,7 +79,7 @@ export default function CourseForm({ onFormSubmit }: { onFormSubmit: () => void 
                     name='description'
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel className='text-brand-black-100'>Descripción</FormLabel>
+                            <FormLabel>Descripción</FormLabel>
                             <FormControl>
                                 <Textarea placeholder='Ej. Lunes y Miércoles 16hs' autoComplete='off' {...field} />
                             </FormControl>
