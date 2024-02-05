@@ -1,7 +1,7 @@
 interface IEntity {
     _id: string;
-    creationDate: Date;
-    active: boolean;
+    creationDate?: Date;
+    active?: boolean;
 }
 
 export interface ICourse extends IEntity {

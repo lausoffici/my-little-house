@@ -1,13 +1,11 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { CheckIcon } from '@radix-ui/react-icons';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { useToast } from '@/components/ui/use-toast';
 
 import { Textarea } from '../ui/textarea';
 
@@ -24,27 +22,25 @@ const formSchema = z.object({
     description: z.string()
 });
 
+interface CourseFormProps {
+    onFormSubmit: (value: string) => void;
+    defaultValues: {
+        course: string;
+        price: number;
+        description: string;
+    };
+}
+
 export const FORM_ID = 'course-form';
 
-export default function CourseForm({ onFormSubmit }: { onFormSubmit: () => void }) {
-    const { toast } = useToast();
-
+export default function CourseForm({ onFormSubmit, defaultValues }: CourseFormProps) {
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
-        defaultValues: {
-            course: '',
-            description: '',
-            price: 0
-        }
+        defaultValues
     });
 
     function onSubmit(values: z.infer<typeof formSchema>) {
-        toast({
-            description: 'Curso creado exitosamente',
-            icon: <CheckIcon width='20px' height='20px' />,
-            variant: 'success'
-        });
-        onFormSubmit();
+        onFormSubmit(values.course);
         console.log(values);
     }
 

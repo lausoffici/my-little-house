@@ -1,6 +1,10 @@
+'use client';
+
+import { Dialog, DialogTrigger } from '@radix-ui/react-dialog';
 import { DotsVerticalIcon } from '@radix-ui/react-icons';
 import { Pencil2Icon } from '@radix-ui/react-icons';
 import { TrashIcon } from '@radix-ui/react-icons';
+import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -10,19 +14,13 @@ import {
     DropdownMenuShortcut,
     DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
+import { ICourse } from '@/types';
 
-const options = [
-    {
-        title: 'Editar',
-        icon: <Pencil2Icon />
-    },
-    {
-        title: 'Eliminar',
-        icon: <TrashIcon />
-    }
-];
+import EditCourseDialog from '../EditCourseDialog';
 
-export default function CourseCardMenu() {
+export default function CourseCardMenu({ course }: { course: ICourse }) {
+    const [openDialog, setOpenDialog] = useState(false);
+
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -31,12 +29,24 @@ export default function CourseCardMenu() {
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-                {options.map(({ title, icon }) => (
-                    <DropdownMenuItem key={title}>
-                        {title}
-                        <DropdownMenuShortcut>{icon}</DropdownMenuShortcut>
-                    </DropdownMenuItem>
-                ))}
+                <Dialog open={openDialog} onOpenChange={setOpenDialog}>
+                    <DialogTrigger className='w-full'>
+                        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                            Editar
+                            <DropdownMenuShortcut>
+                                <Pencil2Icon />
+                            </DropdownMenuShortcut>
+                        </DropdownMenuItem>
+                    </DialogTrigger>
+                    <EditCourseDialog course={course} setOpenDialog={setOpenDialog} />
+                </Dialog>
+
+                <DropdownMenuItem>
+                    Eliminar
+                    <DropdownMenuShortcut>
+                        <TrashIcon />
+                    </DropdownMenuShortcut>
+                </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
     );

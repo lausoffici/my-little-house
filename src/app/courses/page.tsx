@@ -22,7 +22,7 @@ export default async function Courses() {
                         <Card key={_id} className='shadow-sm'>
                             <CardHeader className='flex-row items-center justify-between relative'>
                                 <CardTitle className='w-4/5'>{name}</CardTitle>
-                                <CourseCardMenu />
+                                <CourseCardMenu course={{ _id, name, description, amount }} />
                             </CardHeader>
                             <CardContent>
                                 <p className='text-gray-600'>{description}</p>
