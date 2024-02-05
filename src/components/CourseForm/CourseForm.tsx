@@ -23,7 +23,7 @@ const formSchema = z.object({
 });
 
 interface CourseFormProps {
-    onFormSubmit: () => void;
+    onFormSubmit: (value: string) => void;
     defaultValues: {
         course: string;
         price: number;
@@ -40,7 +40,7 @@ export default function CourseForm({ onFormSubmit, defaultValues }: CourseFormPr
     });
 
     function onSubmit(values: z.infer<typeof formSchema>) {
-        onFormSubmit();
+        onFormSubmit(values.course);
         console.log(values);
     }
 

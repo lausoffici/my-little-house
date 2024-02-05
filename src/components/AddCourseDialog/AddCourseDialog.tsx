@@ -28,9 +28,9 @@ export default function AddCourseDialog() {
     const [openDialog, setOpenDialog] = useState(false);
     const { toast } = useToast();
 
-    function handleSubmit() {
+    function handleSubmit(newCourseName: string) {
         toast({
-            description: 'Curso creado exitosamente',
+            description: `Curso creado exitosamente: ${newCourseName}`,
             icon: <CheckIcon width='20px' height='20px' />,
             variant: 'success'
         });
@@ -49,7 +49,12 @@ export default function AddCourseDialog() {
                     <DialogTitle>Nuevo Curso</DialogTitle>
                     <DialogDescription>Complete el formulario para crear un nuevo curso</DialogDescription>
                 </DialogHeader>
-                <CourseForm onFormSubmit={handleSubmit} defaultValues={defaultValues} />
+                <CourseForm
+                    onFormSubmit={(newCourseName) => {
+                        handleSubmit(newCourseName);
+                    }}
+                    defaultValues={defaultValues}
+                />
                 <DialogFooter>
                     <Button variant='outline' onClick={() => setOpenDialog(false)}>
                         Cancelar

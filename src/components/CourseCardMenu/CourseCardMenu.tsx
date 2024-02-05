@@ -18,7 +18,7 @@ import { ICourse } from '@/types';
 
 import EditCourseDialog from '../EditCourseDialog';
 
-export default function CourseCardMenu({ data }: { data: ICourse }) {
+export default function CourseCardMenu({ course }: { course: ICourse }) {
     const [openDialog, setOpenDialog] = useState(false);
 
     return (
@@ -38,7 +38,7 @@ export default function CourseCardMenu({ data }: { data: ICourse }) {
                             </DropdownMenuShortcut>
                         </DropdownMenuItem>
                     </DialogTrigger>
-                    <EditCourseDialog data={data} setOpenDialog={setOpenDialog} />
+                    <EditCourseDialog course={course} setOpenDialog={setOpenDialog} />
                 </Dialog>
 
                 <DropdownMenuItem>
