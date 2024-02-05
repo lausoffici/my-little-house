@@ -1,6 +1,7 @@
 'use client';
 
 import { PlusCircledIcon } from '@radix-ui/react-icons';
+import { CheckIcon } from '@radix-ui/react-icons';
 import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -13,11 +14,28 @@ import {
     DialogTitle,
     DialogTrigger
 } from '@/components/ui/dialog';
+import { useToast } from '@/components/ui/use-toast';
 
 import CourseForm, { FORM_ID } from '../CourseForm';
 
+const defaultValues = {
+    course: '',
+    price: 0,
+    description: ''
+};
+
 export default function AddCourseDialog() {
     const [openDialog, setOpenDialog] = useState(false);
+    const { toast } = useToast();
+
+    function handleSubmit() {
+        toast({
+            description: 'Curso creado exitosamente',
+            icon: <CheckIcon width='20px' height='20px' />,
+            variant: 'success'
+        });
+        setOpenDialog(false);
+    }
 
     return (
         <Dialog open={openDialog} onOpenChange={setOpenDialog}>
@@ -31,7 +49,7 @@ export default function AddCourseDialog() {
                     <DialogTitle>Nuevo Curso</DialogTitle>
                     <DialogDescription>Complete el formulario para crear un nuevo curso</DialogDescription>
                 </DialogHeader>
-                <CourseForm onFormSubmit={() => setOpenDialog(false)} />
+                <CourseForm onFormSubmit={handleSubmit} defaultValues={defaultValues} />
                 <DialogFooter>
                     <Button variant='outline' onClick={() => setOpenDialog(false)}>
                         Cancelar
