@@ -16,10 +16,12 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { ICourse } from '@/types';
 
+import DeleteCourseDialog from '../DeleteCourseDialog';
 import EditCourseDialog from '../EditCourseDialog';
 
 export default function CourseCardMenu({ course }: { course: ICourse }) {
-    const [openDialog, setOpenDialog] = useState(false);
+    const [openEditDialog, setOpenEditDialog] = useState(false);
+    const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
     return (
         <DropdownMenu>
@@ -29,7 +31,7 @@ export default function CourseCardMenu({ course }: { course: ICourse }) {
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-                <Dialog open={openDialog} onOpenChange={setOpenDialog}>
+                <Dialog open={openEditDialog} onOpenChange={setOpenEditDialog}>
                     <DialogTrigger className='w-full'>
                         <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
                             Editar
@@ -38,15 +40,20 @@ export default function CourseCardMenu({ course }: { course: ICourse }) {
                             </DropdownMenuShortcut>
                         </DropdownMenuItem>
                     </DialogTrigger>
-                    <EditCourseDialog course={course} setOpenDialog={setOpenDialog} />
+                    <EditCourseDialog course={course} onOpenChange={setOpenEditDialog} />
                 </Dialog>
 
-                <DropdownMenuItem>
-                    Eliminar
-                    <DropdownMenuShortcut>
-                        <TrashIcon />
-                    </DropdownMenuShortcut>
-                </DropdownMenuItem>
+                <Dialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>
+                    <DialogTrigger className='w-full'>
+                        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                            Eliminar
+                            <DropdownMenuShortcut>
+                                <TrashIcon />
+                            </DropdownMenuShortcut>
+                        </DropdownMenuItem>
+                    </DialogTrigger>
+                    <DeleteCourseDialog course={course} onOpenChange={setOpenDeleteDialog} />
+                </Dialog>
             </DropdownMenuContent>
         </DropdownMenu>
     );

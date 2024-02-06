@@ -49,12 +49,7 @@ export default function AddCourseDialog() {
                     <DialogTitle>Nuevo Curso</DialogTitle>
                     <DialogDescription>Complete el formulario para crear un nuevo curso</DialogDescription>
                 </DialogHeader>
-                <CourseForm
-                    onFormSubmit={(newCourseName) => {
-                        handleSubmit(newCourseName);
-                    }}
-                    defaultValues={defaultValues}
-                />
+                <CourseForm onFormSubmit={handleSubmit} defaultValues={defaultValues} />
                 <DialogFooter>
                     <Button variant='outline' onClick={() => setOpenDialog(false)}>
                         Cancelar
