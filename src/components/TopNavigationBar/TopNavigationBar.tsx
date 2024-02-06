@@ -1,4 +1,4 @@
-import { MagnifyingGlassIcon, PersonIcon } from '@radix-ui/react-icons';
+import { MagnifyingGlassIcon } from '@radix-ui/react-icons';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -10,6 +10,8 @@ import {
     DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
+
+import { ThemeModeToggle } from './ThemeModeToggle';
 
 export default function TopNavigationBar() {
     return (
@@ -26,6 +28,7 @@ export default function TopNavigationBar() {
                     </div>
                 </form>
             </div>
+            <ThemeModeToggle />
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <Button
@@ -33,7 +36,7 @@ export default function TopNavigationBar() {
                         size='icon'
                         variant='ghost'
                     >
-                        <PersonIcon />
+                        LS
                         <span className='sr-only'>Toggle user menu</span>
                     </Button>
                 </DropdownMenuTrigger>

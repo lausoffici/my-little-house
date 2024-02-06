@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 
 import Sidebar from '@/components/Sidebar';
 import TopNavigationBar from '@/components/TopNavigationBar';
+import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
 
 import Favicon from '../../public/assets/metadata/favicon.ico';
@@ -20,14 +21,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     return (
         <html lang='en'>
             <body className={`${inter.className} flex`}>
-                <div className='flex h-screen w-full'>
-                    <Sidebar />
-                    <div className='flex-1 flex flex-col overflow-hidden'>
-                        <TopNavigationBar />
-                        <main className='p-6 overflow-auto'>{children}</main>
+                <ThemeProvider attribute='class' defaultTheme='system' enableSystem disableTransitionOnChange>
+                    <div className='flex h-screen w-full'>
+                        <Sidebar />
+                        <div className='flex-1 flex flex-col overflow-hidden'>
+                            <TopNavigationBar />
+                            <main className='p-6 overflow-auto'>{children}</main>
+                        </div>
                     </div>
-                </div>
-                <Toaster />
+                    <Toaster />
+                </ThemeProvider>
             </body>
         </html>
     );
