@@ -9,12 +9,12 @@ export default async function Courses() {
     const courses = await api.getCourses();
 
     return (
-        <section className='p-6 h-full'>
+        <section>
             <div className='flex justify-between items-center mb-6'>
                 <h1 className='text-3xl font-bold text-foreground'>Cursos</h1>
                 <AddCourseDialog />
             </div>
-            <div className='h-[93%] overflow-y-auto no-scrollbar'>
+            <div className=''>
                 <div
                     className={`grid auto-rows-[fit-content(1em)] grid-cols-[repeat(auto-fit,minmax(250px,_1fr))] gap-4 overflow-scroll no-scrollbar`}
                 >

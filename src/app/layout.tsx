@@ -1,10 +1,11 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 
+import Sidebar from '@/components/Sidebar';
+import TopNavigationBar from '@/components/TopNavigationBar';
 import { Toaster } from '@/components/ui/toaster';
 
 import Favicon from '../../public/assets/metadata/favicon.ico';
-import Sidebar from '../components/Sidebar/Sidebar';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -19,8 +20,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     return (
         <html lang='en'>
             <body className={`${inter.className} flex`}>
-                <Sidebar />
-                <main className='bg-backgound rounded-l-3xl shadow h-full w-full'>{children}</main>
+                <div className='flex h-screen w-full'>
+                    <Sidebar />
+                    <div className='flex-1 flex flex-col overflow-hidden'>
+                        <TopNavigationBar />
+                        <main className='p-6 overflow-auto'>{children}</main>
+                    </div>
+                </div>
                 <Toaster />
             </body>
         </html>

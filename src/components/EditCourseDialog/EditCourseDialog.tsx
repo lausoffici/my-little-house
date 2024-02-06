@@ -3,12 +3,11 @@
 import { CheckIcon } from '@radix-ui/react-icons';
 import { SetStateAction } from 'react';
 
+import CourseForm, { FORM_ID } from '@/components/CourseForm';
 import { Button } from '@/components/ui/button';
 import { DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useToast } from '@/components/ui/use-toast';
 import { ICourse } from '@/types';
-
-import CourseForm, { FORM_ID } from '../CourseForm';
 
 interface EditCourseDialogProps {
     course: ICourse;
