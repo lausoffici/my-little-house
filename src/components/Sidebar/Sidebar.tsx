@@ -30,7 +30,7 @@ const NavItem = ({ children, href, icon, path }: NavItemProps) => {
         <Link
             className={cn(
                 'flex items-center gap-3 rounded-lg px-3 py-2 text-foreground hover:text-black',
-                isActive && 'bg-secondary text-foreground'
+                isActive && 'bg-muted text-foreground'
             )}
             href={href}
         >
@@ -55,12 +55,12 @@ const Ilustration = ({ path }: { path: string }) => {
 export default function Sidebar() {
     const path = usePathname();
     return (
-        <div className='box-border  w-72 h-full bg-background flex flex-col items-center justify-between pt-2 pb-9'>
+        <div className='w-60 flex flex-col border-r bg-gray-100/40 items-center justify-between'>
             <div className='w-full'>
-                <div className='py-4 mb-10'>
+                <div className='h-[60px] grid place-content-center'>
                     <Logo />
                 </div>
-                <nav className='grid items-start px-4 text-sm font-medium'>
+                <nav className='grid items-start px-4 py-6 text-sm font-medium'>
                     {LinkItems.map(({ name, icon, href }) => (
                         <NavItem key={name} icon={icon} href={href} path={path}>
                             {name}
@@ -68,7 +68,7 @@ export default function Sidebar() {
                     ))}
                 </nav>
             </div>
-            <div>
+            <div className='my-4'>
                 <Ilustration path={path} />
             </div>
         </div>

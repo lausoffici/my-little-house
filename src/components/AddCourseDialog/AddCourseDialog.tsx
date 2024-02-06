@@ -4,6 +4,7 @@ import { PlusCircledIcon } from '@radix-ui/react-icons';
 import { CheckIcon } from '@radix-ui/react-icons';
 import { useState } from 'react';
 
+import CourseForm, { FORM_ID } from '@/components/CourseForm';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -15,8 +16,6 @@ import {
     DialogTrigger
 } from '@/components/ui/dialog';
 import { useToast } from '@/components/ui/use-toast';
-
-import CourseForm, { FORM_ID } from '../CourseForm';
 
 const defaultValues = {
     course: '',

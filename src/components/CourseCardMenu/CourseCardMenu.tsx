@@ -6,6 +6,8 @@ import { Pencil2Icon } from '@radix-ui/react-icons';
 import { TrashIcon } from '@radix-ui/react-icons';
 import { useState } from 'react';
 
+import DeleteCourseDialog from '@/components/DeleteCourseDialog';
+import EditCourseDialog from '@/components/EditCourseDialog';
 import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
@@ -15,9 +17,6 @@ import {
     DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import { ICourse } from '@/types';
-
-import DeleteCourseDialog from '../DeleteCourseDialog';
-import EditCourseDialog from '../EditCourseDialog';
 
 export default function CourseCardMenu({ course }: { course: ICourse }) {
     const [openEditDialog, setOpenEditDialog] = useState(false);
