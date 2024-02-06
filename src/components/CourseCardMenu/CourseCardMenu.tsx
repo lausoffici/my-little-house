@@ -16,10 +16,12 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { ICourse } from '@/types';
 
+import DeleteCourseDialog from '../DeleteCourseDialog';
 import EditCourseDialog from '../EditCourseDialog';
 
 export default function CourseCardMenu({ course }: { course: ICourse }) {
     const [openDialog, setOpenDialog] = useState(false);
+    const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
     return (
         <DropdownMenu>
@@ -41,12 +43,17 @@ export default function CourseCardMenu({ course }: { course: ICourse }) {
                     <EditCourseDialog course={course} setOpenDialog={setOpenDialog} />
                 </Dialog>
 
-                <DropdownMenuItem>
-                    Eliminar
-                    <DropdownMenuShortcut>
-                        <TrashIcon />
-                    </DropdownMenuShortcut>
-                </DropdownMenuItem>
+                <Dialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>
+                    <DialogTrigger className='w-full'>
+                        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                            Eliminar
+                            <DropdownMenuShortcut>
+                                <TrashIcon />
+                            </DropdownMenuShortcut>
+                        </DropdownMenuItem>
+                    </DialogTrigger>
+                    <DeleteCourseDialog course={course} setOpenDialog={setOpenDeleteDialog} />
+                </Dialog>
             </DropdownMenuContent>
         </DropdownMenu>
     );
