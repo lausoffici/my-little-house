@@ -12,10 +12,10 @@ import CourseForm, { FORM_ID } from '../CourseForm';
 
 interface EditCourseDialogProps {
     course: ICourse;
-    setOpenDialog: React.Dispatch<SetStateAction<boolean>>;
+    onOpenChange: React.Dispatch<SetStateAction<boolean>>;
 }
 
-export default function EditCourseDialog({ course, setOpenDialog }: EditCourseDialogProps) {
+export default function EditCourseDialog({ course, onOpenChange }: EditCourseDialogProps) {
     const { toast } = useToast();
     const { name, amount, description } = course;
 
@@ -31,7 +31,7 @@ export default function EditCourseDialog({ course, setOpenDialog }: EditCourseDi
             icon: <CheckIcon width='20px' height='20px' />,
             variant: 'success'
         });
-        setOpenDialog(false);
+        onOpenChange(false);
     }
 
     return (
@@ -40,9 +40,9 @@ export default function EditCourseDialog({ course, setOpenDialog }: EditCourseDi
                 <DialogTitle>Editar Curso</DialogTitle>
                 <DialogDescription>Modifique el formulario para editar el curso</DialogDescription>
             </DialogHeader>
-            <CourseForm onFormSubmit={(newCourseName) => handleSubmit(newCourseName)} defaultValues={currentValue} />
+            <CourseForm onFormSubmit={handleSubmit} defaultValues={currentValue} />
             <DialogFooter>
-                <Button variant='outline' onClick={() => setOpenDialog(false)}>
+                <Button variant='outline' onClick={() => onOpenChange(false)}>
                     Cancelar
                 </Button>
                 <Button form={FORM_ID} type='submit'>

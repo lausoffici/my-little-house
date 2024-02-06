@@ -1,18 +1,17 @@
 import { TrashIcon } from '@radix-ui/react-icons';
 import { SetStateAction } from 'react';
 
+import { Button } from '@/components/ui/button';
 import { DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useToast } from '@/components/ui/use-toast';
 import { ICourse } from '@/types';
 
-import { Button } from '../ui/button';
-
 interface DeleteCourseDialogProps {
     course: ICourse;
-    setOpenDialog: React.Dispatch<SetStateAction<boolean>>;
+    onOpenChange: React.Dispatch<SetStateAction<boolean>>;
 }
 
-export default function DeleteCourseDialog({ course, setOpenDialog }: DeleteCourseDialogProps) {
+export default function DeleteCourseDialog({ course, onOpenChange }: DeleteCourseDialogProps) {
     const { toast } = useToast();
 
     function handleDelete() {
@@ -23,7 +22,7 @@ export default function DeleteCourseDialog({ course, setOpenDialog }: DeleteCour
         });
         const id = course._id;
         console.log(id);
-        setOpenDialog(false);
+        onOpenChange(false);
     }
     return (
         <DialogContent>
@@ -34,7 +33,7 @@ export default function DeleteCourseDialog({ course, setOpenDialog }: DeleteCour
                 ¿Desea eliminar <span className='font-semibold'>{course.name}</span> definitivamente?
             </div>
             <DialogFooter>
-                <Button variant='outline' onClick={() => setOpenDialog(false)}>
+                <Button variant='outline' onClick={() => onOpenChange(false)}>
                     Cancelar
                 </Button>
                 <Button variant='destructive' type='button' onClick={handleDelete}>

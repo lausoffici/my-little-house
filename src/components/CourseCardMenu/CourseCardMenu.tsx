@@ -20,7 +20,7 @@ import DeleteCourseDialog from '../DeleteCourseDialog';
 import EditCourseDialog from '../EditCourseDialog';
 
 export default function CourseCardMenu({ course }: { course: ICourse }) {
-    const [openDialog, setOpenDialog] = useState(false);
+    const [openEditDialog, setOpenEditDialog] = useState(false);
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
     return (
@@ -31,7 +31,7 @@ export default function CourseCardMenu({ course }: { course: ICourse }) {
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-                <Dialog open={openDialog} onOpenChange={setOpenDialog}>
+                <Dialog open={openEditDialog} onOpenChange={setOpenEditDialog}>
                     <DialogTrigger className='w-full'>
                         <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
                             Editar
@@ -40,7 +40,7 @@ export default function CourseCardMenu({ course }: { course: ICourse }) {
                             </DropdownMenuShortcut>
                         </DropdownMenuItem>
                     </DialogTrigger>
-                    <EditCourseDialog course={course} setOpenDialog={setOpenDialog} />
+                    <EditCourseDialog course={course} onOpenChange={setOpenEditDialog} />
                 </Dialog>
 
                 <Dialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>
@@ -52,7 +52,7 @@ export default function CourseCardMenu({ course }: { course: ICourse }) {
                             </DropdownMenuShortcut>
                         </DropdownMenuItem>
                     </DialogTrigger>
-                    <DeleteCourseDialog course={course} setOpenDialog={setOpenDeleteDialog} />
+                    <DeleteCourseDialog course={course} onOpenChange={setOpenDeleteDialog} />
                 </Dialog>
             </DropdownMenuContent>
         </DropdownMenu>
