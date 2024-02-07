@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 
-import Sidebar from '@/components/Sidebar';
-import TopNavigationBar from '@/components/TopNavigationBar';
+import Sidebar from '@/components/common/sidebar';
+import TopNavigationBar from '@/components/common/top-navigation-bar';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
 

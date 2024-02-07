@@ -8,7 +8,7 @@ import { FiLock, FiMonitor, FiSmile } from 'react-icons/fi';
 
 import { cn } from '@/lib/utils';
 
-import Logo from './Logo';
+import Logo from './logo';
 
 const LinkItems = [
     { name: 'Estudiantes', icon: <FiSmile />, href: '/students' },
