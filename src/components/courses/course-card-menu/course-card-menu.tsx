@@ -6,8 +6,8 @@ import { Pencil2Icon } from '@radix-ui/react-icons';
 import { TrashIcon } from '@radix-ui/react-icons';
 import { useState } from 'react';
 
-import DeleteCourseDialog from '@/components/DeleteCourseDialog';
-import EditCourseDialog from '@/components/EditCourseDialog';
+import DeleteCourseDialog from '@/components/courses/delete-course-dialog';
+import EditCourseDialog from '@/components/courses/edit-course-dialog';
 import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,

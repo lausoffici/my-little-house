@@ -3,7 +3,7 @@
 import { CheckIcon } from '@radix-ui/react-icons';
 import { SetStateAction } from 'react';
 
-import CourseForm, { FORM_ID } from '@/components/CourseForm';
+import CourseForm, { FORM_ID } from '@/components/courses/course-form';
 import { Button } from '@/components/ui/button';
 import { DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useToast } from '@/components/ui/use-toast';

@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 
-import { ThemeModeToggle } from './ThemeModeToggle';
+import { ThemeModeToggle } from './theme-mode-toggle';
 
 export default function TopNavigationBar() {
     return (

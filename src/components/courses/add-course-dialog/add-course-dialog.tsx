@@ -4,7 +4,7 @@ import { PlusCircledIcon } from '@radix-ui/react-icons';
 import { CheckIcon } from '@radix-ui/react-icons';
 import { useState } from 'react';
 
-import CourseForm, { FORM_ID } from '@/components/CourseForm';
+import CourseForm, { FORM_ID } from '@/components/courses/course-form';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
