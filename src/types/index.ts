@@ -9,3 +9,13 @@ export interface ICourse extends IEntity {
     amount: number;
     description: string;
 }
+
+export interface IStudent extends IEntity {
+    firstName: string;
+    lastName: string;
+    courses: string[];
+    description?: string;
+    phones?: { name: string; value: number }[];
+    address?: string;
+    email?: string;
+}
