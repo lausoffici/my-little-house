@@ -19,3 +19,9 @@ export interface IStudent extends IEntity {
     address?: string;
     email?: string;
 }
+
+export interface IAvailableCourse {
+    label: string;
+    value: string;
+    icon?: React.ComponentType<{ className?: string }>;
+}

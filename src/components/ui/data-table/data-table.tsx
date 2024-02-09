@@ -17,7 +17,7 @@ import { useState } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 import { DataTablePagination } from './data-table-pagination';
-import DataTableViewOptions from './data-table-view-options';
+import DataTableToolbar from './data-table-toolbar';
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
@@ -52,7 +52,7 @@ export default function DataTable<TData, TValue>({ columns, data }: DataTablePro
     return (
         <>
             <div className='flex items-center py-4'>
-                <DataTableViewOptions table={table} />
+                <DataTableToolbar table={table} />
             </div>
             <div className='rounded-md border'>
                 <Table>
