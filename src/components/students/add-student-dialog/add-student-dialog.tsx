@@ -44,7 +44,7 @@ export default function AddStudentDialog() {
                     <DialogTitle>Nuevo estudiante</DialogTitle>
                     <DialogDescription>Complete el formulario para crear un nuevo estudiante</DialogDescription>
                 </DialogHeader>
-                <StudentForm onStudentFormSubmit={handleSubmit} />
+                <StudentForm onFormSubmit={handleSubmit} />
                 <DialogFooter>
                     <Button variant='outline' onClick={() => setOpenStudentDialog(false)}>
                         Cancelar

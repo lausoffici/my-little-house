@@ -24,22 +24,20 @@ const studentFormSchema = z.object({
         })
         .min(3, { message: 'El apellido debe tener al menos 3 caracteres' })
         .max(50),
-    courses: z
-        .array(z.string().min(3, { message: 'El curso debe tener al menos 3 caracteres' }).max(50))
-        .nonempty({ message: 'Tiene que haber al menos un curso' }),
-    description: z.string(),
-    address: z.string(),
-    email: z.string().email({ message: 'Email inválido' }),
+    courses: z.optional(z.array(z.string())),
+    description: z.optional(z.string()),
+    address: z.optional(z.string()),
+    email: z.string(),
     _id: z.string()
 });
 
 interface StudentFormProps {
-    onStudentFormSubmit: (value: IStudent) => void;
+    onFormSubmit: (value: IStudent) => void;
 }
 
 export const STUDENT_FORM_ID = 'student-form';
 
-export default function StudentForm({ onStudentFormSubmit }: StudentFormProps) {
+export default function StudentForm({ onFormSubmit }: StudentFormProps) {
     const form = useForm<z.infer<typeof studentFormSchema>>({
         resolver: zodResolver(studentFormSchema),
         defaultValues: {
@@ -54,7 +52,7 @@ export default function StudentForm({ onStudentFormSubmit }: StudentFormProps) {
     });
 
     function onSubmit(values: z.infer<typeof studentFormSchema>) {
-        onStudentFormSubmit(values);
+        onFormSubmit(values);
         console.log(values);
     }
 
@@ -95,7 +93,7 @@ export default function StudentForm({ onStudentFormSubmit }: StudentFormProps) {
                             <FormLabel>Cursos</FormLabel>
                             <MultiSelect
                                 options={coursesOptions}
-                                selected={field.value}
+                                selected={field.value ? field.value : []}
                                 className='w-[453px]'
                                 notFoundMessage='Curso no encontrado'
                                 {...field}
