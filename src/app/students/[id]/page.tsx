@@ -1,16 +1,14 @@
-import { Pencil1Icon } from '@radix-ui/react-icons';
-
 import api from '@/api';
+import EditStudentDialog from '@/components/students/edit-student-dialog';
 import StudentDetail from '@/components/students/student-detail';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 
 export default async function StudentPage({ params: { id } }: { params: { id: string } }) {
-    const { firstName, lastName, courses, email, description, address } = await api.getStudent(id);
-
+    const student = await api.getStudent(id);
+    const { firstName, lastName, courses, email, description, address } = student;
     const fullName = `${firstName} ${lastName}`;
 
     return (
@@ -24,9 +22,7 @@ export default async function StudentPage({ params: { id } }: { params: { id: st
                 <Card className='w-2/4'>
                     <CardHeader className='flex flex-row justify-between w-full'>
                         <CardTitle> Información personal</CardTitle>
-                        <Button variant='outline' size='sm' title='Editar' style={{ marginTop: 0 }}>
-                            <Pencil1Icon className='mr-2' /> Editar
-                        </Button>
+                        <EditStudentDialog student={student} />
                     </CardHeader>
                     <CardContent>
                         <div className='flex flex-col gap-3 justify-center'>

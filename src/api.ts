@@ -133,7 +133,7 @@ const students: IStudent[] = [
     {
         firstName: 'Taylor',
         lastName: 'Swift',
-        courses: ['Proficency'],
+        courses: ['Proficiency'],
         _id: '134'
     },
     {

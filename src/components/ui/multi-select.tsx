@@ -58,7 +58,10 @@ const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>(
                                         className='text-sm'
                                         onClick={() => handleUnselect(value)}
                                     >
-                                        {options.find((option) => option.value === value)?.label}
+                                        {
+                                            options.find((option) => option.value === value.toLocaleLowerCase('en-US'))
+                                                ?.label
+                                        }
                                         <button
                                             className='ml-1 ring-offset-background rounded-full outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2'
                                             onKeyDown={(e) => {
