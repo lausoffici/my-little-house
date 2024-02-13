@@ -1,0 +1,154 @@
+'use client';
+
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { MultiSelect } from '@/components/ui/multi-select';
+import { Textarea } from '@/components/ui/textarea';
+import { coursesOptions } from '@/lib/variables';
+import { IStudent } from '@/types';
+
+const studentFormSchema = z.object({
+    firstName: z
+        .string({
+            required_error: 'El nombre es requerido'
+        })
+        .min(3, { message: 'El nombre debe tener al menos 3 caracteres' })
+        .max(50),
+    lastName: z
+        .string({
+            required_error: 'El apellido es requerido'
+        })
+        .min(3, { message: 'El apellido debe tener al menos 3 caracteres' })
+        .max(50),
+    courses: z
+        .array(z.string().min(3, { message: 'El curso debe tener al menos 3 caracteres' }).max(50))
+        .nonempty({ message: 'Tiene que haber al menos un curso' }),
+    description: z.string(),
+    address: z.string(),
+    email: z.string().email({ message: 'Email inválido' }),
+    _id: z.string()
+});
+
+interface StudentFormProps {
+    onStudentFormSubmit: (value: IStudent) => void;
+}
+
+export const STUDENT_FORM_ID = 'student-form';
+
+export default function StudentForm({ onStudentFormSubmit }: StudentFormProps) {
+    const form = useForm<z.infer<typeof studentFormSchema>>({
+        resolver: zodResolver(studentFormSchema),
+        defaultValues: {
+            firstName: '',
+            lastName: '',
+            courses: [],
+            description: '',
+            address: '',
+            email: '',
+            _id: ''
+        }
+    });
+
+    function onSubmit(values: z.infer<typeof studentFormSchema>) {
+        onStudentFormSubmit(values);
+        console.log(values);
+    }
+
+    return (
+        <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-2 py-3' id={STUDENT_FORM_ID}>
+                <FormField
+                    control={form.control}
+                    name='firstName'
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Nombre</FormLabel>
+                            <FormControl>
+                                <Input placeholder='Monica' autoComplete='off' {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name='lastName'
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Apellido</FormLabel>
+                            <FormControl>
+                                <Input placeholder='Geller' autoComplete='off' {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name='courses'
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Cursos</FormLabel>
+                            <MultiSelect
+                                options={coursesOptions}
+                                selected={field.value}
+                                className='w-[453px]'
+                                notFoundMessage='Curso no encontrado'
+                                {...field}
+                            />
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name='address'
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Dirección</FormLabel>
+                            <FormControl>
+                                <Input placeholder='Av. Rios 1562, Monte Grande' autoComplete='off' {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name='email'
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Email</FormLabel>
+                            <FormControl>
+                                <Input
+                                    placeholder='monica.geller@gmail.com'
+                                    type='email'
+                                    autoComplete='off'
+                                    {...field}
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name='description'
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Descripción</FormLabel>
+                            <FormControl>
+                                <Textarea placeholder='Nombre y teléfonos' autoComplete='off' {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+            </form>
+        </Form>
+    );
+}

@@ -19,3 +19,8 @@ export interface IStudent extends IEntity {
     address?: string;
     email?: string;
 }
+
+export type Option = {
+    value: string;
+    label: string;
+};
