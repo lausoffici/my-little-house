@@ -1,10 +1,11 @@
 import api from '@/api';
 import EditStudentDialog from '@/components/students/edit-student-dialog';
-import StudentDetail from '@/components/students/student-detail';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
+
+import StudentDetail from './student-detail';
 
 export default async function StudentPage({ params: { id } }: { params: { id: string } }) {
     const student = await api.getStudent(id);

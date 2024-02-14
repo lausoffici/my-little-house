@@ -112,7 +112,7 @@ const students: IStudent[] = [
     {
         firstName: 'Lionel',
         lastName: 'Messi',
-        courses: ['Advanced', 'Conversational'],
+        courses: ['advanced', 'conversational'],
         address: 'Av.Streen 1234 Miami',
         email: 'leo_kpo_messi@gmail.com',
         description: 'Anto 11 7654 9856',
