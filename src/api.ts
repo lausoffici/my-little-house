@@ -112,7 +112,10 @@ const students: IStudent[] = [
     {
         firstName: 'Lionel',
         lastName: 'Messi',
-        courses: ['Initial'],
+        courses: ['advanced', 'conversational'],
+        address: 'Av.Streen 1234 Miami',
+        email: 'leo_kpo_messi@gmail.com',
+        description: 'Anto 11 7654 9856',
         _id: '137'
     },
     {
@@ -130,7 +133,7 @@ const students: IStudent[] = [
     {
         firstName: 'Taylor',
         lastName: 'Swift',
-        courses: ['Proficency'],
+        courses: ['Proficiency'],
         _id: '134'
     },
     {

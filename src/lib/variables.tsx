@@ -28,5 +28,13 @@ export const coursesOptions: Option[] = [
     {
         value: 'conversational',
         label: 'Conversational'
+    },
+    {
+        value: 'advanced',
+        label: 'Advanced'
+    },
+    {
+        value: 'proficiency',
+        label: 'Proficiency'
     }
 ];

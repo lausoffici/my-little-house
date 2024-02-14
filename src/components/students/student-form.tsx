@@ -33,22 +33,25 @@ const studentFormSchema = z.object({
 
 interface StudentFormProps {
     onFormSubmit: (value: IStudent) => void;
+    defaultValues?: IStudent;
 }
 
 export const STUDENT_FORM_ID = 'student-form';
 
-export default function StudentForm({ onFormSubmit }: StudentFormProps) {
+const emptyDefaultValues = {
+    firstName: '',
+    lastName: '',
+    courses: [],
+    description: '',
+    address: '',
+    email: '',
+    _id: ''
+};
+
+export default function StudentForm({ onFormSubmit, defaultValues = emptyDefaultValues }: StudentFormProps) {
     const form = useForm<z.infer<typeof studentFormSchema>>({
         resolver: zodResolver(studentFormSchema),
-        defaultValues: {
-            firstName: '',
-            lastName: '',
-            courses: [],
-            description: '',
-            address: '',
-            email: '',
-            _id: ''
-        }
+        defaultValues
     });
 
     function onSubmit(values: z.infer<typeof studentFormSchema>) {
