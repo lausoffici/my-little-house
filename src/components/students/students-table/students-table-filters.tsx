@@ -4,21 +4,19 @@ import { Cross2Icon } from '@radix-ui/react-icons';
 import { Table } from '@tanstack/react-table';
 
 import { Button } from '@/components/ui/button';
+import { DataTableFacetedFilter, DataTableViewOptions } from '@/components/ui/data-table';
 import { Input } from '@/components/ui/input';
 import { AVAILABLE_COURSES } from '@/lib/variables';
-
-import DataTableFacetedFilter from './data-table-faceted-filter';
-import DataTableViewOptions from './data-table-view-options';
 
 interface DataTableToolbarProps<TData> {
     table: Table<TData>;
 }
 
-export default function DataTableToolbar<TData>({ table }: DataTableToolbarProps<TData>) {
+export default function StudentsTableFilters<TData>({ table }: DataTableToolbarProps<TData>) {
     const isFiltered = table.getState().columnFilters.length > 0;
 
     return (
-        <div className='flex items-center justify-between gap-2'>
+        <div className='flex items-center justify-between gap-2 w-full'>
             <div className='flex flex-1 items-center space-x-2'>
                 <Input
                     placeholder='Filtrar apellidos...'

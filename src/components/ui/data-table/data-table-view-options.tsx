@@ -24,7 +24,7 @@ const columnsInSpanish: { lastName: string; firstName: string; courses: string; 
     actions: 'Acciones'
 };
 
-export default function DataTableViewOptions<TData>({ table }: DataTableViewOptionsProps<TData>) {
+export function DataTableViewOptions<TData>({ table }: DataTableViewOptionsProps<TData>) {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>

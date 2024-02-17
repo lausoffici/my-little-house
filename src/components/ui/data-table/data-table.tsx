@@ -1,59 +1,17 @@
-'use client';
-
-import {
-    ColumnDef,
-    ColumnFiltersState,
-    SortingState,
-    VisibilityState,
-    flexRender,
-    getCoreRowModel,
-    getFilteredRowModel,
-    getPaginationRowModel,
-    getSortedRowModel,
-    useReactTable
-} from '@tanstack/react-table';
-import { useState } from 'react';
+import { ColumnDef, Table as TanStackTable, flexRender } from '@tanstack/react-table';
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
-import { DataTablePagination } from './data-table-pagination';
-import DataTableToolbar from './data-table-toolbar';
+import { DataTablePagination } from '.';
 
 interface DataTableProps<TData, TValue> {
+    table: TanStackTable<TData>;
     columns: ColumnDef<TData, TValue>[];
-    data: TData[];
 }
 
-export default function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData, TValue>) {
-    const [sorting, setSorting] = useState<SortingState>([]);
-    const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-    const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-    const [rowSelection, setRowSelection] = useState({});
-
-    const table = useReactTable({
-        data,
-        columns,
-        onSortingChange: setSorting,
-        getCoreRowModel: getCoreRowModel(),
-        getPaginationRowModel: getPaginationRowModel(),
-        getSortedRowModel: getSortedRowModel(),
-        onColumnFiltersChange: setColumnFilters,
-        getFilteredRowModel: getFilteredRowModel(),
-        onColumnVisibilityChange: setColumnVisibility,
-        onRowSelectionChange: setRowSelection,
-        state: {
-            sorting,
-            columnFilters,
-            columnVisibility,
-            rowSelection
-        }
-    });
-
+export default function DataTable<TData, TValue>({ table, columns }: DataTableProps<TData, TValue>) {
     return (
         <>
-            <div className='flex items-center py-4'>
-                <DataTableToolbar table={table} />
-            </div>
             <div className='rounded-md border'>
                 <Table>
                     <TableHeader>
