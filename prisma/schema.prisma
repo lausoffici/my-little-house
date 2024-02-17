@@ -1,0 +1,122 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("POSTGRES_PRISMA_URL") // uses connection pooling
+  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+}
+
+model Course {
+  id              Int               @id @default(autoincrement())
+  name            String?
+  amount          Float?
+  observations    String?
+  extra           Boolean           @default(false)
+  active          Boolean           @default(true)
+  invoices        Invoice[]
+  studentByCourse StudentByCourse[]
+}
+
+model Student {
+  id                 Int                 @id @default(autoincrement())
+  courseId           Int?
+  firstName          String
+  lastName           String
+  birthDate          DateTime?
+  createdAt          DateTime?
+  dni                String?
+  address            String?
+  city               String?
+  phone              String?
+  mobilePhone        String?
+  momPhone           String?
+  dadPhone           String?
+  observations       String?
+  active             Boolean             @default(true)
+  invoices           Invoice[]
+  additionals        Additional[]
+  receipts           Receipt[]
+  studentEnrollments StudentEnrollment[]
+  studentByCourse    StudentByCourse[]
+}
+
+model StudentByCourse {
+  id        Int      @id @default(autoincrement())
+  courseId  Int?
+  studentId Int?
+  course    Course?  @relation(fields: [courseId], references: [id])
+  student   Student? @relation(fields: [studentId], references: [id])
+}
+
+model Invoice {
+  id          Int       @id @default(autoincrement())
+  number      Int?
+  description String?
+  amount      Float?
+  balance     Float?
+  state       String?
+  expiredAt   DateTime?
+  paymentDate DateTime?
+  year        Int?
+  studentId   Int?
+  student     Student?  @relation(fields: [studentId], references: [id])
+  courseId    Int?
+  course      Course?   @relation(fields: [courseId], references: [id])
+  items       Item[]
+}
+
+model Additional {
+  id          Int       @id @default(autoincrement())
+  studentId   Int?
+  description String?
+  amount      Float?
+  paymentDate DateTime?
+  student     Student?  @relation(fields: [studentId], references: [id])
+  items       Item[]
+}
+
+model Receipt {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime?
+  studentId Int?
+  total     Float     @default(0)
+  student   Student?  @relation(fields: [studentId], references: [id])
+  items     Item[]
+}
+
+model Item {
+  id           Int         @id @default(autoincrement())
+  description  String?
+  amount       Float?
+  receiptId    Int?
+  invoiceId    Int?
+  additionalId Int?
+  receipt      Receipt?    @relation(fields: [receiptId], references: [id])
+  invoice      Invoice?    @relation(fields: [invoiceId], references: [id])
+  additional   Additional? @relation(fields: [additionalId], references: [id])
+}
+
+model Expenditure {
+  id          Int       @id @default(autoincrement())
+  createdAt   DateTime?
+  description String?
+  amount      Float?
+}
+
+model StudentEnrollment {
+  id        Int      @id @default(autoincrement())
+  studentId Int?
+  year      Int?
+  student   Student? @relation(fields: [studentId], references: [id])
+}
+
+model EnrollmentYear {
+  id     Int  @id @default(autoincrement())
+  year   Int?
+  amount Int?
+}
