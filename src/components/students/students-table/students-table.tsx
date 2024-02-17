@@ -1,8 +1,13 @@
+import { Student } from '@prisma/client';
+
 import DataTable from '@/components/ui/data-table';
-import { IStudent } from '@/types';
 
 import { columns } from './columns';
 
-export default function StudentsTable({ students }: { students: IStudent[] }) {
+type StudentsTableProps = {
+    students: Student[];
+};
+
+export default function StudentsTable({ students }: StudentsTableProps) {
     return <DataTable columns={columns} data={students} />;
 }

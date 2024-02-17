@@ -8,10 +8,15 @@
         "start": "next start",
         "lint": "next lint",
         "format:check": "prettier --check \"src/**/*.(ts|tsx|js|json|yaml)\"",
-        "format:write": "prettier --write \"src/**/*.(ts|tsx|js|json|yaml)\""
+        "format:write": "prettier --write \"src/**/*.(ts|tsx|js|json|yaml)\"",
+        "postinstall": "prisma generate",
+        "prisma:generate": "prisma generate",
+        "prisma:migrate": "prisma migrate dev",
+        "prisma:deploy": "prisma migrate deploy"
     },
     "dependencies": {
         "@hookform/resolvers": "^3.3.4",
+        "@prisma/client": "^5.9.1",
         "@radix-ui/react-checkbox": "^1.0.4",
         "@radix-ui/react-dialog": "^1.0.5",
         "@radix-ui/react-dropdown-menu": "^2.0.6",
@@ -50,6 +55,7 @@
         "eslint-config-next": "14.0.4",
         "postcss": "^8",
         "prettier": "^3.2.4",
+        "prisma": "^5.9.1",
         "tailwindcss": "^3.3.0",
         "typescript": "^5"
     }
