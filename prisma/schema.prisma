@@ -13,22 +13,22 @@ datasource db {
 
 model Course {
   id              Int               @id @default(autoincrement())
-  name            String?
-  amount          Float?
+  name            String            @default("Sin Nombre")
+  amount          Float             @default(0)
   observations    String?
   extra           Boolean           @default(false)
-  active          Boolean           @default(true)
   invoices        Invoice[]
   studentByCourse StudentByCourse[]
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @default(now()) @updatedAt
+  active          Boolean           @default(true)
 }
 
 model Student {
   id                 Int                 @id @default(autoincrement())
-  courseId           Int?
   firstName          String
   lastName           String
   birthDate          DateTime?
-  createdAt          DateTime?
   dni                String?
   address            String?
   city               String?
@@ -37,86 +37,97 @@ model Student {
   momPhone           String?
   dadPhone           String?
   observations       String?
-  active             Boolean             @default(true)
   invoices           Invoice[]
   additionals        Additional[]
   receipts           Receipt[]
   studentEnrollments StudentEnrollment[]
   studentByCourse    StudentByCourse[]
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @default(now()) @updatedAt
+  active             Boolean             @default(true)
 }
 
 model StudentByCourse {
   id        Int      @id @default(autoincrement())
-  courseId  Int?
-  studentId Int?
-  course    Course?  @relation(fields: [courseId], references: [id])
-  student   Student? @relation(fields: [studentId], references: [id])
+  courseId  Int
+  studentId Int
+  course    Course   @relation(fields: [courseId], references: [id])
+  student   Student  @relation(fields: [studentId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@unique([courseId, studentId])
+}
+
+enum InvoiceState {
+  I
+  P
+  B
 }
 
 model Invoice {
-  id          Int       @id @default(autoincrement())
-  number      Int?
-  description String?
-  amount      Float?
-  balance     Float?
-  state       String?
-  expiredAt   DateTime?
+  id          Int          @id @default(autoincrement())
+  month       Int
+  year        Int
+  description String
+  amount      Float
+  balance     Float        @default(0)
+  state       InvoiceState @default(I)
+  expiredAt   DateTime
   paymentDate DateTime?
-  year        Int?
-  studentId   Int?
-  student     Student?  @relation(fields: [studentId], references: [id])
-  courseId    Int?
-  course      Course?   @relation(fields: [courseId], references: [id])
+  studentId   Int
+  student     Student      @relation(fields: [studentId], references: [id])
+  courseId    Int
+  course      Course       @relation(fields: [courseId], references: [id])
   items       Item[]
 }
 
 model Additional {
   id          Int       @id @default(autoincrement())
-  studentId   Int?
-  description String?
-  amount      Float?
+  description String    @default("Sin Descripción")
+  amount      Float
   paymentDate DateTime?
-  student     Student?  @relation(fields: [studentId], references: [id])
+  studentId   Int
+  student     Student   @relation(fields: [studentId], references: [id])
   items       Item[]
 }
 
 model Receipt {
-  id        Int       @id @default(autoincrement())
-  createdAt DateTime?
-  studentId Int?
-  total     Float     @default(0)
-  student   Student?  @relation(fields: [studentId], references: [id])
+  id        Int      @id @default(autoincrement())
+  total     Float    @default(0)
   items     Item[]
+  studentId Int
+  student   Student  @relation(fields: [studentId], references: [id])
+  createdAt DateTime @default(now())
 }
 
 model Item {
   id           Int         @id @default(autoincrement())
-  description  String?
-  amount       Float?
-  receiptId    Int?
+  description  String      @default("Sin Descripción")
+  amount       Float
+  receiptId    Int
+  receipt      Receipt     @relation(fields: [receiptId], references: [id])
   invoiceId    Int?
-  additionalId Int?
-  receipt      Receipt?    @relation(fields: [receiptId], references: [id])
   invoice      Invoice?    @relation(fields: [invoiceId], references: [id])
+  additionalId Int?
   additional   Additional? @relation(fields: [additionalId], references: [id])
 }
 
 model Expenditure {
-  id          Int       @id @default(autoincrement())
-  createdAt   DateTime?
-  description String?
-  amount      Float?
+  id          Int      @id @default(autoincrement())
+  description String   @default("Sin Descripción")
+  amount      Float
+  createdAt   DateTime @default(now())
 }
 
 model StudentEnrollment {
-  id        Int      @id @default(autoincrement())
-  studentId Int?
-  year      Int?
-  student   Student? @relation(fields: [studentId], references: [id])
+  id        Int     @id @default(autoincrement())
+  year      Int
+  studentId Int
+  student   Student @relation(fields: [studentId], references: [id])
 }
 
 model EnrollmentYear {
-  id     Int  @id @default(autoincrement())
-  year   Int?
-  amount Int?
+  id     Int @id @default(autoincrement())
+  year   Int
+  amount Int
 }
