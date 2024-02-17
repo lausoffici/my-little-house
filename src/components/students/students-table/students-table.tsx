@@ -1,5 +1,7 @@
 'use client';
 
+import { Student } from '@prisma/client';
+
 import DataTable from '@/components/ui/data-table';
 import { useDataTable } from '@/hooks/use-data-table';
 import { DataTableFilterableColumn, DataTableSearchableColumn, IStudent } from '@/types';
@@ -26,7 +28,11 @@ export const searchableColumns: DataTableSearchableColumn<IStudent>[] = [
     }
 ];
 
-export default function StudentsTable({ students }: { students: IStudent[] }) {
+type StudentsTableProps = {
+    students: Student[];
+};
+
+export default function StudentsTable({ students }: StudentsTableProps) {
     const table = useDataTable({ data: students, columns, pageCount: 1, searchableColumns, filterableColumns });
 
     return (

@@ -1,30 +1,40 @@
-export const AVAILABLE_COURSES = [
+import { Option } from '@/types';
+
+export const coursesOptions: Option[] = [
     {
         value: 'children',
         label: 'Children'
-    },
-    {
-        value: 'conversational',
-        label: 'Conversational'
-    },
-    {
-        value: 'fce',
-        label: 'FCE'
-    },
-    {
-        value: 'intermediate',
-        label: 'Intermediate'
     },
     {
         value: 'initial',
         label: 'Initial'
     },
     {
+        value: 'pre intermediate',
+        label: 'Pre Intermediate'
+    },
+    {
+        value: 'intermediate',
+        label: 'Intermediate'
+    },
+    {
+        value: 'adults',
+        label: 'Adults'
+    },
+    {
+        value: 'fce',
+        label: 'FCE'
+    },
+    {
+        value: 'conversational',
+        label: 'Conversational'
+    },
+    {
         value: 'advanced',
         label: 'Advanced'
     },
     {
-        value: 'proficency',
-        label: 'Proficency'
+        value: 'proficiency',
+        label: 'Proficiency'
     }
 ];

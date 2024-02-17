@@ -1,5 +1,6 @@
 'use client';
 
+import { Student } from '@prisma/client';
 import { ColumnDef } from '@tanstack/react-table';
 import { MoreHorizontal } from 'lucide-react';
 import Link from 'next/link';
@@ -14,9 +15,8 @@ import {
     DropdownMenuLabel,
     DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { IStudent } from '@/types';
 
-export const columns: ColumnDef<IStudent>[] = [
+export const columns: ColumnDef<Student>[] = [
     {
         id: 'select',
         header: ({ table }) => (
@@ -52,7 +52,7 @@ export const columns: ColumnDef<IStudent>[] = [
         id: 'actions',
         cell: ({ row }) => {
             const student = row.original;
-            const id = student._id.toString();
+            const id = student.id.toString();
 
             return (
                 <DropdownMenu>
