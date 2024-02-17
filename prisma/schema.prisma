@@ -72,13 +72,13 @@ model Invoice {
   amount      Float
   balance     Float        @default(0)
   state       InvoiceState @default(I)
-  expiredAt   DateTime
+  expiredAt   DateTime     @default(now())
   paymentDate DateTime?
   studentId   Int
   student     Student      @relation(fields: [studentId], references: [id])
-  courseId    Int
-  course      Course       @relation(fields: [courseId], references: [id])
-  items       Item[]
+  courseId    Int?
+  course      Course?      @relation(fields: [courseId], references: [id])
+  // items       Item[]
 }
 
 model Additional {
@@ -107,7 +107,7 @@ model Item {
   receiptId    Int
   receipt      Receipt     @relation(fields: [receiptId], references: [id])
   invoiceId    Int?
-  invoice      Invoice?    @relation(fields: [invoiceId], references: [id])
+  // invoice      Invoice?    @relation(fields: [invoiceId], references: [id])
   additionalId Int?
   additional   Additional? @relation(fields: [additionalId], references: [id])
 }
