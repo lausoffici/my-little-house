@@ -44,7 +44,7 @@ export default async function StudentPage({ params: { id } }: { params: { id: st
                             <div className='flex items-center gap-2'>
                                 <Label className='text-xs'>Cursos </Label>
                                 <div>
-                                    {courses?.map(({ id, name }) => (
+                                    {courses.map(({ id, name }) => (
                                         <Badge variant='secondary' key={id} className='py-1 px-2 text-sm mr-2'>
                                             {name}
                                         </Badge>
