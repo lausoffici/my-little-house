@@ -1,5 +1,6 @@
 'use client';
 
+import { Course } from '@prisma/client';
 import { Dialog, DialogTrigger } from '@radix-ui/react-dialog';
 import { DotsVerticalIcon } from '@radix-ui/react-icons';
 import { Pencil2Icon } from '@radix-ui/react-icons';
@@ -16,9 +17,8 @@ import {
     DropdownMenuShortcut,
     DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { ICourse } from '@/types';
 
-export default function CourseCardMenu({ course }: { course: ICourse }) {
+export default function CourseCardMenu({ course }: { course: Course }) {
     const [openEditDialog, setOpenEditDialog] = useState(false);
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 

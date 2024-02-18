@@ -15,16 +15,10 @@ import {
 
 interface DataTableViewOptionsProps<TData> {
     table: Table<TData>;
+    columnNamesMap: Record<string, string>;
 }
 
-const columnsInSpanish: { lastName: string; firstName: string; courses: string; actions: string } = {
-    lastName: 'Apellido',
-    firstName: 'Nombre',
-    courses: 'Cursos',
-    actions: 'Acciones'
-};
-
-export default function DataTableViewOptions<TData>({ table }: DataTableViewOptionsProps<TData>) {
+export function DataTableViewOptions<TData>({ table, columnNamesMap }: DataTableViewOptionsProps<TData>) {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -47,7 +41,7 @@ export default function DataTableViewOptions<TData>({ table }: DataTableViewOpti
                                 checked={column.getIsVisible()}
                                 onCheckedChange={(value) => column.toggleVisibility(!!value)}
                             >
-                                {columnsInSpanish[column.id as keyof typeof columnsInSpanish]}
+                                {columnNamesMap[column.id as keyof typeof columnNamesMap]}
                             </DropdownMenuCheckboxItem>
                         );
                     })}
