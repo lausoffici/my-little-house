@@ -1,10 +1,12 @@
 import { Course } from '@prisma/client';
 import { TrashIcon } from '@radix-ui/react-icons';
+import { useRouter } from 'next/navigation';
 import { SetStateAction } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useToast } from '@/components/ui/use-toast';
+import { deleteCourse } from '@/lib/courses';
 
 interface DeleteCourseDialogProps {
     course: Course;
@@ -13,16 +15,18 @@ interface DeleteCourseDialogProps {
 
 export default function DeleteCourseDialog({ course, onOpenChange }: DeleteCourseDialogProps) {
     const { toast } = useToast();
+    const { name, id } = course;
+    const router = useRouter();
 
-    function handleDelete() {
+    async function handleDelete() {
         toast({
-            description: `Curso eliminado: ${course.name}`,
+            description: `Curso eliminado: ${name}`,
             icon: <TrashIcon width='20px' height='20px' />,
             variant: 'destructive'
         });
-        const id = course.id;
-        console.log(id);
+        await deleteCourse(id);
         onOpenChange(false);
+        router.refresh();
     }
     return (
         <DialogContent>

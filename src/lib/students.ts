@@ -37,6 +37,9 @@ export const getStudentList = async (searchParams: SearchParams) => {
     const whereClause = {
         active: true,
         studentByCourse: courseIds.length > 0 ? { some: { courseId: { in: courseIds } } } : undefined,
+        firstName: {
+            not: ''
+        },
         lastName: lastName
             ? {
                   contains: lastName,
