@@ -1,13 +1,13 @@
+import { Course } from '@prisma/client';
 import { TrashIcon } from '@radix-ui/react-icons';
 import { SetStateAction } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useToast } from '@/components/ui/use-toast';
-import { ICourse } from '@/types';
 
 interface DeleteCourseDialogProps {
-    course: ICourse;
+    course: Course;
     onOpenChange: React.Dispatch<SetStateAction<boolean>>;
 }
 
@@ -20,7 +20,7 @@ export default function DeleteCourseDialog({ course, onOpenChange }: DeleteCours
             icon: <TrashIcon width='20px' height='20px' />,
             variant: 'destructive'
         });
-        const id = course._id;
+        const id = course.id;
         console.log(id);
         onOpenChange(false);
     }

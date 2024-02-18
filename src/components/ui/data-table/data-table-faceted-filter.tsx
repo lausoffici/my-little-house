@@ -2,7 +2,7 @@ import { CheckIcon, PlusCircledIcon } from '@radix-ui/react-icons';
 import { Column } from '@tanstack/react-table';
 
 import { cn } from '@/lib/utils';
-import { IAvailableCourse } from '@/types';
+import { Option } from '@/types';
 
 import { Badge } from '../badge';
 import { Button } from '../button';
@@ -21,7 +21,7 @@ import { Separator } from '../separator';
 interface DataTableFacetedFilterProps<TData, TValue> {
     column?: Column<TData, TValue>;
     title?: string;
-    options: IAvailableCourse[];
+    options: Option[];
 }
 
 export function DataTableFacetedFilter<TData, TValue>({

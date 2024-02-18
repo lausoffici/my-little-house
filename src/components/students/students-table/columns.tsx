@@ -1,10 +1,11 @@
 'use client';
 
-import { Student } from '@prisma/client';
+import { Course, Student } from '@prisma/client';
 import { ColumnDef } from '@tanstack/react-table';
 import { MoreHorizontal } from 'lucide-react';
 import Link from 'next/link';
 
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { DataTableColumnHeader } from '@/components/ui/data-table';
@@ -45,8 +46,23 @@ export const columns: ColumnDef<Student>[] = [
         header: ({ column }) => <DataTableColumnHeader column={column} title='Nombre' />
     },
     {
-        accessorKey: 'courses',
-        header: ({ column }) => <DataTableColumnHeader column={column} title='Cursos' />
+        accessorKey: 'studentByCourse',
+        header: ({ column }) => <DataTableColumnHeader column={column} title='Cursos' />,
+        cell: ({ row }) => {
+            const student: any = row.original;
+            const courses: Course[] = student.studentByCourse.map(({ course }: any) => course);
+
+            return (
+                <div className='flex space-x-2'>
+                    {courses.map((c) => (
+                        <Badge key={c.id} variant='secondary'>
+                            {c.name}
+                        </Badge>
+                    ))}
+                </div>
+            );
+        },
+        enableSorting: false
     },
     {
         id: 'actions',

@@ -26,7 +26,7 @@ interface CourseFormProps {
     defaultValues: {
         course: string;
         price: number;
-        description: string;
+        observations: string | null;
     };
 }
 

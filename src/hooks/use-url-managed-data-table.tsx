@@ -18,23 +18,21 @@ import {
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import * as React from 'react';
 
-import { DataTableFilterableColumn, DataTableSearchableColumn } from '@/types';
-
-interface UseDataTableProps<TData, TValue> {
-    data: TData[];
-    columns: ColumnDef<TData, TValue>[];
+interface UseDataTableProps<TData> {
+    data: any[];
+    columns: ColumnDef<TData>[];
     pageCount: number;
-    searchableColumns?: DataTableSearchableColumn<TData>[];
-    filterableColumns?: DataTableFilterableColumn<TData>[];
+    searchableColumns?: string[];
+    filterableColumns?: string[];
 }
 
-export function useDataTable<TData, TValue>({
+export function useURLManagedDataTable<TData>({
     data,
     columns,
     pageCount,
     searchableColumns = [],
     filterableColumns = []
-}: UseDataTableProps<TData, TValue>) {
+}: UseDataTableProps<TData>) {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
@@ -77,12 +75,14 @@ export function useDataTable<TData, TValue>({
     }, [sortBy, sortOrder]);
 
     const columnFilters = React.useMemo<ColumnFiltersState>(() => {
-        const allValidColumns = [...searchableColumns, ...filterableColumns].map((column) => column.id) as string[];
+        const allValidColumns = [...searchableColumns, ...filterableColumns].map(
+            (columnName) => columnName
+        ) as string[];
         return Array.from(searchParams.entries())
             .filter(([key]) => allValidColumns.includes(key))
             .map(([key, value]) => ({
                 id: key,
-                value: filterableColumns.some((column) => column.id === key) ? value.split('.') : value
+                value: filterableColumns.some((columnName) => columnName === key) ? value.split('.') : value
             }));
     }, [filterableColumns, searchParams, searchableColumns]);
 
@@ -104,8 +104,8 @@ export function useDataTable<TData, TValue>({
     const setColumnFilters = (filters: ColumnFiltersState) => {
         const newParamsObject: Record<string, string | number | null> = filters.reduce(
             (acc, filter) => {
-                const isSearchable = searchableColumns.some((column) => column.id === filter.id);
-                const isFilterable = filterableColumns.some((column) => column.id === filter.id);
+                const isSearchable = searchableColumns.some((columnName) => columnName === filter.id);
+                const isFilterable = filterableColumns.some((columnName) => columnName === filter.id);
 
                 if (isSearchable || isFilterable) {
                     const value = Array.isArray(filter.value) ? filter.value.join('.') : filter.value;

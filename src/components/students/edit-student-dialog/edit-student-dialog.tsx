@@ -1,5 +1,6 @@
 'use client';
 
+import { Student } from '@prisma/client';
 import { Pencil1Icon } from '@radix-ui/react-icons';
 import { CheckIcon } from '@radix-ui/react-icons';
 import { useState } from 'react';
@@ -15,15 +16,14 @@ import {
     DialogTrigger
 } from '@/components/ui/dialog';
 import { useToast } from '@/components/ui/use-toast';
-import { IStudent } from '@/types';
 
 import StudentForm, { STUDENT_FORM_ID } from '../student-form';
 
-export default function EditStudentDialog({ student }: { student: IStudent }) {
+export default function EditStudentDialog({ student }: { student: Student }) {
     const [openEditStudentDialog, setOpenEditStudentDialog] = useState(false);
     const { toast } = useToast();
 
-    function handleSubmit(newStudent: IStudent) {
+    function handleSubmit(newStudent: Student) {
         toast({
             description: `Estudiante editado: ${newStudent.firstName} ${newStudent.lastName}`,
             icon: <CheckIcon width='20px' height='20px' />,

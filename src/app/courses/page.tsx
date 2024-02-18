@@ -1,12 +1,12 @@
-import api from '@/api';
 import AddCourseDialog from '@/components/courses/add-course-dialog';
 import CourseCardMenu from '@/components/courses/course-card-menu';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { getActiveCourses } from '@/lib/courses';
 import { formatCurrency } from '@/lib/utils';
 
 export default async function Courses() {
-    const courses = await api.getCourses();
+    const courses = await getActiveCourses();
 
     return (
         <section>
@@ -17,16 +17,16 @@ export default async function Courses() {
             <div
                 className={`grid auto-rows-[fit-content(1em)] grid-cols-[repeat(auto-fit,minmax(250px,_1fr))] gap-4 overflow-scroll no-scrollbar`}
             >
-                {courses.map(({ _id, name, description, amount }) => (
-                    <Card key={_id} className='shadow-sm'>
+                {courses.map((course) => (
+                    <Card key={course.id} className='shadow-sm'>
                         <CardHeader className='flex-row items-center justify-between relative'>
-                            <CardTitle className='w-4/5'>{name}</CardTitle>
-                            <CourseCardMenu course={{ _id, name, description, amount }} />
+                            <CardTitle className='w-4/5'>{course.name}</CardTitle>
+                            <CourseCardMenu course={course} />
                         </CardHeader>
                         <CardContent>
-                            <p className='text-gray-600'>{description}</p>
+                            <p className='text-gray-600'>{course.observations}</p>
                             <Badge variant='secondary' className='px-1 mt-2 w-fit text-md'>
-                                {formatCurrency(amount)}
+                                {formatCurrency(course.amount)}
                             </Badge>
                         </CardContent>
                     </Card>

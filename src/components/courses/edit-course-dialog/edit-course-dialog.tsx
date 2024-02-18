@@ -1,5 +1,6 @@
 'use client';
 
+import { Course } from '@prisma/client';
 import { CheckIcon } from '@radix-ui/react-icons';
 import { SetStateAction } from 'react';
 
@@ -7,21 +8,20 @@ import CourseForm, { FORM_ID } from '@/components/courses/course-form';
 import { Button } from '@/components/ui/button';
 import { DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useToast } from '@/components/ui/use-toast';
-import { ICourse } from '@/types';
 
 interface EditCourseDialogProps {
-    course: ICourse;
+    course: Course;
     onOpenChange: React.Dispatch<SetStateAction<boolean>>;
 }
 
 export default function EditCourseDialog({ course, onOpenChange }: EditCourseDialogProps) {
     const { toast } = useToast();
-    const { name, amount, description } = course;
+    const { name, amount, observations } = course;
 
     const currentValue = {
         course: name,
         price: amount,
-        description
+        observations
     };
 
     function handleSubmit(newCourseName: string) {

@@ -1,16 +1,22 @@
-import api from '@/api';
 import EditStudentDialog from '@/components/students/edit-student-dialog';
+import StudentDetail from '@/components/students/student-detail';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-
-import StudentDetail from './student-detail';
+import { getStudentById } from '@/lib/students';
 
 export default async function StudentPage({ params: { id } }: { params: { id: string } }) {
-    const student = await api.getStudent(id);
-    const { firstName, lastName, courses, email, description, address } = student;
+    const student = await getStudentById(Number(id));
+
+    if (!student) {
+        return <div>Student not found</div>;
+    }
+
+    const { firstName, lastName, address, observations } = student;
+
     const fullName = `${firstName} ${lastName}`;
+    const courses = student.studentByCourse.map(({ course }) => course);
 
     return (
         <div className='flex flex-col gap-4'>
@@ -33,16 +39,14 @@ export default async function StudentPage({ params: { id } }: { params: { id: st
                             <Separator />
                             <StudentDetail label='Dirección' info={address} />
                             <Separator />
-                            <StudentDetail label='Email' info={email} />
-                            <Separator />
-                            <StudentDetail label='Descripción' info={description} />
+                            <StudentDetail label='Descripción' info={observations} />
                             <Separator />
                             <div className='flex items-center gap-2'>
                                 <Label className='text-xs'>Cursos </Label>
                                 <div>
-                                    {courses?.map((course) => (
-                                        <Badge variant='secondary' key={course} className='py-1 px-2 text-sm mr-2'>
-                                            {course}
+                                    {courses?.map(({ id, name }) => (
+                                        <Badge variant='secondary' key={id} className='py-1 px-2 text-sm mr-2'>
+                                            {name}
                                         </Badge>
                                     ))}
                                 </div>

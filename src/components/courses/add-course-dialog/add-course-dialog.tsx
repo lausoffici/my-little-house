@@ -20,7 +20,7 @@ import { useToast } from '@/components/ui/use-toast';
 const defaultValues = {
     course: '',
     price: 0,
-    description: ''
+    observations: ''
 };
 
 export default function AddCourseDialog() {

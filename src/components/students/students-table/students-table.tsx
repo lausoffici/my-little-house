@@ -1,44 +1,39 @@
 'use client';
 
 import { Student } from '@prisma/client';
+import React from 'react';
 
 import DataTable from '@/components/ui/data-table';
-import { useDataTable } from '@/hooks/use-data-table';
-import { DataTableFilterableColumn, DataTableSearchableColumn, IStudent } from '@/types';
+import { useURLManagedDataTable } from '@/hooks/use-url-managed-data-table';
+import { getStudentList } from '@/lib/students';
+import { Option } from '@/types';
 
 import { columns } from './columns';
 import StudentsTableFilters from './students-table-filters';
 
-export const filterableColumns: DataTableFilterableColumn<IStudent>[] = [
-    {
-        id: 'courses',
-        title: 'Cursos',
-        options: [
-            { label: 'Curso 1', value: '1' },
-            { label: 'Curso 2', value: '2' },
-            { label: 'Curso 3', value: '3' }
-        ]
-    }
-];
-
-export const searchableColumns: DataTableSearchableColumn<IStudent>[] = [
-    {
-        id: 'lastName',
-        title: 'Apellido'
-    }
-];
+export const filterableColumns = ['studentByCourse'];
+export const searchableColumns = ['lastName'];
 
 type StudentsTableProps = {
-    students: Student[];
+    studentsPromise: ReturnType<typeof getStudentList>;
+    courseOptions: Option[];
 };
 
-export default function StudentsTable({ students }: StudentsTableProps) {
-    const table = useDataTable({ data: students, columns, pageCount: 1, searchableColumns, filterableColumns });
+export default function StudentsTable({ studentsPromise, courseOptions }: StudentsTableProps) {
+    const { data, totalPages } = React.use(studentsPromise);
+
+    const table = useURLManagedDataTable<Student>({
+        data,
+        columns,
+        pageCount: totalPages,
+        searchableColumns,
+        filterableColumns
+    });
 
     return (
         <>
             <div className='flex items-center py-4'>
-                <StudentsTableFilters table={table} />
+                <StudentsTableFilters table={table} courseOptions={courseOptions} />
             </div>
 
             <DataTable table={table} columns={columns} />

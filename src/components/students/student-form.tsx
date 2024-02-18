@@ -9,7 +9,6 @@ import { Input } from '@/components/ui/input';
 import { MultiSelect } from '@/components/ui/multi-select';
 import { Textarea } from '@/components/ui/textarea';
 import { coursesOptions } from '@/lib/variables';
-import { IStudent } from '@/types';
 
 const studentFormSchema = z.object({
     firstName: z
@@ -32,8 +31,8 @@ const studentFormSchema = z.object({
 });
 
 interface StudentFormProps {
-    onFormSubmit: (value: IStudent) => void;
-    defaultValues?: IStudent;
+    onFormSubmit: (value: any) => void;
+    defaultValues?: any;
 }
 
 export const STUDENT_FORM_ID = 'student-form';
@@ -45,7 +44,7 @@ const emptyDefaultValues = {
     description: '',
     address: '',
     email: '',
-    _id: ''
+    id: ''
 };
 
 export default function StudentForm({ onFormSubmit, defaultValues = emptyDefaultValues }: StudentFormProps) {
