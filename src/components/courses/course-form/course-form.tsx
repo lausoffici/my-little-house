@@ -7,48 +7,35 @@ import { z } from 'zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-
-const formSchema = z.object({
-    course: z
-        .string({
-            required_error: 'El nombre del curso es requerido'
-        })
-        .min(3, { message: 'El título debe tener al menos 3 caracteres' })
-        .max(50),
-    price: z.coerce
-        .number({ required_error: 'El precio del curso es requerido' })
-        .positive({ message: 'El precio debe ser mayor a 0' }),
-    description: z.string()
-});
+import { courseFormSchema } from '@/lib/validations/form';
 
 interface CourseFormProps {
-    onFormSubmit: (value: string) => void;
+    onFormSubmit: (course: FormData) => void;
     defaultValues: {
-        course: string;
-        price: number;
-        observations: string | null;
+        name: string;
+        amount: number;
+        observations: string;
     };
 }
 
 export const FORM_ID = 'course-form';
 
 export default function CourseForm({ onFormSubmit, defaultValues }: CourseFormProps) {
-    const form = useForm<z.infer<typeof formSchema>>({
-        resolver: zodResolver(formSchema),
+    const form = useForm<z.infer<typeof courseFormSchema>>({
+        resolver: zodResolver(courseFormSchema),
         defaultValues
     });
 
-    function onSubmit(values: z.infer<typeof formSchema>) {
-        onFormSubmit(values.course);
-        console.log(values);
+    function onSubmit(course: FormData) {
+        onFormSubmit(course);
     }
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-2 py-3' id={FORM_ID}>
+            <form action={onSubmit} className='space-y-2 py-3' id={FORM_ID}>
                 <FormField
                     control={form.control}
-                    name='course'
+                    name='name'
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Título</FormLabel>
@@ -61,7 +48,7 @@ export default function CourseForm({ onFormSubmit, defaultValues }: CourseFormPr
                 />
                 <FormField
                     control={form.control}
-                    name='price'
+                    name='amount'
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Precio ($)</FormLabel>
@@ -72,14 +59,20 @@ export default function CourseForm({ onFormSubmit, defaultValues }: CourseFormPr
                         </FormItem>
                     )}
                 />
+
                 <FormField
                     control={form.control}
-                    name='description'
+                    name='observations'
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Descripción</FormLabel>
+                            <FormLabel>Observaciones</FormLabel>
                             <FormControl>
-                                <Textarea placeholder='Ej. Lunes y Miércoles 16hs' autoComplete='off' {...field} />
+                                <Textarea
+                                    placeholder='Ej. Lunes y Miércoles 16hs'
+                                    autoComplete='off'
+                                    {...field}
+                                    value={field.value ?? ''}
+                                />
                             </FormControl>
 
                             <FormMessage />

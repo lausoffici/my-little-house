@@ -2,6 +2,7 @@
 
 import { PlusCircledIcon } from '@radix-ui/react-icons';
 import { CheckIcon } from '@radix-ui/react-icons';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 import CourseForm, { FORM_ID } from '@/components/courses/course-form';
@@ -16,23 +17,27 @@ import {
     DialogTrigger
 } from '@/components/ui/dialog';
 import { useToast } from '@/components/ui/use-toast';
+import { createCourse } from '@/lib/courses';
 
 const defaultValues = {
-    course: '',
-    price: 0,
+    name: '',
+    amount: 0,
     observations: ''
 };
 
 export default function AddCourseDialog() {
     const [openDialog, setOpenDialog] = useState(false);
     const { toast } = useToast();
+    const router = useRouter();
 
-    function handleSubmit(newCourseName: string) {
+    async function handleSubmit(newCourse: FormData) {
         toast({
-            description: `Curso creado exitosamente: ${newCourseName}`,
+            description: `Curso creado exitosamente: ${newCourse.get('name')}`,
             icon: <CheckIcon width='20px' height='20px' />,
             variant: 'success'
         });
+        await createCourse(newCourse);
+        router.refresh();
         setOpenDialog(false);
     }
 
