@@ -1,4 +1,9 @@
+'use client';
+
 import { MagnifyingGlassIcon } from '@radix-ui/react-icons';
+import { DefaultSession } from 'next-auth';
+import { signOut } from 'next-auth/react';
+import Image from 'next/image';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -13,7 +18,13 @@ import { Input } from '@/components/ui/input';
 
 import { ThemeModeToggle } from './theme-mode-toggle';
 
-export default function TopNavigationBar() {
+type TopNavigationBarProps = {
+    user: DefaultSession['user'];
+};
+
+export default function TopNavigationBar({ user }: TopNavigationBarProps) {
+    console.log(user);
+
     return (
         <header className='flex w-full h-14 lg:h-[60px] items-center justify-between gap-4 border-b bg-gray-100/40 dark:bg-gray-800/40 px-4 py-2 flex-shrink-0 sticky top-0'>
             <div className='w-full flex-1'>
@@ -32,21 +43,25 @@ export default function TopNavigationBar() {
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <Button
-                        className='rounded-full border border-gray-200 w-8 h-8 dark:border-gray-800'
+                        className='rounded-full border border-gray-200 w-9 h-9 dark:border-gray-800'
                         size='icon'
                         variant='ghost'
                     >
-                        LS
+                        {user?.image && (
+                            <Image className='rounded-full' src={user?.image} alt='' height={32} width={32} />
+                        )}
                         <span className='sr-only'>Toggle user menu</span>
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align='end'>
-                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                    <DropdownMenuLabel>Mi Cuenta</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem>Settings</DropdownMenuItem>
                     <DropdownMenuItem>Support</DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem>Logout</DropdownMenuItem>
+                    <DropdownMenuItem className='cursor-pointer' onClick={() => signOut()}>
+                        Cerrar Sesion
+                    </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
         </header>
