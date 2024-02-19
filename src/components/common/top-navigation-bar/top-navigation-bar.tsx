@@ -23,8 +23,6 @@ type TopNavigationBarProps = {
 };
 
 export default function TopNavigationBar({ user }: TopNavigationBarProps) {
-    console.log(user);
-
     return (
         <header className='flex w-full h-14 lg:h-[60px] items-center justify-between gap-4 border-b bg-gray-100/40 dark:bg-gray-800/40 px-4 py-2 flex-shrink-0 sticky top-0'>
             <div className='w-full flex-1'>
