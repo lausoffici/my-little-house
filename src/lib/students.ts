@@ -74,3 +74,32 @@ export const getStudentList = async (searchParams: SearchParams) => {
 
     return { data: students, totalPages };
 };
+
+export const getStudentNamesByTerm = async (term: string) => {
+    const students = await prisma.student.findMany({
+        where: {
+            OR: [
+                {
+                    firstName: {
+                        contains: term,
+                        mode: 'insensitive' as const
+                    }
+                },
+                {
+                    lastName: {
+                        contains: term,
+                        mode: 'insensitive' as const
+                    }
+                }
+            ]
+        },
+        select: {
+            id: true,
+            firstName: true,
+            lastName: true
+        },
+        take: 10
+    });
+
+    return students;
+};

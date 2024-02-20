@@ -1,6 +1,6 @@
 'use client';
 
-import { Course, Student } from '@prisma/client';
+import { Course } from '@prisma/client';
 import { ColumnDef } from '@tanstack/react-table';
 import { MoreHorizontal } from 'lucide-react';
 import Link from 'next/link';
@@ -16,8 +16,9 @@ import {
     DropdownMenuLabel,
     DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
+import { StudentWithCourses } from '@/types';
 
-export const columns: ColumnDef<Student>[] = [
+export const columns: ColumnDef<StudentWithCourses>[] = [
     {
         id: 'select',
         header: ({ table }) => (
@@ -49,14 +50,14 @@ export const columns: ColumnDef<Student>[] = [
         accessorKey: 'studentByCourse',
         header: ({ column }) => <DataTableColumnHeader column={column} title='Cursos' />,
         cell: ({ row }) => {
-            const student: any = row.original;
-            const courses: Course[] = student.studentByCourse.map(({ course }: any) => course);
+            const student = row.original;
+            const courses: Course[] = student.studentByCourse.map(({ course }) => course);
 
             return (
                 <div className='flex space-x-2'>
-                    {courses.map((c) => (
-                        <Badge key={c.id} variant='secondary'>
-                            {c.name}
+                    {courses.map(({ id, name }) => (
+                        <Badge key={id} variant='secondary'>
+                            {name}
                         </Badge>
                     ))}
                 </div>
