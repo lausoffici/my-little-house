@@ -1,4 +1,3 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { Metadata } from 'next';
 import { getServerSession } from 'next-auth';
 import { Inter } from 'next/font/google';
@@ -27,23 +26,19 @@ type RootLayoutProps = {
 export default async function RootLayout({ children }: RootLayoutProps) {
     const session = await getServerSession(authOptions);
 
-    const queryClient = new QueryClient();
-
     return (
         <html lang='en'>
             <body className={`${inter.className} flex`}>
-                <QueryClientProvider client={queryClient}>
-                    <ThemeProvider attribute='class' defaultTheme='system' enableSystem disableTransitionOnChange>
-                        <div className='flex h-screen w-full'>
-                            <Sidebar />
-                            <div className='flex-1 flex flex-col overflow-hidden'>
-                                <TopNavigationBar user={session?.user} />
-                                <main className='p-6 overflow-auto'>{children}</main>
-                            </div>
+                <ThemeProvider attribute='class' defaultTheme='system' enableSystem disableTransitionOnChange>
+                    <div className='flex h-screen w-full'>
+                        <Sidebar />
+                        <div className='flex-1 flex flex-col overflow-hidden'>
+                            <TopNavigationBar user={session?.user} />
+                            <main className='p-6 overflow-auto'>{children}</main>
                         </div>
-                        <Toaster />
-                    </ThemeProvider>
-                </QueryClientProvider>
+                    </div>
+                    <Toaster />
+                </ThemeProvider>
             </body>
         </html>
     );

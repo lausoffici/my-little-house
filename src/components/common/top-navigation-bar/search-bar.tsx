@@ -1,9 +1,13 @@
+'use client';
+
 import { ArrowRightIcon, MagnifyingGlassIcon } from '@radix-ui/react-icons';
 import Link from 'next/link';
 import React, { useState } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 
 import { Input } from '@/components/ui/input';
+
+const MINIMUM_CHARACTERS = 4;
 
 export const SearchBar = () => {
     const [inputValue, setInputValue] = useState('');
@@ -12,6 +16,11 @@ export const SearchBar = () => {
 
     // Function to fetch student names from an API
     const debouncedFetchStudentNames = useDebouncedCallback(async (searchTerm: string) => {
+        if (searchTerm.length < MINIMUM_CHARACTERS) {
+            setStudentNames([]);
+            return;
+        }
+
         try {
             const response = await fetch(`/api/students?query=${searchTerm}`);
             if (!response.ok) throw new Error('Network response was not ok');
@@ -21,7 +30,7 @@ export const SearchBar = () => {
             console.error('Failed to fetch student names:', error);
             setStudentNames([]);
         }
-    }, 800);
+    }, 1_000);
 
     function handleSearch(searchTerm: string) {
         setInputValue(searchTerm);
