@@ -38,5 +38,3 @@ export const coursesOptions: Option[] = [
         label: 'Proficiency'
     }
 ];
-
-export const SEARCH_BAR_MIN_CHARACTERS = 4;

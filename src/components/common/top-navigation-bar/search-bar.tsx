@@ -57,7 +57,7 @@ export const SearchBar = () => {
                     value={inputValue}
                 />
                 {studentNames.length > 0 && isDropdownOpen && (
-                    <div className='absolute top-10 left-0 flex flex-col bg-white border rounded text-foreground w-full z-1000'>
+                    <div className='absolute top-10 left-0 flex flex-col bg-white border rounded text-foreground w-full'>
                         {studentNames.map(({ id, firstName, lastName }) => (
                             <Link
                                 key={id}
