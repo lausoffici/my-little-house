@@ -131,3 +131,13 @@ model EnrollmentYear {
   year   Int
   amount Int
 }
+
+model CashRegisterInitialBalance {
+  id      Int   @id @default(autoincrement())
+  balance Float
+  year    Int
+  month   Int
+  day     Int
+
+  @@unique([year, month, day])
+}

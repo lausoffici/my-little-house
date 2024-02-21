@@ -7,3 +7,12 @@ export type Option = {
 export interface SearchParams {
     [key: string]: string | string[] | undefined;
 }
+
+export type CashRegisterIncomingItem = {
+    id: number;
+    description: string;
+    amount: number;
+    receiptId: number;
+    studentId: number;
+    studentName: string;
+};

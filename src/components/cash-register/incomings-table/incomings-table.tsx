@@ -1,11 +1,11 @@
 'use client';
 
-import { Item } from '@prisma/client';
 import React from 'react';
 
 import DataTable from '@/components/ui/data-table';
 import { useURLManagedDataTable } from '@/hooks/use-url-managed-data-table';
 import { getIncomingsList } from '@/lib/cash-register';
+import { CashRegisterIncomingItem } from '@/types';
 
 import { columns } from './columns';
 
@@ -19,9 +19,7 @@ type StudentsTableProps = {
 export default function IncomingsTable({ incomingsPromise }: StudentsTableProps) {
     const { data, totalPages } = React.use(incomingsPromise);
 
-    console.log(data);
-
-    const table = useURLManagedDataTable<Item>({
+    const table = useURLManagedDataTable<CashRegisterIncomingItem>({
         data,
         columns,
         pageCount: totalPages,
@@ -31,9 +29,9 @@ export default function IncomingsTable({ incomingsPromise }: StudentsTableProps)
 
     return (
         <>
-            <div className='flex items-center py-4'>
-                {/* <StudentsTableFilters table={table} courseOptions={courseOptions} /> */}
-            </div>
+            {/* <div className='flex items-center py-4'>
+                <StudentsTableFilters table={table} courseOptions={courseOptions} />
+            </div> */}
 
             <DataTable table={table} columns={columns} />
         </>
