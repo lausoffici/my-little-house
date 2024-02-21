@@ -14,11 +14,20 @@ interface MultiSelectProps {
     onChange: React.Dispatch<React.SetStateAction<string[]>>;
     className?: string;
     notFoundMessage?: string;
+    name: string;
 }
 
 const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>(
     (
-        { options, selected, onChange, className, notFoundMessage = 'Item no encontrado', ...props }: MultiSelectProps,
+        {
+            options,
+            selected,
+            onChange,
+            className,
+            notFoundMessage = 'Item no encontrado',
+            name,
+            ...props
+        }: MultiSelectProps,
         ref
     ) => {
         const [open, setOpen] = React.useState(false);
@@ -26,7 +35,6 @@ const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>(
         const handleUnselect = (item: string) => {
             onChange(selected.filter((i) => i !== item));
         };
-
         return (
             <Popover open={open} onOpenChange={setOpen} {...props}>
                 <PopoverTrigger asChild>
@@ -50,6 +58,14 @@ const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>(
                                 }
                             }}
                         >
+                            <input
+                                type='hidden'
+                                name={name}
+                                aria-hidden
+                                multiple
+                                value={selected.join(',')}
+                                className='hidden'
+                            />
                             <div className='flex gap-1 flex-wrap'>
                                 {selected.map((value) => (
                                     <Badge

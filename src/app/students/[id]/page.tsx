@@ -4,16 +4,20 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
+import { getCourseOptions } from '@/lib/courses';
 import { getStudentById } from '@/lib/students';
+import { formateDate } from '@/lib/utils';
 
 export default async function StudentPage({ params: { id } }: { params: { id: string } }) {
     const student = await getStudentById(Number(id));
+    const courseOptions = await getCourseOptions();
 
     if (!student) {
         return <div>Student not found</div>;
     }
 
-    const { firstName, lastName, address, observations } = student;
+    const { firstName, lastName, birthDate, dni, address, city, phone, mobilePhone, momPhone, dadPhone, observations } =
+        student;
 
     const fullName = `${firstName} ${lastName}`;
     const courses = student.studentByCourse.map(({ course }) => course);
@@ -29,7 +33,7 @@ export default async function StudentPage({ params: { id } }: { params: { id: st
                 <Card className='w-2/4'>
                     <CardHeader className='flex flex-row justify-between w-full'>
                         <CardTitle> Información personal</CardTitle>
-                        <EditStudentDialog student={student} />
+                        <EditStudentDialog student={student} courseOptions={courseOptions} />
                     </CardHeader>
                     <CardContent>
                         <div className='flex flex-col gap-3 justify-center'>
@@ -37,9 +41,26 @@ export default async function StudentPage({ params: { id } }: { params: { id: st
                             <Separator />
                             <StudentDetail label='Apellido' info={lastName} />
                             <Separator />
+                            <StudentDetail
+                                label='Fecha de Nacimiento'
+                                info={birthDate ? formateDate(birthDate) : undefined}
+                            />
+                            <Separator />
+                            <StudentDetail label='Dni' info={dni} />
+                            <Separator />
                             <StudentDetail label='Dirección' info={address} />
                             <Separator />
-                            <StudentDetail label='Descripción' info={observations} />
+                            <StudentDetail label='Localidad' info={city} />
+                            <Separator />
+                            <StudentDetail label='Teléfono' info={phone} />
+                            <Separator />
+                            <StudentDetail label='Celular' info={mobilePhone} />
+                            <Separator />
+                            <StudentDetail label='Celular Madre/tutora' info={momPhone} />
+                            <Separator />
+                            <StudentDetail label='Celular Padre/tutor' info={dadPhone} />
+                            <Separator />
+                            <StudentDetail label='Observaciones' info={observations} />
                             <Separator />
                             <div className='flex items-center gap-2'>
                                 <Label className='text-xs'>Cursos </Label>

@@ -2,7 +2,7 @@ import { Label } from '@/components/ui/label';
 
 interface StudentDetailProps {
     label: string;
-    info: string | null;
+    info: any;
 }
 
 export default function StudentDetail({ label, info }: StudentDetailProps) {
