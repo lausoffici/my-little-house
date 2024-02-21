@@ -1,6 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { parseAbsolute, toCalendarDate } from '@internationalized/date';
 import { useForm } from 'react-hook-form';
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -60,7 +61,6 @@ export default function StudentForm({
     });
 
     function onSubmit(values: FormData) {
-        console.log(values.get('birthDate'));
         onFormSubmit(values);
     }
 
@@ -100,17 +100,21 @@ export default function StudentForm({
                 <FormField
                     control={form.control}
                     name='birthDate'
-                    render={({ field }) => {
-                        return (
-                            <FormItem>
-                                <FormLabel>Fecha de Nacimiento</FormLabel>
-                                <FormControl>
-                                    <DateTimePicker />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        );
-                    }}
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Fecha de Nacimiento</FormLabel>
+                            <FormControl>
+                                <DateTimePicker
+                                    defaultValue={
+                                        field.value
+                                            ? toCalendarDate(parseAbsolute(field.value.toISOString(), 'UTC'))
+                                            : undefined
+                                    }
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
                 />
                 <FormField
                     control={form.control}

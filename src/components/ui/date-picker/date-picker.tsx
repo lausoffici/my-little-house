@@ -75,6 +75,3 @@ const DateTimePicker = React.forwardRef<HTMLDivElement, DatePickerStateOptions<D
 DateTimePicker.displayName = 'DateTimePicker';
 
 export { DateTimePicker };
-function getLocalTimeZone(): string {
-    throw new Error('Function not implemented.');
-}

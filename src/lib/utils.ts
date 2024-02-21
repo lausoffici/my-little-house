@@ -12,5 +12,5 @@ export function formatCurrency(amount: number) {
 }
 
 export function formateDate(date: Date) {
-    return date.toISOString().replace(/T.*/, '').split('-').reverse().join('-');
+    return date.toISOString().replace(/T.*/, '').split('-').reverse().join('/');
 }
