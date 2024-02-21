@@ -34,7 +34,7 @@ export function AddInitialBalanceDialog({ initialBalance }: AddInitialBalanceDia
             </DialogTrigger>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Saldo Inicial {new Date().toLocaleDateString()}</DialogTitle>
+                    <DialogTitle>Saldo inicial</DialogTitle>
                     <DialogDescription>
                         Complete el formulario para {initialBalance ? 'modificar' : 'agregar'} el saldo inicial de la
                         caja

@@ -1,3 +1,4 @@
+import { parseAbsolute, toCalendarDate } from '@internationalized/date';
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -13,4 +14,8 @@ export function formatCurrency(amount: number) {
 
 export function formateDate(date: Date) {
     return date.toISOString().replace(/T.*/, '').split('-').reverse().join('/');
+}
+
+export function getDatePickerFormattedDate(date: Date) {
+    return toCalendarDate(parseAbsolute(date.toISOString(), 'UTC'));
 }

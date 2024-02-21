@@ -20,7 +20,6 @@ export const SearchBar = () => {
             setStudentNames([]);
             return;
         }
-
         try {
             const response = await fetch(`/api/students?query=${searchTerm}`);
             if (!response.ok) throw new Error('Network response was not ok');

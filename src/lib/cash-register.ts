@@ -4,18 +4,40 @@ import { CashRegisterIncomingItem, SearchParams } from '@/types';
 
 import prisma from './prisma';
 import { formatCurrency } from './utils';
-import { incomingListSearchParamsSchema } from './validations/params';
+import { getCashRegisterBalanceSearchParamsSchema, incomingListSearchParamsSchema } from './validations/params';
 
 export const getIncomingsList = async (searchParams: SearchParams) => {
-    const { page, size, sortBy, sortOrder } = incomingListSearchParamsSchema.parse(searchParams);
+    const { page, size, sortBy, sortOrder, day, month, year } = incomingListSearchParamsSchema.parse(searchParams);
 
     const pageNumber = Number(page);
     const pageSize = Number(size);
 
-    const whereClause = {};
+    const yearNumber = Number(year) || new Date().getFullYear();
+    const monthNumber = Number(month) || new Date().getMonth() + 1;
+    const dayNumber = Number(day) || new Date().getDate();
+
+    const startDate = new Date(yearNumber, monthNumber - 1, dayNumber);
+    const endDate = new Date(yearNumber, monthNumber - 1, dayNumber + 1);
+
+    const whereClause = {
+        receipt: {
+            createdAt: {
+                gte: startDate,
+                lt: endDate
+            }
+        }
+    };
 
     // Get the total count of students
     const totalItems = await prisma.item.count({
+        where: whereClause
+    });
+
+    // Get the total amount of the items with sum
+    const totalAmount = await prisma.item.aggregate({
+        _sum: {
+            amount: true
+        },
         where: whereClause
     });
 
@@ -36,6 +58,7 @@ export const getIncomingsList = async (searchParams: SearchParams) => {
             receipt: {
                 select: {
                     id: true,
+                    createdAt: true,
                     student: {
                         select: {
                             id: true,
@@ -60,7 +83,7 @@ export const getIncomingsList = async (searchParams: SearchParams) => {
         };
     });
 
-    return { data: transformedItems, totalPages };
+    return { data: transformedItems, totalPages, totalAmount };
 };
 
 export const setCashRegisterBalance = async (_: any, formData: FormData) => {
@@ -80,25 +103,33 @@ export const setCashRegisterBalance = async (_: any, formData: FormData) => {
                 },
                 create: {
                     balance,
-                    day: date.getDay(),
-                    month: date.getMonth(),
+                    day: date.getDate(),
+                    month: date.getMonth() + 1,
                     year: date.getFullYear()
                 }
             });
-            return { message: `Saldo inicial guardado correctamente: ${formatCurrency(balance)}` };
+            return { message: `Saldo inicial guardado correctamente: ${formatCurrency(balance)}`, error: false };
         }
     } catch (error) {
+        console.error(error);
         return { message: 'Ocurrió un error al guardar el saldo inicial', error: true };
     }
 };
 
-export const getCashRegisterBalance = async (date: string) => {
+export const getCashRegisterBalance = async (searchParams: SearchParams) => {
+    const { day, month, year } = getCashRegisterBalanceSearchParamsSchema.parse(searchParams);
+
+    const yearNumber = Number(year) || new Date().getFullYear();
+    const monthNumber = Number(month) || new Date().getMonth() + 1;
+    const dayNumber = Number(day) || new Date().getDate();
+
     const balance = await prisma.cashRegisterInitialBalance.findFirst({
         where: {
-            day: new Date(date).getDay(),
-            month: new Date(date).getMonth(),
-            year: new Date(date).getFullYear()
+            day: dayNumber,
+            month: monthNumber,
+            year: yearNumber
         }
     });
+
     return balance;
 };

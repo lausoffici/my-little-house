@@ -2,7 +2,7 @@
 
 import { CashRegisterInitialBalance } from '@prisma/client';
 import { CheckIcon } from '@radix-ui/react-icons';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 import { useFormState } from 'react-dom';
 
@@ -27,6 +27,13 @@ export function AddInitialBalanceForm({ onOpenDialogChange, initialBalance }: Ad
     const { toast } = useToast();
     const [state, action] = useFormState(setCashRegisterBalance, initialState);
     const router = useRouter();
+    const searchParams = useSearchParams();
+
+    const day = Number(searchParams.get('day')) || new Date().getDate();
+    const month = Number(searchParams.get('month')) || new Date().getMonth() + 1;
+    const year = Number(searchParams.get('year')) || new Date().getFullYear();
+
+    const date = new Date(year, month - 1, day);
 
     useEffect(() => {
         if (state === undefined || state.message === '') return;
@@ -51,7 +58,7 @@ export function AddInitialBalanceForm({ onOpenDialogChange, initialBalance }: Ad
         <form action={action} className='space-y-2 py-3' id={FORM_ID}>
             <Label htmlFor='balance'>Saldo inicial ($)</Label>
             <Input type='number' name='balance' defaultValue={initialBalance?.balance} />
-            <input type='hidden' name='date' value={new Date().toISOString()} />
+            <input type='hidden' name='date' value={date.toISOString()} />
             <input type='hidden' name='id' value={initialBalance?.id} />
         </form>
     );

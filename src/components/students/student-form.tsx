@@ -1,13 +1,13 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { parseAbsolute, toCalendarDate } from '@internationalized/date';
 import { useForm } from 'react-hook-form';
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { MultiSelect } from '@/components/ui/multi-select';
 import { Textarea } from '@/components/ui/textarea';
+import { getDatePickerFormattedDate } from '@/lib/utils';
 import { studentFormSchema } from '@/lib/validations/form';
 import { Option } from '@/types';
 
@@ -105,11 +105,7 @@ export default function StudentForm({
                             <FormLabel>Fecha de Nacimiento</FormLabel>
                             <FormControl>
                                 <DateTimePicker
-                                    defaultValue={
-                                        field.value
-                                            ? toCalendarDate(parseAbsolute(field.value.toISOString(), 'UTC'))
-                                            : undefined
-                                    }
+                                    defaultValue={field.value ? getDatePickerFormattedDate(field.value) : undefined}
                                 />
                             </FormControl>
                             <FormMessage />
