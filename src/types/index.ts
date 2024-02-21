@@ -19,3 +19,12 @@ export type StudentWithCourses = Prisma.StudentGetPayload<{
         };
     };
 }>;
+
+export type CashRegisterIncomingItem = {
+    id: number;
+    description: string;
+    amount: number;
+    receiptId: number;
+    studentId: number;
+    studentName: string;
+};

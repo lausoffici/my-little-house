@@ -9,4 +9,11 @@ export const studentListSearchParamsSchema = z.object({
     lastName: z.string().optional()
 });
 
+export const incomingListSearchParamsSchema = z.object({
+    page: z.string().default('1'),
+    size: z.string().default('10'),
+    sortBy: z.string().default('description'),
+    sortOrder: z.string().default('asc')
+});
+
 export const studentNamesListQueryParamsSchema = z.string();
