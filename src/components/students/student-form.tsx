@@ -1,38 +1,36 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { parseAbsolute, toCalendarDate } from '@internationalized/date';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { MultiSelect } from '@/components/ui/multi-select';
 import { Textarea } from '@/components/ui/textarea';
-import { coursesOptions } from '@/lib/constants';
+import { studentFormSchema } from '@/lib/validations/form';
+import { Option } from '@/types';
 
-const studentFormSchema = z.object({
-    firstName: z
-        .string({
-            required_error: 'El nombre es requerido'
-        })
-        .min(3, { message: 'El nombre debe tener al menos 3 caracteres' })
-        .max(50),
-    lastName: z
-        .string({
-            required_error: 'El apellido es requerido'
-        })
-        .min(3, { message: 'El apellido debe tener al menos 3 caracteres' })
-        .max(50),
-    courses: z.optional(z.array(z.string())),
-    description: z.optional(z.string()),
-    address: z.optional(z.string()),
-    email: z.string(),
-    _id: z.string()
-});
+import { DateTimePicker } from '../ui/date-picker/date-picker';
 
+type StudentFormValues = {
+    firstName: string;
+    lastName: string;
+    courses?: string[];
+    birthDate?: Date;
+    dni?: string;
+    address?: string;
+    city?: string;
+    phone?: string;
+    mobilePhone?: string;
+    momPhone?: string;
+    dadPhone?: string;
+    observations?: string;
+};
 interface StudentFormProps {
     onFormSubmit: (value: any) => void;
-    defaultValues?: any;
+    defaultValues?: StudentFormValues;
+    courseOptions: Option[];
 }
 
 export const STUDENT_FORM_ID = 'student-form';
@@ -41,34 +39,44 @@ const emptyDefaultValues = {
     firstName: '',
     lastName: '',
     courses: [],
-    description: '',
+    birthDate: undefined,
+    dni: '',
     address: '',
-    email: '',
-    id: ''
+    city: '',
+    phone: '',
+    mobilePhone: '',
+    momPhone: '',
+    dadPhone: '',
+    observations: ''
 };
 
-export default function StudentForm({ onFormSubmit, defaultValues = emptyDefaultValues }: StudentFormProps) {
-    const form = useForm<z.infer<typeof studentFormSchema>>({
+export default function StudentForm({
+    onFormSubmit,
+    defaultValues = emptyDefaultValues,
+    courseOptions
+}: StudentFormProps) {
+    const form = useForm<StudentFormValues>({
         resolver: zodResolver(studentFormSchema),
         defaultValues
     });
 
-    function onSubmit(values: z.infer<typeof studentFormSchema>) {
+    function onSubmit(values: FormData) {
         onFormSubmit(values);
-        console.log(values);
     }
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-2 py-3' id={STUDENT_FORM_ID}>
+            <form action={onSubmit} id={STUDENT_FORM_ID} className='grid grid-cols-2 gap-4'>
                 <FormField
                     control={form.control}
                     name='firstName'
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Nombre</FormLabel>
+                            <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">
+                                Nombre
+                            </FormLabel>
                             <FormControl>
-                                <Input placeholder='Monica' autoComplete='off' {...field} />
+                                <Input required placeholder='Monica' autoComplete='off' {...field} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -79,9 +87,43 @@ export default function StudentForm({ onFormSubmit, defaultValues = emptyDefault
                     name='lastName'
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Apellido</FormLabel>
+                            <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">
+                                Apellido
+                            </FormLabel>
                             <FormControl>
-                                <Input placeholder='Geller' autoComplete='off' {...field} />
+                                <Input required placeholder='Geller' autoComplete='off' {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name='birthDate'
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Fecha de Nacimiento</FormLabel>
+                            <FormControl>
+                                <DateTimePicker
+                                    defaultValue={
+                                        field.value
+                                            ? toCalendarDate(parseAbsolute(field.value.toISOString(), 'UTC'))
+                                            : undefined
+                                    }
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name='dni'
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>DNI</FormLabel>
+                            <FormControl>
+                                <Input type='number' autoComplete='off' {...field} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -91,14 +133,15 @@ export default function StudentForm({ onFormSubmit, defaultValues = emptyDefault
                     control={form.control}
                     name='courses'
                     render={({ field }) => (
-                        <FormItem>
+                        <FormItem className='col-span-2'>
                             <FormLabel>Cursos</FormLabel>
                             <MultiSelect
-                                options={coursesOptions}
-                                selected={field.value ? field.value : []}
-                                className='w-[453px]'
+                                options={courseOptions}
+                                selected={field.value && field.value.length > 0 ? field.value : []}
+                                className='w-[622px]'
                                 notFoundMessage='Curso no encontrado'
                                 {...field}
+                                name='courses'
                             />
                             <FormMessage />
                         </FormItem>
@@ -111,7 +154,7 @@ export default function StudentForm({ onFormSubmit, defaultValues = emptyDefault
                         <FormItem>
                             <FormLabel>Dirección</FormLabel>
                             <FormControl>
-                                <Input placeholder='Av. Rios 1562, Monte Grande' autoComplete='off' {...field} />
+                                <Input placeholder='Av. Rios 1562' autoComplete='off' {...field} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -119,17 +162,12 @@ export default function StudentForm({ onFormSubmit, defaultValues = emptyDefault
                 />
                 <FormField
                     control={form.control}
-                    name='email'
+                    name='city'
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Email</FormLabel>
+                            <FormLabel>Localidad</FormLabel>
                             <FormControl>
-                                <Input
-                                    placeholder='monica.geller@gmail.com'
-                                    type='email'
-                                    autoComplete='off'
-                                    {...field}
-                                />
+                                <Input placeholder='Llavallol' autoComplete='off' {...field} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -137,12 +175,64 @@ export default function StudentForm({ onFormSubmit, defaultValues = emptyDefault
                 />
                 <FormField
                     control={form.control}
-                    name='description'
+                    name='phone'
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Descripción</FormLabel>
+                            <FormLabel>Teléfono</FormLabel>
                             <FormControl>
-                                <Textarea placeholder='Nombre y teléfonos' autoComplete='off' {...field} />
+                                <Input placeholder='4444-4444' autoComplete='off' {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name='mobilePhone'
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Celular</FormLabel>
+                            <FormControl>
+                                <Input placeholder='1512345678' autoComplete='off' {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name='momPhone'
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Celular Madre/tutora</FormLabel>
+                            <FormControl>
+                                <Input placeholder='1512345678' autoComplete='off' {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name='dadPhone'
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Celular Padre/tutor</FormLabel>
+                            <FormControl>
+                                <Input placeholder='1512345678' autoComplete='off' {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name='observations'
+                    render={({ field }) => (
+                        <FormItem className='col-span-2'>
+                            <FormLabel>Observaciones</FormLabel>
+                            <FormControl>
+                                <Textarea placeholder='Nombre madre/padre y/o tutor ' autoComplete='off' {...field} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
