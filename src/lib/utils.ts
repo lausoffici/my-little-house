@@ -19,3 +19,14 @@ export function formateDate(date: Date) {
 export function getDatePickerFormattedDate(date: Date) {
     return toCalendarDate(parseAbsolute(date.toISOString(), 'UTC'));
 }
+
+export function capitalizeFirstLetter(string: string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+export function getMonthName(monthNumber: number) {
+    const date = new Date();
+    date.setMonth(monthNumber - 1);
+
+    return date.toLocaleString('es', { month: 'long' });
+}

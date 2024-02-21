@@ -1,17 +1,21 @@
+import React from 'react';
+
 import DeleteStudentDialog from '@/components/students/delete-student-dialog';
 import EditStudentDialog from '@/components/students/edit-student-dialog';
 import StudentDetail from '@/components/students/student-detail';
+import StudentInvoicesTable from '@/components/students/student-invoices-table/student-invoices-table';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { getCourseOptions } from '@/lib/courses';
-import { getStudentById } from '@/lib/students';
+import { getStudentById, getStudentInvoices } from '@/lib/students';
 import { formateDate } from '@/lib/utils';
 
 export default async function StudentPage({ params: { id } }: { params: { id: string } }) {
     const student = await getStudentById(Number(id));
     const courseOptions = await getCourseOptions();
+    const invoicesPromise = getStudentInvoices(Number(id));
 
     if (!student) {
         return <div>Student not found</div>;
@@ -82,7 +86,11 @@ export default async function StudentPage({ params: { id } }: { params: { id: st
                     <CardHeader>
                         <CardTitle>Cuotas</CardTitle>
                     </CardHeader>
-                    <CardContent></CardContent>
+                    <CardContent>
+                        <React.Suspense fallback={'Cargando...'}>
+                            <StudentInvoicesTable invoicesPromise={invoicesPromise} />
+                        </React.Suspense>
+                    </CardContent>
                 </Card>
             </div>
         </div>

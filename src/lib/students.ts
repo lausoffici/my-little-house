@@ -230,3 +230,11 @@ export const deleteStudent = async (id: number) => {
         }
     });
 };
+
+export const getStudentInvoices = async (id: number) => {
+    return await prisma.invoice.findMany({
+        where: {
+            studentId: id
+        }
+    });
+};
