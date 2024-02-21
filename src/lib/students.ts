@@ -77,11 +77,13 @@ export const getStudentList = async (searchParams: SearchParams) => {
 };
 
 export const createStudent = async (createdStudent: FormData) => {
+    const date = createdStudent.get('birthDate');
+
     const parsedData = studentFormSchema.safeParse({
         firstName: createdStudent.get('firstName'),
         lastName: createdStudent.get('lastName'),
         courses: createdStudent.get('courses'),
-        birthDate: createdStudent.get('birthDate'),
+        birthDate: date === '' ? undefined : date,
         dni: createdStudent.get('dni'),
         address: createdStudent.get('address'),
         city: createdStudent.get('city'),
@@ -216,4 +218,15 @@ export const getStudentNamesByTerm = async (term: string) => {
     });
 
     return students;
+};
+
+export const deleteStudent = async (id: number) => {
+    return await prisma.student.update({
+        where: {
+            id
+        },
+        data: {
+            active: false
+        }
+    });
 };
