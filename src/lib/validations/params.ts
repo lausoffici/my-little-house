@@ -15,3 +15,5 @@ export const incomingListSearchParamsSchema = z.object({
     sortBy: z.string().default('description'),
     sortOrder: z.string().default('asc')
 });
+
+export const studentNamesListQueryParamsSchema = z.string();
