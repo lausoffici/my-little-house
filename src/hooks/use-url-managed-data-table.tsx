@@ -19,7 +19,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import * as React from 'react';
 
 interface UseDataTableProps<TData> {
-    data: any[];
+    data: TData[];
     columns: ColumnDef<TData>[];
     pageCount: number;
     searchableColumns?: string[];
