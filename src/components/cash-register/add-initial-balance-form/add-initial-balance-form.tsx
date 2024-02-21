@@ -2,7 +2,7 @@
 
 import { CashRegisterInitialBalance } from '@prisma/client';
 import { CheckIcon } from '@radix-ui/react-icons';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 import { useFormState } from 'react-dom';
 
