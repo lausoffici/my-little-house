@@ -1,5 +1,5 @@
 import { Course } from '@prisma/client';
-import { TrashIcon } from '@radix-ui/react-icons';
+import { ExclamationTriangleIcon, TrashIcon } from '@radix-ui/react-icons';
 import { useRouter } from 'next/navigation';
 import { SetStateAction } from 'react';
 
@@ -19,14 +19,25 @@ export default function DeleteCourseDialog({ course, onOpenChange }: DeleteCours
     const router = useRouter();
 
     async function handleDelete() {
-        toast({
-            description: `Curso eliminado: ${name}`,
-            icon: <TrashIcon width='20px' height='20px' />,
-            variant: 'destructive'
-        });
-        await deleteCourse(id);
-        onOpenChange(false);
-        router.refresh();
+        try {
+            await deleteCourse(id);
+
+            toast({
+                description: `Curso eliminado: ${name}`,
+                icon: <TrashIcon width='20px' height='20px' />,
+                variant: 'destructive'
+            });
+
+            onOpenChange(false);
+            router.refresh();
+        } catch (err) {
+            toast({
+                description: `Ha ocurrido un error`,
+                icon: <ExclamationTriangleIcon width='20px' height='20px' />,
+                variant: 'destructive'
+            });
+            console.error(err);
+        }
     }
     return (
         <DialogContent>

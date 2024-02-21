@@ -1,6 +1,6 @@
 'use client';
 
-import { PlusCircledIcon } from '@radix-ui/react-icons';
+import { ExclamationTriangleIcon, PlusCircledIcon } from '@radix-ui/react-icons';
 import { CheckIcon } from '@radix-ui/react-icons';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -31,14 +31,25 @@ export default function AddCourseDialog() {
     const router = useRouter();
 
     async function handleSubmit(newCourse: FormData) {
-        toast({
-            description: `Curso creado exitosamente: ${newCourse.get('name')}`,
-            icon: <CheckIcon width='20px' height='20px' />,
-            variant: 'success'
-        });
-        await createCourse(newCourse);
-        router.refresh();
-        setOpenDialog(false);
+        try {
+            await createCourse(newCourse);
+
+            toast({
+                description: `Curso creado exitosamente: ${newCourse.get('name')}`,
+                icon: <CheckIcon width='20px' height='20px' />,
+                variant: 'success'
+            });
+
+            setOpenDialog(false);
+            router.refresh();
+        } catch (err) {
+            toast({
+                description: `Ha ocurrido un error`,
+                icon: <ExclamationTriangleIcon width='20px' height='20px' />,
+                variant: 'destructive'
+            });
+            console.log(err);
+        }
     }
 
     return (

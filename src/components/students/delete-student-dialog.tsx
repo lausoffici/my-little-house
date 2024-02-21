@@ -1,7 +1,7 @@
 'use client';
 
 import { DialogTrigger } from '@radix-ui/react-dialog';
-import { TrashIcon } from '@radix-ui/react-icons';
+import { ExclamationTriangleIcon, TrashIcon } from '@radix-ui/react-icons';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
@@ -24,14 +24,25 @@ export default function DeleteStudentDialog({ studentWithCourses }: DeleteCourse
     const fullName = `${firstName} ${lastName}`;
 
     async function handleDelete() {
-        toast({
-            description: `Estudiante eliminado: ${fullName} `,
-            icon: <TrashIcon width='20px' height='20px' />,
-            variant: 'destructive'
-        });
-        await deleteStudent(id);
-        setopenDeleteStudentDialog(false);
-        router.replace('/students');
+        try {
+            await deleteStudent(id);
+
+            toast({
+                description: `Estudiante eliminado: ${fullName} `,
+                icon: <TrashIcon width='20px' height='20px' />,
+                variant: 'destructive'
+            });
+
+            setopenDeleteStudentDialog(false);
+            router.replace('/students');
+        } catch (err) {
+            toast({
+                description: `Ha ocurrido un error`,
+                icon: <ExclamationTriangleIcon width='20px' height='20px' />,
+                variant: 'destructive'
+            });
+            console.error(err);
+        }
     }
 
     return (

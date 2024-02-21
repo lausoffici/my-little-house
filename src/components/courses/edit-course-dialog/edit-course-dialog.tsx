@@ -1,7 +1,7 @@
 'use client';
 
 import { Course } from '@prisma/client';
-import { CheckIcon } from '@radix-ui/react-icons';
+import { CheckIcon, ExclamationTriangleIcon } from '@radix-ui/react-icons';
 import { useRouter } from 'next/navigation';
 import { SetStateAction } from 'react';
 
@@ -28,14 +28,23 @@ export default function EditCourseDialog({ course, onOpenChange }: EditCourseDia
     };
 
     async function handleSubmit(editedCourse: FormData) {
-        toast({
-            description: `Curso editado exitosamente: ${editedCourse.get('name')} `,
-            icon: <CheckIcon width='20px' height='20px' />,
-            variant: 'success'
-        });
-        await editCourse(id, editedCourse);
-        onOpenChange(false);
-        router.refresh();
+        try {
+            toast({
+                description: `Curso editado exitosamente: ${editedCourse.get('name')} `,
+                icon: <CheckIcon width='20px' height='20px' />,
+                variant: 'success'
+            });
+            await editCourse(id, editedCourse);
+            onOpenChange(false);
+            router.refresh();
+        } catch (err) {
+            toast({
+                description: `Ha ocurrido un error`,
+                icon: <ExclamationTriangleIcon width='20px' height='20px' />,
+                variant: 'destructive'
+            });
+            console.error(err);
+        }
     }
 
     return (
