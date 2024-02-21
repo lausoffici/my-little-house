@@ -1,11 +1,13 @@
 import { CashRegisterInitialBalance } from '@prisma/client';
 import React from 'react';
 
+import TotalBalance from '@/components/cash-register/TotalBalance';
 import { AddInitialBalanceDialog } from '@/components/cash-register/add-initial-balance-dialog';
-import CashRegisterDatePicker from '@/components/cash-register/cash-register-date-picker/cash-register-date-picker';
-import IncomingsTable from '@/components/cash-register/incomings-table/incomings-table';
+import CashRegisterDatePicker from '@/components/cash-register/cash-register-date-picker';
+import IncomingsTable from '@/components/cash-register/incomings-table';
+import OutcomingsTable from '@/components/cash-register/outcomings-table';
 import { Badge } from '@/components/ui/badge';
-import { getCashRegisterBalance, getIncomingsList } from '@/lib/cash-register';
+import { getCashRegisterBalance, getExpendituresByDate, getIncomingsListByDate } from '@/lib/cash-register';
 import { formatCurrency } from '@/lib/utils';
 import { SearchParams } from '@/types';
 
@@ -14,7 +16,9 @@ export interface CashRegisterProps {
 }
 
 export default async function CashRegister({ searchParams }: CashRegisterProps) {
-    const incomingsPromise = getIncomingsList(searchParams);
+    const incomingsPromise = getIncomingsListByDate(searchParams);
+    const outcomingsPromise = getExpendituresByDate(searchParams);
+
     const initialBalance: CashRegisterInitialBalance | null = await getCashRegisterBalance(searchParams);
 
     return (
@@ -30,30 +34,39 @@ export default async function CashRegister({ searchParams }: CashRegisterProps) 
             </div>
 
             {initialBalance ? (
-                <div className='flex text-xl font-bold mb-6'>
+                <div className='flex items-center text-xl font-bold mb-6'>
                     <h2 className='mr-2'>Saldo inicial</h2>
-                    <Badge variant='outline' className='w-fit text-sm'>
+                    <Badge variant='outline' className='text-sm'>
                         {formatCurrency(initialBalance?.balance ?? 0)}
                     </Badge>
                 </div>
             ) : (
                 <div className='flex items-center text-xl font-bold mb-6'>
                     <h2 className='mr-2'>Saldo inicial</h2>
-                    <Badge variant='outline' className='font-medium text-sm'>
+                    <Badge variant='outline' className='text-sm'>
                         --
                     </Badge>
                 </div>
             )}
 
-            <div className='flex flex-col'>
-                <React.Suspense fallback={'Loading...'}>
-                    <IncomingsTable incomingsPromise={incomingsPromise} />
-                </React.Suspense>
-
-                <div>
-                    <h2 className='text-xl font-bold text-foreground mb-2'>Salidas</h2>
+            <div className='flex gap-2 w-full flex-col 2xl:flex-row'>
+                <div className='flex-auto'>
+                    <React.Suspense fallback={'Cargando Entradas...'}>
+                        <IncomingsTable incomingsPromise={incomingsPromise} />
+                    </React.Suspense>
+                </div>
+                <div className='flex-initial'>
+                    <React.Suspense fallback={'Cargando Salidas...'}>
+                        <OutcomingsTable outcomingsPromise={outcomingsPromise} />
+                    </React.Suspense>
                 </div>
             </div>
+
+            <TotalBalance
+                outcomingsPromise={outcomingsPromise}
+                incomingsPromise={incomingsPromise}
+                initialBalance={initialBalance?.balance ?? 0}
+            />
         </section>
     );
 }

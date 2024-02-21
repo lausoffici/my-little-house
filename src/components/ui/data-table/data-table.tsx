@@ -7,9 +7,10 @@ import { DataTablePagination } from '.';
 interface DataTableProps<TData, TValue> {
     table: TanStackTable<TData>;
     columns: ColumnDef<TData, TValue>[];
+    withRowSelection?: boolean;
 }
 
-export default function DataTable<TData, TValue>({ table, columns }: DataTableProps<TData, TValue>) {
+export default function DataTable<TData, TValue>({ table, columns, withRowSelection }: DataTableProps<TData, TValue>) {
     return (
         <>
             <div className='rounded-md border'>
@@ -50,7 +51,7 @@ export default function DataTable<TData, TValue>({ table, columns }: DataTablePr
                     </TableBody>
                 </Table>
             </div>
-            <DataTablePagination table={table} />
+            <DataTablePagination table={table} withRowSelection={withRowSelection} />
         </>
     );
 }

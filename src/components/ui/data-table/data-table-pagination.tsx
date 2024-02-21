@@ -3,15 +3,17 @@ import { Table } from '@tanstack/react-table';
 
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { cn } from '@/lib/utils';
 
 interface DataTablePaginationProps<TData> {
     table: Table<TData>;
+    withRowSelection?: boolean;
 }
 
-export function DataTablePagination<TData>({ table }: DataTablePaginationProps<TData>) {
+export function DataTablePagination<TData>({ table, withRowSelection }: DataTablePaginationProps<TData>) {
     return (
         <div className='flex items-center justify-between px-2 my-3'>
-            <div className='flex-1 text-sm text-muted-foreground'>
+            <div className={cn('flex-1 text-sm text-muted-foreground', !withRowSelection && 'invisible')}>
                 {table.getFilteredSelectedRowModel().rows.length} de {table.getFilteredRowModel().rows.length} fila(s)
                 seleccionada(s)
             </div>

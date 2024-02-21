@@ -1,5 +1,6 @@
 'use client';
 
+import { Expenditure } from '@prisma/client';
 import {
     getCoreRowModel,
     getFilteredRowModel,
@@ -11,20 +12,19 @@ import React from 'react';
 
 import { Badge } from '@/components/ui/badge';
 import DataTable from '@/components/ui/data-table';
-import { getIncomingsListByDate } from '@/lib/cash-register';
+import { getExpendituresByDate } from '@/lib/cash-register';
 import { formatCurrency } from '@/lib/utils';
-import { CashRegisterIncomingItem } from '@/types';
 
 import { columns } from './columns';
 
-type IncomingsTableProps = {
-    incomingsPromise: ReturnType<typeof getIncomingsListByDate>;
+type OutcomingsTableProps = {
+    outcomingsPromise: ReturnType<typeof getExpendituresByDate>;
 };
 
-export default function IncomingsTable({ incomingsPromise }: IncomingsTableProps) {
-    const { data, totalAmount } = React.use(incomingsPromise);
+export default function OutcomingsTable({ outcomingsPromise }: OutcomingsTableProps) {
+    const { data, totalAmount } = React.use(outcomingsPromise);
 
-    const table = useReactTable<CashRegisterIncomingItem>({
+    const table = useReactTable<Expenditure>({
         data,
         columns,
         getCoreRowModel: getCoreRowModel(),
@@ -37,7 +37,7 @@ export default function IncomingsTable({ incomingsPromise }: IncomingsTableProps
     return (
         <>
             <div className='flex items-center mb-2'>
-                <h2 className='text-xl font-bold mr-2'>Entradas</h2>
+                <h2 className='text-xl font-bold mr-2'>Salidas</h2>
                 <Badge variant='outline' className='text-sm'>
                     {formatCurrency(totalAmount)}
                 </Badge>

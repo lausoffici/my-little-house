@@ -6,11 +6,9 @@ import prisma from './prisma';
 import { formatCurrency } from './utils';
 import { getCashRegisterBalanceSearchParamsSchema, incomingListSearchParamsSchema } from './validations/params';
 
-export const getIncomingsList = async (searchParams: SearchParams) => {
-    const { page, size, sortBy, sortOrder, day, month, year } = incomingListSearchParamsSchema.parse(searchParams);
-
-    const pageNumber = Number(page);
-    const pageSize = Number(size);
+// If not date is provided, it will use the current date
+export const getIncomingsListByDate = async (searchParams: SearchParams) => {
+    const { day, month, year } = incomingListSearchParamsSchema.parse(searchParams);
 
     const yearNumber = Number(year) || new Date().getFullYear();
     const monthNumber = Number(month) || new Date().getMonth() + 1;
@@ -28,11 +26,6 @@ export const getIncomingsList = async (searchParams: SearchParams) => {
         }
     };
 
-    // Get the total count of students
-    const totalItems = await prisma.item.count({
-        where: whereClause
-    });
-
     // Get the total amount of the items with sum
     const totalAmount = await prisma.item.aggregate({
         _sum: {
@@ -41,16 +34,8 @@ export const getIncomingsList = async (searchParams: SearchParams) => {
         where: whereClause
     });
 
-    // Calculate total pages
-    const totalPages = Math.ceil(totalItems / pageSize);
-
     const items = await prisma.item.findMany({
         where: whereClause,
-        skip: (pageNumber - 1) * pageSize,
-        take: pageSize,
-        orderBy: {
-            [sortBy]: sortOrder
-        },
         select: {
             id: true,
             description: true,
@@ -79,11 +64,12 @@ export const getIncomingsList = async (searchParams: SearchParams) => {
             ...itemData,
             receiptId: receipt.id,
             studentId: student.id,
-            studentName: `${student.firstName} ${student.lastName}`
+            studentName: `${student.firstName} ${student.lastName}`,
+            createdAt: receipt.createdAt
         };
     });
 
-    return { data: transformedItems, totalPages, totalAmount: totalAmount?._sum?.amount ?? 0 };
+    return { data: transformedItems, totalAmount: totalAmount?._sum?.amount ?? 0 };
 };
 
 export const setCashRegisterBalance = async (_: any, formData: FormData) => {
@@ -134,7 +120,8 @@ export const getCashRegisterBalance = async (searchParams: SearchParams) => {
     return balance;
 };
 
-export const getExpenditures = async (searchParams: SearchParams) => {
+// If not date is provided, it will use the current date
+export const getExpendituresByDate = async (searchParams: SearchParams) => {
     const { day, month, year } = incomingListSearchParamsSchema.parse(searchParams);
 
     const yearNumber = Number(year) || new Date().getFullYear();
