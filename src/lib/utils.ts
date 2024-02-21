@@ -10,3 +10,7 @@ export function formatCurrency(amount: number) {
         amount
     );
 }
+
+export function formateDate(date: Date) {
+    return date.toISOString().replace(/T.*/, '').split('-').reverse().join('/');
+}

@@ -12,3 +12,29 @@ export const courseFormSchema = z.object({
         .positive({ message: 'El precio debe ser mayor a 0' }),
     observations: z.string().nullable()
 });
+
+export const studentFormSchema = z.object({
+    firstName: z
+        .string({
+            required_error: 'El nombre es requerido'
+        })
+        .min(3, { message: 'El nombre debe tener al menos 3 caracteres' })
+        .max(50),
+    lastName: z
+        .string({
+            required_error: 'El apellido es requerido'
+        })
+        .min(3, { message: 'El apellido debe tener al menos 3 caracteres' })
+        .max(50),
+    courses: z.optional(z.string()),
+    birthDate: z.optional(z.string()),
+    dni: z.optional(z.string()),
+    description: z.optional(z.string()),
+    address: z.optional(z.string()),
+    city: z.optional(z.string()),
+    phone: z.optional(z.string()),
+    mobilePhone: z.optional(z.string()),
+    momPhone: z.optional(z.string()),
+    dadPhone: z.optional(z.string()),
+    observations: z.optional(z.string())
+});
