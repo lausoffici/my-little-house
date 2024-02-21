@@ -1,10 +1,18 @@
 'use client';
 
+import {
+    getCoreRowModel,
+    getFacetedRowModel,
+    getFacetedUniqueValues,
+    getFilteredRowModel,
+    getPaginationRowModel,
+    getSortedRowModel,
+    useReactTable
+} from '@tanstack/react-table';
 import React from 'react';
 
 import { Badge } from '@/components/ui/badge';
 import DataTable from '@/components/ui/data-table';
-import { useURLManagedDataTable } from '@/hooks/use-url-managed-data-table';
 import { getIncomingsList } from '@/lib/cash-register';
 import { formatCurrency } from '@/lib/utils';
 import { CashRegisterIncomingItem } from '@/types';
@@ -21,14 +29,16 @@ type StudentsTableProps = {
 export default function IncomingsTable({ incomingsPromise }: StudentsTableProps) {
     const { data, totalPages, totalAmount } = React.use(incomingsPromise);
 
-    const incomingTotal = totalAmount?._sum?.amount ?? 0;
-
-    const table = useURLManagedDataTable<CashRegisterIncomingItem>({
+    const table = useReactTable<CashRegisterIncomingItem>({
         data,
         columns,
-        pageCount: totalPages,
-        searchableColumns,
-        filterableColumns
+        pageCount: totalPages ?? -1,
+        getCoreRowModel: getCoreRowModel(),
+        getFilteredRowModel: getFilteredRowModel(),
+        getPaginationRowModel: getPaginationRowModel(),
+        getSortedRowModel: getSortedRowModel(),
+        getFacetedRowModel: getFacetedRowModel(),
+        getFacetedUniqueValues: getFacetedUniqueValues()
     });
 
     return (
@@ -36,7 +46,7 @@ export default function IncomingsTable({ incomingsPromise }: StudentsTableProps)
             <div className='flex items-center mb-2'>
                 <h2 className='text-xl font-bold mr-2'>Entradas</h2>
                 <Badge variant='outline' className='text-foreground w-fit text-sm'>
-                    {formatCurrency(incomingTotal)}
+                    {formatCurrency(totalAmount)}
                 </Badge>
             </div>
 

@@ -83,7 +83,7 @@ export const getIncomingsList = async (searchParams: SearchParams) => {
         };
     });
 
-    return { data: transformedItems, totalPages, totalAmount };
+    return { data: transformedItems, totalPages, totalAmount: totalAmount?._sum?.amount ?? 0 };
 };
 
 export const setCashRegisterBalance = async (_: any, formData: FormData) => {
@@ -132,4 +132,42 @@ export const getCashRegisterBalance = async (searchParams: SearchParams) => {
     });
 
     return balance;
+};
+
+export const getExpenditures = async (searchParams: SearchParams) => {
+    const { day, month, year } = incomingListSearchParamsSchema.parse(searchParams);
+
+    const yearNumber = Number(year) || new Date().getFullYear();
+    const monthNumber = Number(month) || new Date().getMonth() + 1;
+    const dayNumber = Number(day) || new Date().getDate();
+
+    const startDate = new Date(yearNumber, monthNumber - 1, dayNumber);
+    const endDate = new Date(yearNumber, monthNumber - 1, dayNumber + 1);
+
+    const whereClause = {
+        createdAt: {
+            gte: startDate,
+            lt: endDate
+        }
+    };
+
+    // Get the total amount of the items with sum
+    const totalAmount = await prisma.expenditure.aggregate({
+        _sum: {
+            amount: true
+        },
+        where: whereClause
+    });
+
+    const items = await prisma.expenditure.findMany({
+        where: whereClause,
+        select: {
+            id: true,
+            description: true,
+            amount: true,
+            createdAt: true
+        }
+    });
+
+    return { data: items, totalAmount: totalAmount?._sum?.amount ?? 0 };
 };
