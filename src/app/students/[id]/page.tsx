@@ -1,3 +1,4 @@
+import DeleteStudentDialog from '@/components/students/delete-student-dialog';
 import EditStudentDialog from '@/components/students/edit-student-dialog';
 import StudentDetail from '@/components/students/student-detail';
 import { Badge } from '@/components/ui/badge';
@@ -24,9 +25,11 @@ export default async function StudentPage({ params: { id } }: { params: { id: st
 
     return (
         <div className='flex flex-col gap-4'>
-            <div>
-                <h1 className='text-3xl font-bold text-foreground'>{fullName}</h1>
-                <p className='text-md text-foreground'>Detalles del estudiante</p>
+            <div className='flex justify-between'>
+                <div className='flex  flex-col gap-1'>
+                    <h1 className='text-3xl font-bold text-foreground'>{fullName}</h1>
+                </div>
+                <DeleteStudentDialog studentWithCourses={student} />
             </div>
 
             <div className='flex flex-row gap-3'>
@@ -43,7 +46,7 @@ export default async function StudentPage({ params: { id } }: { params: { id: st
                             <Separator />
                             <StudentDetail
                                 label='Fecha de Nacimiento'
-                                info={birthDate ? formateDate(birthDate) : undefined}
+                                info={birthDate ? formateDate(birthDate) : null}
                             />
                             <Separator />
                             <StudentDetail label='Dni' info={dni} />

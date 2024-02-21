@@ -1,6 +1,6 @@
 'use client';
 
-import { Pencil1Icon } from '@radix-ui/react-icons';
+import { ExclamationTriangleIcon, Pencil1Icon } from '@radix-ui/react-icons';
 import { CheckIcon } from '@radix-ui/react-icons';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -46,14 +46,25 @@ export default function EditStudentDialog({ student, courseOptions }: EditStuden
     } = student;
 
     async function handleSubmit(editedStudent: FormData) {
-        toast({
-            description: `Estudiante editado: ${editedStudent.get('firstName')} ${editedStudent.get('lastName')}`,
-            icon: <CheckIcon width='20px' height='20px' />,
-            variant: 'success'
-        });
-        await editStudent(id, editedStudent);
-        router.refresh();
-        setOpenEditStudentDialog(false);
+        try {
+            await editStudent(id, editedStudent);
+
+            toast({
+                description: `Estudiante editado: ${editedStudent.get('firstName')} ${editedStudent.get('lastName')}`,
+                icon: <CheckIcon width='20px' height='20px' />,
+                variant: 'success'
+            });
+
+            setOpenEditStudentDialog(false);
+            router.refresh();
+        } catch (error) {
+            toast({
+                description: `Ha ocurrido un error`,
+                icon: <ExclamationTriangleIcon width='20px' height='20px' />,
+                variant: 'destructive'
+            });
+            console.error(error);
+        }
     }
 
     const courses = student.studentByCourse.map(({ course }) => course.id.toString());

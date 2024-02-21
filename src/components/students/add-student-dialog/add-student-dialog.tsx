@@ -1,6 +1,6 @@
 'use client';
 
-import { PlusCircledIcon } from '@radix-ui/react-icons';
+import { ExclamationTriangleIcon, PlusCircledIcon } from '@radix-ui/react-icons';
 import { CheckIcon } from '@radix-ui/react-icons';
 import { useState } from 'react';
 
@@ -27,13 +27,23 @@ export default function AddStudentDialog({ courseOptions }: AddStudentDialogProp
     const { toast } = useToast();
 
     async function handleSubmit(newStudent: FormData) {
-        toast({
-            description: `Estudiante creado: ${newStudent.get('firstName')} ${newStudent.get('lastName')}`,
-            icon: <CheckIcon width='20px' height='20px' />,
-            variant: 'success'
-        });
-        await createStudent(newStudent);
-        setOpenStudentDialog(false);
+        try {
+            await createStudent(newStudent);
+
+            toast({
+                description: `Estudiante creado: ${newStudent.get('firstName')} ${newStudent.get('lastName')}`,
+                icon: <CheckIcon width='20px' height='20px' />,
+                variant: 'success'
+            });
+            setOpenStudentDialog(false);
+        } catch (error) {
+            console.error(error);
+            toast({
+                description: `Ha ocurrido un error`,
+                icon: <ExclamationTriangleIcon width='20px' height='20px' />,
+                variant: 'destructive'
+            });
+        }
     }
 
     return (
