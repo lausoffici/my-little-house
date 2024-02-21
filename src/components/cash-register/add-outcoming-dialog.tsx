@@ -14,31 +14,28 @@ import {
     DialogTrigger
 } from '@/components/ui/dialog';
 
-import { AddInitialBalanceForm } from '../add-initial-balance-form';
+import { AddInitialBalanceForm } from './add-initial-balance-form';
 
-export const FORM_ID = 'add-initial-balance-form';
+export const FORM_ID = 'add-outcoming-form';
 
-type AddInitialBalanceDialogProps = {
+type AddOutcomingDialogProps = {
     initialBalance: CashRegisterInitialBalance | null;
 };
 
-export function AddInitialBalanceDialog({ initialBalance }: AddInitialBalanceDialogProps) {
+export function AddOutcomingDialog({ initialBalance }: AddOutcomingDialogProps) {
     const [openStudentDialog, setOpenStudentDialog] = useState(false);
 
     return (
         <Dialog open={openStudentDialog} onOpenChange={setOpenStudentDialog}>
             <DialogTrigger asChild>
-                <Button>
-                    <span className='ml-2'>{initialBalance ? 'Modificar' : 'Agregar'} saldo inicial</span>
+                <Button variant='ghost' size='sm'>
+                    {initialBalance ? 'Modificar' : 'Agregar'}
                 </Button>
             </DialogTrigger>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Saldo inicial</DialogTitle>
-                    <DialogDescription>
-                        Complete el formulario para {initialBalance ? 'modificar' : 'agregar'} el saldo inicial de la
-                        caja
-                    </DialogDescription>
+                    <DialogTitle>Crear Salida</DialogTitle>
+                    <DialogDescription>Complete el formulario para agregar una salida de dinero</DialogDescription>
                 </DialogHeader>
                 <AddInitialBalanceForm initialBalance={initialBalance} onOpenDialogChange={setOpenStudentDialog} />
                 <DialogFooter>

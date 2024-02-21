@@ -20,7 +20,7 @@ export default async function Students({ searchParams }: StudentsPageProps) {
                 <h1 className='text-3xl font-bold text-foreground'>Estudiantes</h1>
                 <AddStudentDialog courseOptions={courseOptions} />
             </div>
-            <React.Suspense fallback={'Loading...'}>
+            <React.Suspense fallback='Loading...'>
                 <StudentsTable studentsPromise={studentsPromise} courseOptions={courseOptions} />
             </React.Suspense>
         </div>

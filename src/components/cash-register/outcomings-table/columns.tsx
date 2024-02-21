@@ -26,11 +26,11 @@ export const columns: ColumnDef<Expenditure>[] = [
             const { createdAt } = row.original;
             const locales = 'default';
             const options = {
-                hour: '2-digit' as const,
-                minute: '2-digit' as const,
-                second: '2-digit' as const,
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
                 hour12: false
-            };
+            } as const;
             return <span>{new Date(createdAt).toLocaleTimeString(locales, options)}</span>;
         }
     }

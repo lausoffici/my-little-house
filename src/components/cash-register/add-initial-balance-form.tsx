@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
 import { setCashRegisterBalance } from '@/lib/cash-register';
 
-import { FORM_ID } from '../add-initial-balance-dialog/';
+import { FORM_ID } from './add-initial-balance-dialog';
 
 const initialState = {
     message: '',
