@@ -41,15 +41,13 @@ const NavItem = ({ children, href, icon, path }: NavItemProps) => {
 };
 
 const Ilustration = ({ path }: { path: string }) => {
-    return (
-        <Image
-            className=''
-            src={path === '/' ? '/assets/book.png' : `/assets${path}.png`}
-            width={200}
-            height={200}
-            alt={path.slice(0, 1)}
-        />
-    );
+    const imagesByPath: Record<string, string> = {
+        '/students': '/assets/students.png',
+        '/courses': '/assets/courses.png',
+        '/cash-register': '/assets/cash-register.png'
+    };
+    const src = imagesByPath[path] ?? '/assets/book.png';
+    return <Image src={src} width={200} height={200} alt='Ilustration' />;
 };
 
 export default function Sidebar() {

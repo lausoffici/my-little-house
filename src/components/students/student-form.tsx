@@ -8,7 +8,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { MultiSelect } from '@/components/ui/multi-select';
 import { Textarea } from '@/components/ui/textarea';
-import { coursesOptions } from '@/lib/variables';
+import { coursesOptions } from '@/lib/constants';
 
 const studentFormSchema = z.object({
     firstName: z

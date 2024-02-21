@@ -8,3 +8,5 @@ export const studentListSearchParamsSchema = z.object({
     studentByCourse: z.string().optional(),
     lastName: z.string().optional()
 });
+
+export const studentNamesListQueryParamsSchema = z.string();
