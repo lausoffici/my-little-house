@@ -1,10 +1,10 @@
 'use server';
 
-import { getYearMonthDayFromSearchParams } from '@/components/cash-register/cash-register.utils';
 import { CashRegisterIncomingItem, SearchParams } from '@/types';
 
 import prisma from './prisma';
 import { formatCurrency } from './utils';
+import { getYearMonthDayFromSearchParams } from './utils/cash-register.utils';
 import { getCashRegisterBalanceSearchParamsSchema, incomingListSearchParamsSchema } from './validations/params';
 
 // If not date is provided, it will use the current date

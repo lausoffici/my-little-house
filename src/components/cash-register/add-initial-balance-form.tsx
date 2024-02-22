@@ -10,8 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
 import { setCashRegisterBalance } from '@/lib/cash-register';
-
-import { getAppliedDateFromSearchParams } from './cash-register.utils';
+import { getAppliedDateFromSearchParams } from '@/lib/utils/cash-register.utils';
 
 const initialState = {
     message: '',

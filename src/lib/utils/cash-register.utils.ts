@@ -14,11 +14,11 @@ export const getAppliedDateFromSearchParams = (searchParams: ReadonlyURLSearchPa
     const month = Number(searchParams.get('month'));
     const year = Number(searchParams.get('year'));
 
-    if (!day || !month || !year || !isValidDate(year, month, day)) {
-        return new Date();
+    if (day && month && year && isValidDate(year, month, day)) {
+        return new Date(year, month - 1, day);
     }
 
-    return new Date(year, month - 1, day);
+    return new Date();
 };
 
 // Returns an object with the year, month and day based on the search params day/month/year
