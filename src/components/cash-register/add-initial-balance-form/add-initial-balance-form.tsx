@@ -1,7 +1,7 @@
 'use client';
 
 import { CashRegisterInitialBalance } from '@prisma/client';
-import { CheckIcon } from '@radix-ui/react-icons';
+import { CheckIcon, ExclamationTriangleIcon } from '@radix-ui/react-icons';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 import { useFormState } from 'react-dom';
@@ -41,6 +41,7 @@ export function AddInitialBalanceForm({ onOpenDialogChange, initialBalance }: Ad
         if (state?.error) {
             toast({
                 description: state?.message,
+                icon: <ExclamationTriangleIcon width='20px' height='20px' />,
                 variant: 'destructive'
             });
         } else {

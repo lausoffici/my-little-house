@@ -36,5 +36,6 @@ export const studentFormSchema = z.object({
     mobilePhone: z.optional(z.string()),
     momPhone: z.optional(z.string()),
     dadPhone: z.optional(z.string()),
-    observations: z.optional(z.string())
+    observations: z.optional(z.string()),
+    id: z.optional(z.string())
 });

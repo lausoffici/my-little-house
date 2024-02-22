@@ -76,7 +76,7 @@ export const getStudentList = async (searchParams: SearchParams) => {
     return { data: students, totalPages };
 };
 
-export const createStudent = async (createdStudent: FormData) => {
+export const createStudent = async (_: any, createdStudent: FormData) => {
     const date = createdStudent.get('birthDate');
 
     const parsedData = studentFormSchema.safeParse({
@@ -95,39 +95,55 @@ export const createStudent = async (createdStudent: FormData) => {
     });
 
     if (!parsedData.success) {
+        console.error(parsedData.error.flatten().fieldErrors);
         return {
-            errors: parsedData.error.flatten().fieldErrors
+            error: true,
+            message: 'Error al crear el estudiante'
         };
     }
 
-    const student = await prisma.student.create({
-        data: {
-            firstName: parsedData.data.firstName,
-            lastName: parsedData.data.lastName,
-            birthDate: parsedData.data.birthDate,
-            dni: parsedData.data.dni,
-            address: parsedData.data.address,
-            city: parsedData.data.city,
-            phone: parsedData.data.phone,
-            mobilePhone: parsedData.data.mobilePhone,
-            momPhone: parsedData.data.momPhone,
-            dadPhone: parsedData.data.dadPhone,
-            observations: parsedData.data.observations
-        }
-    });
-
-    if (parsedData.data.courses) {
-        await prisma.studentByCourse.createMany({
-            data: parsedData.data.courses.split(',').map((id) => ({
-                studentId: student.id,
-                courseId: Number(id)
-            }))
+    try {
+        // Create the student
+        const student = await prisma.student.create({
+            data: {
+                firstName: parsedData.data.firstName,
+                lastName: parsedData.data.lastName,
+                birthDate: parsedData.data.birthDate,
+                dni: parsedData.data.dni,
+                address: parsedData.data.address,
+                city: parsedData.data.city,
+                phone: parsedData.data.phone,
+                mobilePhone: parsedData.data.mobilePhone,
+                momPhone: parsedData.data.momPhone,
+                dadPhone: parsedData.data.dadPhone,
+                observations: parsedData.data.observations
+            }
         });
+
+        // If the courses string is not empty, create the studentByCourse records
+        if (parsedData.data.courses) {
+            await prisma.studentByCourse.createMany({
+                data: parsedData.data.courses.split(',').map((id) => ({
+                    studentId: student.id,
+                    courseId: Number(id)
+                }))
+            });
+        }
+
+        return {
+            error: false,
+            message: `Estudiante creado extosamente: ${student.firstName} ${student.lastName}`
+        };
+    } catch (e) {
+        console.error(e);
+        return {
+            error: true,
+            message: 'Error al crear el estudiante'
+        };
     }
-    return student;
 };
 
-export const editStudent = async (id: number, editedStudent: FormData) => {
+export const editStudent = async (_: any, editedStudent: FormData) => {
     const parsedData = studentFormSchema.safeParse({
         firstName: editedStudent.get('firstName'),
         lastName: editedStudent.get('lastName'),
@@ -140,55 +156,72 @@ export const editStudent = async (id: number, editedStudent: FormData) => {
         mobilePhone: editedStudent.get('mobilePhone'),
         momPhone: editedStudent.get('momPhone'),
         dadPhone: editedStudent.get('dadPhone'),
-        observations: editedStudent.get('observations')
+        observations: editedStudent.get('observations'),
+        id: editedStudent.get('id')
     });
 
     if (!parsedData.success) {
+        console.error(parsedData.error.flatten().fieldErrors);
         return {
-            errors: parsedData.error.flatten().fieldErrors
+            error: true,
+            message: 'Error al editar el estudiante'
         };
     }
 
-    const student = await prisma.student.update({
-        where: {
-            id
-        },
-        include: {
-            studentByCourse: true
-        },
-        data: {
-            firstName: parsedData.data.firstName,
-            lastName: parsedData.data.lastName,
-            birthDate: parsedData.data.birthDate,
-            dni: parsedData.data.dni,
-            address: parsedData.data.address,
-            city: parsedData.data.city,
-            phone: parsedData.data.phone,
-            mobilePhone: parsedData.data.mobilePhone,
-            momPhone: parsedData.data.momPhone,
-            dadPhone: parsedData.data.dadPhone,
-            observations: parsedData.data.observations
-        }
-    });
+    const id = Number(parsedData.data.id);
 
-    const currentStudentCoursesId = student.studentByCourse.map(({ courseId }) => courseId).join(',');
-
-    if (parsedData.data.courses && parsedData.data.courses !== currentStudentCoursesId) {
-        await prisma.studentByCourse.deleteMany({
+    try {
+        const student = await prisma.student.update({
             where: {
-                studentId: id
+                id
+            },
+            include: {
+                studentByCourse: true
+            },
+            data: {
+                firstName: parsedData.data.firstName,
+                lastName: parsedData.data.lastName,
+                birthDate: parsedData.data.birthDate,
+                dni: parsedData.data.dni,
+                address: parsedData.data.address,
+                city: parsedData.data.city,
+                phone: parsedData.data.phone,
+                mobilePhone: parsedData.data.mobilePhone,
+                momPhone: parsedData.data.momPhone,
+                dadPhone: parsedData.data.dadPhone,
+                observations: parsedData.data.observations
             }
         });
 
-        await prisma.studentByCourse.createMany({
-            data: parsedData.data.courses.split(',').map((id) => ({
-                studentId: student.id,
-                courseId: Number(id)
-            }))
-        });
-    }
+        const currentStudentCoursesId = student.studentByCourse.map(({ courseId }) => courseId).join(',');
 
-    return student;
+        // If the courses string is not empty and it's different from the current courses string, delete the current studentByCourse records and create the new ones
+        if (parsedData.data.courses && parsedData.data.courses !== currentStudentCoursesId) {
+            await prisma.studentByCourse.deleteMany({
+                where: {
+                    studentId: id
+                }
+            });
+
+            await prisma.studentByCourse.createMany({
+                data: parsedData.data.courses.split(',').map((id) => ({
+                    studentId: student.id,
+                    courseId: Number(id)
+                }))
+            });
+        }
+
+        return {
+            error: false,
+            message: `Estudiante editado extosamente: ${student.firstName} ${student.lastName}`
+        };
+    } catch (e) {
+        console.error(e);
+        return {
+            error: true,
+            message: 'Error al editar el estudiante'
+        };
+    }
 };
 
 export const getStudentNamesByTerm = async (term: string) => {
