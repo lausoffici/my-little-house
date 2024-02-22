@@ -19,12 +19,16 @@ export default async function CashRegister({ searchParams }: CashRegisterProps) 
 
     return (
         <section>
-            <div className='flex justify-between items-center mb-6'>
-                <div className='flex items-center gap-3'>
-                    <h1 className='text-3xl font-bold text-foreground'>Caja</h1>
-                    <div className='w-[160px]'>
-                        <CashRegisterDatePicker />
-                    </div>
+            <div className='flex justify-between mb-6'>
+                <div>
+                    <h1 className='text-3xl font-bold text-foreground mb-1'>Caja</h1>
+                    <p className='text-gray-600 text-sm'>
+                        Consulta de entradas y salidas de dinero en efectivo por fecha.
+                    </p>
+                </div>
+
+                <div className='w-[160px]'>
+                    <CashRegisterDatePicker />
                 </div>
                 <AddInitialBalanceDialog initialBalance={initialBalance} />
             </div>
