@@ -27,4 +27,5 @@ export type CashRegisterIncomingItem = {
     receiptId: number;
     studentId: number;
     studentName: string;
+    createdAt: Date;
 };
