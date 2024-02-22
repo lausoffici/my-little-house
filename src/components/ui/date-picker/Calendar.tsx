@@ -20,13 +20,9 @@ import {
 } from 'react-aria';
 import { CalendarState, useCalendarState } from 'react-stately';
 
-import { cn } from '@/lib/utils';
+import { capitalizeFirstLetter, cn } from '@/lib/utils';
 
 import { Button } from '../button';
-
-function capitalizeFirstLetter(string: string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
-}
 
 function Calendar(props: CalendarProps<DateValue>) {
     const prevButtonRef = React.useRef<HTMLButtonElement | null>(null);
