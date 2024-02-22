@@ -1,4 +1,7 @@
 import { type Prisma } from '@prisma/client';
+import { VariantProps } from 'class-variance-authority';
+
+import { BadgeProps, badgeVariants, variants } from '@/components/ui/badge';
 
 export type Option = {
     value: string;
@@ -30,17 +33,4 @@ export type CashRegisterIncomingItem = {
     createdAt: Date;
 };
 
-export type invoicesStatusType = {
-    P: {
-        text: string;
-        color: 'default' | 'success' | 'informative' | 'destructive' | 'secondary' | 'outline' | null | undefined;
-    };
-    B: {
-        text: string;
-        color: 'default' | 'success' | 'informative' | 'destructive' | 'secondary' | 'outline' | null | undefined;
-    };
-    I: {
-        text: string;
-        color: 'default' | 'success' | 'informative' | 'destructive' | 'secondary' | 'outline' | null | undefined;
-    };
-};
+export type InvoicesStatusType = Record<string, { text: string; color: keyof (typeof variants)['variant'] }>;

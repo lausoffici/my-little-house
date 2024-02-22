@@ -16,9 +16,9 @@ import {
     DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import { capitalizeFirstLetter, getMonthName } from '@/lib/utils';
-import { invoicesStatusType } from '@/types';
+import { InvoicesStatusType } from '@/types';
 
-const invoicesStatus: invoicesStatusType = {
+const invoicesStatus: InvoicesStatusType = {
     P: {
         text: 'Pagado',
         color: 'success'
@@ -55,11 +55,11 @@ export const columns: ColumnDef<Invoice>[] = [
     },
     {
         accessorKey: 'description',
-        header: ({ column }) => <Label className='font-bold'>Descripción</Label>
+        header: () => <Label className='font-bold'>Descripción</Label>
     },
     {
         accessorKey: 'month',
-        header: ({ column }) => <Label className='font-bold'>Mes</Label>,
+        header: () => <Label className='font-bold'>Mes</Label>,
         cell: ({ row }) => {
             const monthNumber = row.original;
             const monthName = getMonthName(+monthNumber.month);
@@ -70,11 +70,11 @@ export const columns: ColumnDef<Invoice>[] = [
     },
     {
         accessorKey: 'year',
-        header: ({ column }) => <Label className='font-bold'>Año</Label>
+        header: () => <Label className='font-bold'>Año</Label>
     },
     {
         accessorKey: 'amount',
-        header: ({ column }) => <Label className='font-bold'>Precio</Label>,
+        header: () => <Label className='font-bold'>Precio</Label>,
         cell: ({ row }) => {
             const amount = row.original.amount;
             return <Label className='font-bold'>{`$${amount}`}</Label>;
@@ -82,7 +82,7 @@ export const columns: ColumnDef<Invoice>[] = [
     },
     {
         accessorKey: 'state',
-        header: ({ column }) => <Label className='font-bold'> Estado</Label>,
+        header: () => <Label className='font-bold'>Estado</Label>,
         cell: ({ row }) => {
             const invoice = row.original;
             return <Badge variant={invoicesStatus[invoice.state].color}>{invoicesStatus[invoice.state].text}</Badge>;
@@ -90,7 +90,7 @@ export const columns: ColumnDef<Invoice>[] = [
     },
     {
         id: 'actions',
-        cell: ({ row }) => {
+        cell: () => {
             return (
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
