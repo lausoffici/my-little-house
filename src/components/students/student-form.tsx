@@ -1,6 +1,10 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { CheckIcon, ExclamationTriangleIcon } from '@radix-ui/react-icons';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+import { useFormState } from 'react-dom';
 import { useForm } from 'react-hook-form';
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -12,6 +16,7 @@ import { studentFormSchema } from '@/lib/validations/form';
 import { Option } from '@/types';
 
 import { DateTimePicker } from '../ui/date-picker/date-picker';
+import { useToast } from '../ui/use-toast';
 
 type StudentFormValues = {
     firstName: string;
@@ -26,11 +31,20 @@ type StudentFormValues = {
     momPhone?: string;
     dadPhone?: string;
     observations?: string;
+    id?: number;
 };
+
 interface StudentFormProps {
-    onFormSubmit: (value: any) => void;
     defaultValues?: StudentFormValues;
     courseOptions: Option[];
+    onOpenDialogChange: (open: boolean) => void;
+    action: (
+        _: any,
+        formData: FormData
+    ) => Promise<{
+        error?: boolean;
+        message: string;
+    }>;
 }
 
 export const STUDENT_FORM_ID = 'student-form';
@@ -50,23 +64,49 @@ const emptyDefaultValues = {
     observations: ''
 };
 
+const initialState = {
+    message: '',
+    error: false
+};
+
 export default function StudentForm({
-    onFormSubmit,
     defaultValues = emptyDefaultValues,
-    courseOptions
+    courseOptions,
+    onOpenDialogChange,
+    action: serverAction
 }: StudentFormProps) {
+    const { toast } = useToast();
+    const router = useRouter();
+    const [state, action] = useFormState(serverAction, initialState);
+
     const form = useForm<StudentFormValues>({
         resolver: zodResolver(studentFormSchema),
         defaultValues
     });
 
-    function onSubmit(values: FormData) {
-        onFormSubmit(values);
-    }
+    useEffect(() => {
+        if (state === undefined || state.message === '') return;
+
+        if (state?.error) {
+            toast({
+                description: state?.message,
+                icon: <ExclamationTriangleIcon width='20px' height='20px' />,
+                variant: 'destructive'
+            });
+        } else {
+            toast({
+                description: state?.message,
+                icon: <CheckIcon width='20px' height='20px' />,
+                variant: 'success'
+            });
+            router.refresh();
+        }
+        onOpenDialogChange(false);
+    }, [onOpenDialogChange, router, state, toast]);
 
     return (
         <Form {...form}>
-            <form action={onSubmit} id={STUDENT_FORM_ID} className='grid grid-cols-2 gap-4'>
+            <form action={action} id={STUDENT_FORM_ID} className='grid grid-cols-2 gap-4'>
                 <FormField
                     control={form.control}
                     name='firstName'
@@ -234,6 +274,7 @@ export default function StudentForm({
                         </FormItem>
                     )}
                 />
+                <input type='hidden' name='id' value={defaultValues?.id} />
             </form>
         </Form>
     );

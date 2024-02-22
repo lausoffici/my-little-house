@@ -5,8 +5,7 @@ import { DateValue } from 'react-aria';
 
 import { DateTimePicker } from '@/components/ui/date-picker/date-picker';
 import { getDatePickerFormattedDate } from '@/lib/utils';
-
-import { getAppliedDateFromSearchParams } from './cash-register.utils';
+import { getAppliedDateFromSearchParams } from '@/lib/utils/cash-register.utils';
 
 export default function CashRegisterDatePicker() {
     const router = useRouter();

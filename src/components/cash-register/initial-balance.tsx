@@ -26,9 +26,6 @@ export default function InitialBalance({ initialBalancePromise }: InitialBalance
     ) : (
         <div className='flex items-center text-xl font-bold mb-6'>
             <h2 className='mr-2'>Saldo inicial:</h2>
-            <Badge variant='outline' className='text-sm mr-1'>
-                --
-            </Badge>
             <AddInitialBalanceDialog initialBalance={initialBalance} />
         </div>
     );

@@ -20,8 +20,13 @@ export default async function CashRegister({ searchParams }: CashRegisterProps) 
     return (
         <section>
             <div className='flex justify-between mb-6'>
-                <h1 className='text-3xl font-bold text-foreground'>Caja</h1>
-                <div className='w-[160px]'>
+                <div>
+                    <h1 className='text-3xl font-bold text-foreground'>Caja</h1>
+                    <p className='text-gray-600 text-sm mt-2'>
+                        Consulta de entradas y salidas de dinero en efectivo por fecha.
+                    </p>
+                </div>
+                <div className='max-w-[160px]'>
                     <CashRegisterDatePicker />
                 </div>
             </div>

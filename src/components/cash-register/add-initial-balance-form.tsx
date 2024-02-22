@@ -1,7 +1,7 @@
 'use client';
 
 import { CashRegisterInitialBalance } from '@prisma/client';
-import { CheckIcon } from '@radix-ui/react-icons';
+import { CheckIcon, ExclamationTriangleIcon } from '@radix-ui/react-icons';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 import { useFormState } from 'react-dom';
@@ -10,8 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
 import { setCashRegisterBalance } from '@/lib/cash-register';
-
-import { getAppliedDateFromSearchParams } from './cash-register.utils';
+import { getAppliedDateFromSearchParams } from '@/lib/utils/cash-register.utils';
 
 const initialState = {
     message: '',
@@ -39,6 +38,7 @@ export function AddInitialBalanceForm({ onOpenDialogChange, initialBalance }: Ad
         if (state?.error) {
             toast({
                 description: state?.message,
+                icon: <ExclamationTriangleIcon width='20px' height='20px' />,
                 variant: 'destructive'
             });
         } else {

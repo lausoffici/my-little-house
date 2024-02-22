@@ -15,9 +15,9 @@ import { Badge } from '@/components/ui/badge';
 import DataTable from '@/components/ui/data-table';
 import { getExpendituresByDate } from '@/lib/cash-register';
 import { formatCurrency, isToday } from '@/lib/utils';
+import { getAppliedDateFromSearchParams } from '@/lib/utils/cash-register.utils';
 
 import { AddOutcomingDialog } from '../add-outcoming-dialog';
-import { getAppliedDateFromSearchParams } from '../cash-register.utils';
 import { columns } from './columns';
 
 type OutcomingsTableProps = {

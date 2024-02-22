@@ -48,7 +48,7 @@ export default function DeleteStudentDialog({ studentWithCourses }: DeleteCourse
     return (
         <Dialog open={openDeleteStudentDialog} onOpenChange={setopenDeleteStudentDialog}>
             <DialogTrigger asChild>
-                <Button variant='destructive' className='p-2'>
+                <Button variant='destructive'>
                     <TrashIcon className='mr-2' /> Eliminar
                 </Button>
             </DialogTrigger>

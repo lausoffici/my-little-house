@@ -1,8 +1,6 @@
 'use client';
 
-import { ExclamationTriangleIcon, Pencil1Icon } from '@radix-ui/react-icons';
-import { CheckIcon } from '@radix-ui/react-icons';
-import { useRouter } from 'next/navigation';
+import { Pencil1Icon } from '@radix-ui/react-icons';
 import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -15,7 +13,6 @@ import {
     DialogTitle,
     DialogTrigger
 } from '@/components/ui/dialog';
-import { useToast } from '@/components/ui/use-toast';
 import { editStudent } from '@/lib/students';
 import { Option, StudentWithCourses } from '@/types';
 
@@ -27,9 +24,8 @@ type EditStudentDialogProps = {
 };
 
 export default function EditStudentDialog({ student, courseOptions }: EditStudentDialogProps) {
-    const [openEditStudentDialog, setOpenEditStudentDialog] = useState(false);
-    const router = useRouter();
-    const { toast } = useToast();
+    const [isOpen, setIsOpen] = useState(false);
+
     const {
         firstName,
         lastName,
@@ -45,28 +41,6 @@ export default function EditStudentDialog({ student, courseOptions }: EditStuden
         id
     } = student;
 
-    async function handleSubmit(editedStudent: FormData) {
-        try {
-            await editStudent(id, editedStudent);
-
-            toast({
-                description: `Estudiante editado: ${editedStudent.get('firstName')} ${editedStudent.get('lastName')}`,
-                icon: <CheckIcon width='20px' height='20px' />,
-                variant: 'success'
-            });
-
-            setOpenEditStudentDialog(false);
-            router.refresh();
-        } catch (error) {
-            toast({
-                description: `Ha ocurrido un error`,
-                icon: <ExclamationTriangleIcon width='20px' height='20px' />,
-                variant: 'destructive'
-            });
-            console.error(error);
-        }
-    }
-
     const courses = student.studentByCourse.map(({ course }) => course.id.toString());
 
     const defaultValues = {
@@ -81,11 +55,12 @@ export default function EditStudentDialog({ student, courseOptions }: EditStuden
         mobilePhone: mobilePhone || undefined,
         momPhone: momPhone || undefined,
         dadPhone: dadPhone || undefined,
-        observations: observations || undefined
+        observations: observations || undefined,
+        id
     };
 
     return (
-        <Dialog open={openEditStudentDialog} onOpenChange={setOpenEditStudentDialog}>
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
                 <Button variant='outline' size='sm' title='Editar' style={{ marginTop: 0 }}>
                     <Pencil1Icon className='mr-2' /> Editar
@@ -98,9 +73,14 @@ export default function EditStudentDialog({ student, courseOptions }: EditStuden
                         Modifique el formulario para editar la información del estudiante
                     </DialogDescription>
                 </DialogHeader>
-                <StudentForm onFormSubmit={handleSubmit} defaultValues={defaultValues} courseOptions={courseOptions} />
+                <StudentForm
+                    action={editStudent}
+                    defaultValues={defaultValues}
+                    courseOptions={courseOptions}
+                    onOpenDialogChange={setIsOpen}
+                />
                 <DialogFooter>
-                    <Button variant='outline' onClick={() => setOpenEditStudentDialog(false)}>
+                    <Button variant='outline' onClick={() => setIsOpen(false)}>
                         Cancelar
                     </Button>
                     <Button form={STUDENT_FORM_ID} type='submit'>
