@@ -15,7 +15,7 @@ type StudentInvoicesTableProps = {
 export default function StudentInvoicesTable({ invoicesPromise }: StudentInvoicesTableProps) {
     const invoices = React.use(invoicesPromise);
 
-    const sortedInvoices = invoices.sort((a, b) => {
+    const sortedInvoices = [...invoices].sort((a, b) => {
         if (a.year !== b.year) {
             return b.year - a.year;
         } else {

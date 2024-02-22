@@ -87,7 +87,7 @@ export default async function StudentPage({ params: { id } }: { params: { id: st
                         <CardTitle>Cuotas</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <React.Suspense fallback={'Cargando...'}>
+                        <React.Suspense fallback='Cargando...'>
                             <StudentInvoicesTable invoicesPromise={invoicesPromise} />
                         </React.Suspense>
                     </CardContent>
