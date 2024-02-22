@@ -1,6 +1,5 @@
 'use client';
 
-import { Student } from '@prisma/client';
 import { Cross2Icon } from '@radix-ui/react-icons';
 import { Table } from '@tanstack/react-table';
 import React from 'react';
@@ -9,10 +8,10 @@ import { useDebouncedCallback } from 'use-debounce';
 import { Button } from '@/components/ui/button';
 import { DataTableFacetedFilter, DataTableViewOptions } from '@/components/ui/data-table';
 import { Input } from '@/components/ui/input';
-import { Option } from '@/types';
+import { Option, StudentWithCourses } from '@/types';
 
 interface StudentsTableFilters {
-    table: Table<Student>;
+    table: Table<StudentWithCourses>;
     courseOptions: Option[];
 }
 
