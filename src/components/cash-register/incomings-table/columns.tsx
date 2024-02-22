@@ -11,6 +11,10 @@ import { CashRegisterIncomingItem } from '@/types';
 
 export const columns: ColumnDef<CashRegisterIncomingItem>[] = [
     {
+        accessorKey: 'studentName',
+        header: ({ column }) => <DataTableColumnHeader column={column} title='Alumno' />
+    },
+    {
         accessorKey: 'description',
         header: ({ column }) => <DataTableColumnHeader column={column} title='Concepto' />
     },
@@ -38,10 +42,6 @@ export const columns: ColumnDef<CashRegisterIncomingItem>[] = [
                 </Link>
             );
         }
-    },
-    {
-        accessorKey: 'studentName',
-        header: ({ column }) => <DataTableColumnHeader column={column} title='Alumno' />
     },
     {
         accessorKey: 'createdAt',

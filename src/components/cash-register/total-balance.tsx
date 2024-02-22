@@ -27,7 +27,7 @@ export default function TotalBalance({
 
     return (
         <div className='flex items-center'>
-            <h2 className='text-xl font-bold mr-2'>Debe haber:</h2>
+            <h2 className='text-xl font-bold mr-2'>Saldo total:</h2>
             <Badge variant='outline' className='text-foreground w-fit text-sm'>
                 {formatCurrency(totalBalance)}
             </Badge>
