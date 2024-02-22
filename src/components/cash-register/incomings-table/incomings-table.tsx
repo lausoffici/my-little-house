@@ -36,8 +36,8 @@ export default function IncomingsTable({ incomingsPromise }: IncomingsTableProps
 
     return (
         <>
-            <div className='flex items-center mb-2'>
-                <h2 className='text-xl font-bold mr-2'>Entradas</h2>
+            <div className='flex items-center mb-2 min-h-[32px]'>
+                <h2 className='text-xl font-bold mr-2'>Entradas:</h2>
                 <Badge variant='outline' className='text-sm'>
                     {formatCurrency(totalAmount)}
                 </Badge>

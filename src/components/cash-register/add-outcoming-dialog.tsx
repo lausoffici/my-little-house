@@ -1,6 +1,5 @@
 'use client';
 
-import { CashRegisterInitialBalance } from '@prisma/client';
 import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -14,30 +13,26 @@ import {
     DialogTrigger
 } from '@/components/ui/dialog';
 
-import { AddInitialBalanceForm } from './add-initial-balance-form';
+import { AddOutcomingForm, FORM_ID } from './add-outcoming-form';
 
-export const FORM_ID = 'add-outcoming-form';
-
-type AddOutcomingDialogProps = {
-    initialBalance: CashRegisterInitialBalance | null;
-};
-
-export function AddOutcomingDialog({ initialBalance }: AddOutcomingDialogProps) {
+export function AddOutcomingDialog() {
     const [openStudentDialog, setOpenStudentDialog] = useState(false);
 
     return (
         <Dialog open={openStudentDialog} onOpenChange={setOpenStudentDialog}>
             <DialogTrigger asChild>
-                <Button variant='ghost' size='sm'>
-                    {initialBalance ? 'Modificar' : 'Agregar'}
+                <Button variant='ghost' size='sm' className='px-2'>
+                    Agregar salida
                 </Button>
             </DialogTrigger>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Crear Salida</DialogTitle>
-                    <DialogDescription>Complete el formulario para agregar una salida de dinero</DialogDescription>
+                    <DialogTitle>Agregar salida</DialogTitle>
+                    <DialogDescription>
+                        Complete el formulario para agregar una salida de dinero a la caja
+                    </DialogDescription>
                 </DialogHeader>
-                <AddInitialBalanceForm initialBalance={initialBalance} onOpenDialogChange={setOpenStudentDialog} />
+                <AddOutcomingForm onOpenDialogChange={setOpenStudentDialog} />
                 <DialogFooter>
                     <Button variant='outline' onClick={() => setOpenStudentDialog(false)}>
                         Cancelar

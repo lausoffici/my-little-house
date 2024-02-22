@@ -1,17 +1,17 @@
 'use client';
 
-import { CashRegisterInitialBalance } from '@prisma/client';
 import { CheckIcon } from '@radix-ui/react-icons';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { useFormState } from 'react-dom';
+import { useForm } from 'react-hook-form';
 
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
-import { setCashRegisterBalance } from '@/lib/cash-register';
+import { addExpenditure } from '@/lib/cash-register';
 
-import { FORM_ID } from './add-outcoming-dialog';
+export const FORM_ID = 'add-outcoming-form';
 
 const initialState = {
     message: '',
@@ -20,20 +20,19 @@ const initialState = {
 
 type AddOutcomingForm = {
     onOpenDialogChange: (open: boolean) => void;
-    initialBalance: CashRegisterInitialBalance | null;
 };
 
-export function AddOutcomingForm({ onOpenDialogChange, initialBalance }: AddOutcomingForm) {
-    const { toast } = useToast();
-    const [state, action] = useFormState(setCashRegisterBalance, initialState);
+export function AddOutcomingForm({ onOpenDialogChange }: AddOutcomingForm) {
     const router = useRouter();
-    const searchParams = useSearchParams();
+    const [state, action] = useFormState(addExpenditure, initialState);
+    const { toast } = useToast();
 
-    const day = Number(searchParams.get('day')) || new Date().getDate();
-    const month = Number(searchParams.get('month')) || new Date().getMonth() + 1;
-    const year = Number(searchParams.get('year')) || new Date().getFullYear();
-
-    const date = new Date(year, month - 1, day);
+    const form = useForm({
+        defaultValues: {
+            description: '',
+            amount: 0
+        }
+    });
 
     useEffect(() => {
         if (state === undefined || state.message === '') return;
@@ -55,10 +54,39 @@ export function AddOutcomingForm({ onOpenDialogChange, initialBalance }: AddOutc
     }, [onOpenDialogChange, router, state, toast]);
 
     return (
-        <form action={action} className='space-y-2 py-3' id={FORM_ID}>
-            <Label htmlFor='amount'>Importe ($)</Label>
-            <Input type='number' name='balance' defaultValue={initialBalance?.balance} />
-            <input type='hidden' name='date' value={date.toISOString()} />
-        </form>
+        <Form {...form}>
+            <form action={action} className='space-y-2 py-3' id={FORM_ID}>
+                <FormField
+                    control={form.control}
+                    name='description'
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">
+                                Concepto
+                            </FormLabel>
+                            <FormControl>
+                                <Input required placeholder='Retiro' autoComplete='off' {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name='amount'
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">
+                                Importe ($)
+                            </FormLabel>
+                            <FormControl>
+                                <Input required type='number' placeholder='100' autoComplete='off' {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+            </form>
+        </Form>
     );
 }

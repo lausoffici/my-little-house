@@ -8,13 +8,16 @@ import {
     getSortedRowModel,
     useReactTable
 } from '@tanstack/react-table';
+import { useSearchParams } from 'next/navigation';
 import React from 'react';
 
 import { Badge } from '@/components/ui/badge';
 import DataTable from '@/components/ui/data-table';
 import { getExpendituresByDate } from '@/lib/cash-register';
-import { formatCurrency } from '@/lib/utils';
+import { formatCurrency, isToday } from '@/lib/utils';
 
+import { AddOutcomingDialog } from '../add-outcoming-dialog';
+import { getAppliedDateFromSearchParams } from '../cash-register.utils';
 import { columns } from './columns';
 
 type OutcomingsTableProps = {
@@ -22,6 +25,7 @@ type OutcomingsTableProps = {
 };
 
 export default function OutcomingsTable({ outcomingsPromise }: OutcomingsTableProps) {
+    const searchParams = useSearchParams();
     const { data, totalAmount } = React.use(outcomingsPromise);
 
     const table = useReactTable<Expenditure>({
@@ -34,13 +38,19 @@ export default function OutcomingsTable({ outcomingsPromise }: OutcomingsTablePr
         enableRowSelection: false
     });
 
+    const date = getAppliedDateFromSearchParams(searchParams);
+    const appliedDateIsToday = isToday(date);
+
     return (
         <>
-            <div className='flex items-center mb-2'>
-                <h2 className='text-xl font-bold mr-2'>Salidas</h2>
-                <Badge variant='outline' className='text-sm'>
-                    {formatCurrency(totalAmount)}
-                </Badge>
+            <div className='flex mb-2 justify-between items-center'>
+                <div className='flex items-center min-h-[32px]'>
+                    <h2 className='text-xl font-bold mr-2'>Salidas:</h2>
+                    <Badge variant='outline' className='text-sm mr-1'>
+                        {formatCurrency(totalAmount)}
+                    </Badge>
+                </div>
+                {appliedDateIsToday && <AddOutcomingDialog />}
             </div>
 
             <DataTable table={table} columns={columns} withRowSelection={false} />

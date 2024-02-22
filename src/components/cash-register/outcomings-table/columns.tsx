@@ -24,14 +24,14 @@ export const columns: ColumnDef<Expenditure>[] = [
         header: ({ column }) => <DataTableColumnHeader column={column} title='Hora' />,
         cell: ({ row }) => {
             const { createdAt } = row.original;
-            const locales = 'default';
+            const locales = 'es-AR';
             const options = {
                 hour: '2-digit',
                 minute: '2-digit',
                 second: '2-digit',
                 hour12: false
             } as const;
-            return <span>{new Date(createdAt).toLocaleTimeString(locales, options)}</span>;
+            return <span>{createdAt.toLocaleTimeString(locales, options)}</span>;
         }
     }
 ];

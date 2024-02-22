@@ -8,9 +8,10 @@ import { cn } from '@/lib/utils';
 interface DataTablePaginationProps<TData> {
     table: Table<TData>;
     withRowSelection?: boolean;
+    withPagination?: boolean;
 }
 
-export function DataTablePagination<TData>({ table, withRowSelection }: DataTablePaginationProps<TData>) {
+export function DataTablePagination<TData>({ table, withRowSelection = true }: DataTablePaginationProps<TData>) {
     return (
         <div className='flex items-center justify-between px-2 my-3'>
             <div className={cn('flex-1 text-sm text-muted-foreground', !withRowSelection && 'invisible')}>

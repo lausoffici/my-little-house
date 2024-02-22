@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
 import { setCashRegisterBalance } from '@/lib/cash-register';
 
-import { FORM_ID } from './add-initial-balance-dialog';
+import { getAppliedDateFromSearchParams } from './cash-register.utils';
 
 const initialState = {
     message: '',
@@ -23,17 +23,15 @@ type AddInitialBalanceFormProps = {
     initialBalance: CashRegisterInitialBalance | null;
 };
 
+export const FORM_ID = 'add-initial-balance-form';
+
 export function AddInitialBalanceForm({ onOpenDialogChange, initialBalance }: AddInitialBalanceFormProps) {
-    const { toast } = useToast();
-    const [state, action] = useFormState(setCashRegisterBalance, initialState);
     const router = useRouter();
     const searchParams = useSearchParams();
+    const [state, action] = useFormState(setCashRegisterBalance, initialState);
+    const { toast } = useToast();
 
-    const day = Number(searchParams.get('day')) || new Date().getDate();
-    const month = Number(searchParams.get('month')) || new Date().getMonth() + 1;
-    const year = Number(searchParams.get('year')) || new Date().getFullYear();
-
-    const date = new Date(year, month - 1, day);
+    const date = getAppliedDateFromSearchParams(searchParams);
 
     useEffect(() => {
         if (state === undefined || state.message === '') return;

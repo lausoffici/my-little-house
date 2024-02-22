@@ -19,3 +19,12 @@ export function formateDate(date: Date) {
 export function getDatePickerFormattedDate(date: Date) {
     return toCalendarDate(parseAbsolute(date.toISOString(), 'UTC'));
 }
+
+export const isToday = (date: Date) => {
+    const today = new Date();
+    return (
+        date.getDate() === today.getDate() &&
+        date.getMonth() === today.getMonth() &&
+        date.getFullYear() === today.getFullYear()
+    );
+};

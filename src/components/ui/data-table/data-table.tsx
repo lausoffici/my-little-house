@@ -1,3 +1,5 @@
+'use client';
+
 import { ColumnDef, Table as TanStackTable, flexRender } from '@tanstack/react-table';
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';

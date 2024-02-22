@@ -14,9 +14,7 @@ import {
     DialogTrigger
 } from '@/components/ui/dialog';
 
-import { AddInitialBalanceForm } from './add-initial-balance-form';
-
-export const FORM_ID = 'add-initial-balance-form';
+import { AddInitialBalanceForm, FORM_ID } from './add-initial-balance-form';
 
 type AddInitialBalanceDialogProps = {
     initialBalance: CashRegisterInitialBalance | null;
@@ -28,13 +26,13 @@ export function AddInitialBalanceDialog({ initialBalance }: AddInitialBalanceDia
     return (
         <Dialog open={openStudentDialog} onOpenChange={setOpenStudentDialog}>
             <DialogTrigger asChild>
-                <Button variant='ghost' size='sm'>
-                    {initialBalance ? 'Modificar' : 'Agregar'}
+                <Button variant='ghost' size='sm' className='px-2'>
+                    {initialBalance ? 'Modificar' : 'Agregar'} saldo inicial
                 </Button>
             </DialogTrigger>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Saldo inicial</DialogTitle>
+                    <DialogTitle>{initialBalance ? 'Modificar' : 'Agregar'} saldo inicial</DialogTitle>
                     <DialogDescription>
                         Complete el formulario para {initialBalance ? 'modificar' : 'agregar'} el saldo inicial de la
                         caja
@@ -46,7 +44,7 @@ export function AddInitialBalanceDialog({ initialBalance }: AddInitialBalanceDia
                         Cancelar
                     </Button>
                     <Button form={FORM_ID} type='submit'>
-                        Agregar
+                        {initialBalance ? 'Modificar' : 'Agregar'}
                     </Button>
                 </DialogFooter>
             </DialogContent>
