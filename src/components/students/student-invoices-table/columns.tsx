@@ -16,11 +16,21 @@ import {
     DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import { capitalizeFirstLetter, getMonthName } from '@/lib/utils';
+import { invoicesStatusType } from '@/types';
 
-const invoicesStatus = {
-    P: 'Pagado',
-    B: 'Becado',
-    I: 'Pendiente'
+const invoicesStatus: invoicesStatusType = {
+    P: {
+        text: 'Pagado',
+        color: 'success'
+    },
+    B: {
+        text: 'Becado',
+        color: 'informative'
+    },
+    I: {
+        text: 'Pendiente',
+        color: 'destructive'
+    }
 };
 
 export const columns: ColumnDef<Invoice>[] = [
@@ -75,11 +85,7 @@ export const columns: ColumnDef<Invoice>[] = [
         header: ({ column }) => <Label className='font-bold'> Estado</Label>,
         cell: ({ row }) => {
             const invoice = row.original;
-            return (
-                <Badge variant={invoice.state === 'I' ? 'destructive' : 'success'}>
-                    {invoicesStatus[invoice.state]}
-                </Badge>
-            );
+            return <Badge variant={invoicesStatus[invoice.state].color}>{invoicesStatus[invoice.state].text}</Badge>;
         }
     },
     {
@@ -96,7 +102,7 @@ export const columns: ColumnDef<Invoice>[] = [
                     <DropdownMenuContent align='end'>
                         <DropdownMenuLabel>Acciones</DropdownMenuLabel>
                         <DropdownMenuItem>
-                            <span>Cobrar</span>
+                            <span>Ver comprobante</span>
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>

@@ -29,3 +29,18 @@ export type CashRegisterIncomingItem = {
     studentName: string;
     createdAt: Date;
 };
+
+export type invoicesStatusType = {
+    P: {
+        text: string;
+        color: 'default' | 'success' | 'informative' | 'destructive' | 'secondary' | 'outline' | null | undefined;
+    };
+    B: {
+        text: string;
+        color: 'default' | 'success' | 'informative' | 'destructive' | 'secondary' | 'outline' | null | undefined;
+    };
+    I: {
+        text: string;
+        color: 'default' | 'success' | 'informative' | 'destructive' | 'secondary' | 'outline' | null | undefined;
+    };
+};
