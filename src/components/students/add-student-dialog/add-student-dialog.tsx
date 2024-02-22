@@ -29,7 +29,6 @@ export default function AddStudentDialog({ courseOptions }: AddStudentDialogProp
     async function handleSubmit(newStudent: FormData) {
         try {
             await createStudent(newStudent);
-
             toast({
                 description: `Estudiante creado: ${newStudent.get('firstName')} ${newStudent.get('lastName')}`,
                 icon: <CheckIcon width='20px' height='20px' />,

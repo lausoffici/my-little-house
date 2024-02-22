@@ -30,3 +30,12 @@ export function getMonthName(monthNumber: number) {
 
     return date.toLocaleString('es', { month: 'long' });
 }
+
+export const isToday = (date: Date) => {
+    const today = new Date();
+    return (
+        date.getDate() === today.getDate() &&
+        date.getMonth() === today.getMonth() &&
+        date.getFullYear() === today.getFullYear()
+    );
+};

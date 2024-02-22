@@ -1,12 +1,11 @@
 'use client';
 
-import { Student } from '@prisma/client';
 import React from 'react';
 
 import DataTable from '@/components/ui/data-table';
 import { useURLManagedDataTable } from '@/hooks/use-url-managed-data-table';
 import { getStudentList } from '@/lib/students';
-import { Option } from '@/types';
+import { Option, StudentWithCourses } from '@/types';
 
 import { columns } from './columns';
 import StudentsTableFilters from './students-table-filters';
@@ -22,7 +21,7 @@ type StudentsTableProps = {
 export default function StudentsTable({ studentsPromise, courseOptions }: StudentsTableProps) {
     const { data, totalPages } = React.use(studentsPromise);
 
-    const table = useURLManagedDataTable<Student>({
+    const table = useURLManagedDataTable<StudentWithCourses>({
         data,
         columns,
         pageCount: totalPages,

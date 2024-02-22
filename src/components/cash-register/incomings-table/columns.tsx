@@ -4,11 +4,10 @@ import { ExternalLinkIcon } from '@radix-ui/react-icons';
 import { ColumnDef } from '@tanstack/react-table';
 import Link from 'next/link';
 
+import { Badge } from '@/components/ui/badge';
 import { DataTableColumnHeader } from '@/components/ui/data-table';
 import { formatCurrency } from '@/lib/utils';
 import { CashRegisterIncomingItem } from '@/types';
-
-import { Badge } from '../../ui/badge';
 
 export const columns: ColumnDef<CashRegisterIncomingItem>[] = [
     {
@@ -42,7 +41,21 @@ export const columns: ColumnDef<CashRegisterIncomingItem>[] = [
     },
     {
         accessorKey: 'studentName',
-        header: ({ column }) => <DataTableColumnHeader column={column} title='Alumno' />,
-        enableSorting: false
+        header: ({ column }) => <DataTableColumnHeader column={column} title='Alumno' />
+    },
+    {
+        accessorKey: 'createdAt',
+        header: ({ column }) => <DataTableColumnHeader column={column} title='Hora' />,
+        cell: ({ row }) => {
+            const { createdAt } = row.original;
+            const locales = 'default';
+            const options = {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            } as const;
+            return <span>{new Date(createdAt).toLocaleTimeString(locales, options)}</span>;
+        }
     }
 ];

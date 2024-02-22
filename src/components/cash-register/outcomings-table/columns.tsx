@@ -1,0 +1,37 @@
+'use client';
+
+import { Expenditure } from '@prisma/client';
+import { ColumnDef } from '@tanstack/react-table';
+
+import { DataTableColumnHeader } from '@/components/ui/data-table';
+import { formatCurrency } from '@/lib/utils';
+
+export const columns: ColumnDef<Expenditure>[] = [
+    {
+        accessorKey: 'description',
+        header: ({ column }) => <DataTableColumnHeader column={column} title='Concepto' />
+    },
+    {
+        accessorKey: 'amount',
+        header: ({ column }) => <DataTableColumnHeader column={column} title='Importe' />,
+        cell: ({ row }) => {
+            const { amount } = row.original;
+            return <span>{formatCurrency(amount)}</span>;
+        }
+    },
+    {
+        accessorKey: 'createdAt',
+        header: ({ column }) => <DataTableColumnHeader column={column} title='Hora' />,
+        cell: ({ row }) => {
+            const { createdAt } = row.original;
+            const locales = 'es-AR';
+            const options = {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            } as const;
+            return <span>{createdAt.toLocaleTimeString(locales, options)}</span>;
+        }
+    }
+];

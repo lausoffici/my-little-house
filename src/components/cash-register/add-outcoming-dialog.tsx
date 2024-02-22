@@ -1,6 +1,5 @@
 'use client';
 
-import { CashRegisterInitialBalance } from '@prisma/client';
 import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -14,33 +13,26 @@ import {
     DialogTrigger
 } from '@/components/ui/dialog';
 
-import { AddInitialBalanceForm } from '../add-initial-balance-form';
+import { AddOutcomingForm, FORM_ID } from './add-outcoming-form';
 
-export const FORM_ID = 'add-initial-balance-form';
-
-type AddInitialBalanceDialogProps = {
-    initialBalance: CashRegisterInitialBalance | null;
-};
-
-export function AddInitialBalanceDialog({ initialBalance }: AddInitialBalanceDialogProps) {
+export function AddOutcomingDialog() {
     const [openStudentDialog, setOpenStudentDialog] = useState(false);
 
     return (
         <Dialog open={openStudentDialog} onOpenChange={setOpenStudentDialog}>
             <DialogTrigger asChild>
-                <Button>
-                    <span className='ml-2'>{initialBalance ? 'Modificar' : 'Agregar'} saldo inicial</span>
+                <Button variant='ghost' size='sm' className='px-2'>
+                    Agregar salida
                 </Button>
             </DialogTrigger>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Saldo inicial</DialogTitle>
+                    <DialogTitle>Agregar salida</DialogTitle>
                     <DialogDescription>
-                        Complete el formulario para {initialBalance ? 'modificar' : 'agregar'} el saldo inicial de la
-                        caja
+                        Complete el formulario para agregar una salida de dinero a la caja
                     </DialogDescription>
                 </DialogHeader>
-                <AddInitialBalanceForm initialBalance={initialBalance} onOpenDialogChange={setOpenStudentDialog} />
+                <AddOutcomingForm onOpenDialogChange={setOpenStudentDialog} />
                 <DialogFooter>
                     <Button variant='outline' onClick={() => setOpenStudentDialog(false)}>
                         Cancelar
