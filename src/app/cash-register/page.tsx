@@ -22,7 +22,7 @@ export default async function CashRegister({ searchParams }: CashRegisterProps) 
             <div className='flex justify-between mb-6'>
                 <div>
                     <h1 className='text-3xl font-bold text-foreground'>Caja</h1>
-                    <p className='text-gray-600 text-sm'>
+                    <p className='text-gray-600 text-sm mt-2'>
                         Consulta de entradas y salidas de dinero en efectivo por fecha.
                     </p>
                 </div>
