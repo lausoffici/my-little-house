@@ -26,7 +26,7 @@ export default async function CashRegister({ searchParams }: CashRegisterProps) 
                         Consulta de entradas y salidas de dinero en efectivo por fecha.
                     </p>
                 </div>
-                <div className='w-[160px]'>
+                <div className='max-w-[160px]'>
                     <CashRegisterDatePicker />
                 </div>
             </div>
