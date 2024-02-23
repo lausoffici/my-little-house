@@ -39,3 +39,8 @@ export const isToday = (date: Date) => {
         date.getFullYear() === today.getFullYear()
     );
 };
+
+export function padWithZeros(number: number) {
+    let strNumber = String(number);
+    return strNumber.padStart(7, '0');
+}

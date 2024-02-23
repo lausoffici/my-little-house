@@ -1,7 +1,6 @@
 import { type Prisma } from '@prisma/client';
-import { VariantProps } from 'class-variance-authority';
 
-import { BadgeProps, badgeVariants, variants } from '@/components/ui/badge';
+import { variants } from '@/components/ui/badge';
 
 export type Option = {
     value: string;
@@ -18,6 +17,21 @@ export type StudentWithCourses = Prisma.StudentGetPayload<{
         studentByCourse: {
             include: {
                 course: true;
+            };
+        };
+    };
+}>;
+
+export type ReceiptsWithItemsAndStudents = Prisma.ReceiptGetPayload<{
+    select: {
+        id: true;
+        total: true;
+        createdAt: true;
+        items: true;
+        student: {
+            select: {
+                firstName: true;
+                lastName: true;
             };
         };
     };
