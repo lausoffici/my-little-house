@@ -77,8 +77,8 @@ export default function ReceiptsDialog({ receipt }: ReceiptsDialogProps) {
                         <div className='border-b-2 border-gray-600 w-full'></div>
                         <div className='flex flex-col gap-2 py-2'>
                             {receipt.items.map((item) => (
-                                <div key={item.id} className='flex justify-between'>
-                                    <span className='italic'>{item.description}</span>
+                                <div key={item.id} className='flex justify-between gap-2'>
+                                    <span className='italic '>{item.description}</span>
                                     <span>{formatCurrency(item.amount)}</span>
                                 </div>
                             ))}
