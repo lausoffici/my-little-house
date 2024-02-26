@@ -1,7 +1,6 @@
 import { type Prisma } from '@prisma/client';
-import { VariantProps } from 'class-variance-authority';
 
-import { BadgeProps, badgeVariants, variants } from '@/components/ui/badge';
+import { variants } from '@/components/ui/badge';
 
 export type Option = {
     value: string;
@@ -34,3 +33,19 @@ export type CashRegisterIncomingItem = {
 };
 
 export type InvoicesStatusType = Record<string, { text: string; color: keyof (typeof variants)['variant'] }>;
+
+export type InvoiceListItem = Prisma.InvoiceGetPayload<{
+    include: {
+        student: {
+            select: {
+                firstName: true;
+                lastName: true;
+            };
+        };
+        course: {
+            select: {
+                name: true;
+            };
+        };
+    };
+}>;
