@@ -1,6 +1,7 @@
 import { type Prisma } from '@prisma/client';
 
 import { variants } from '@/components/ui/badge';
+import { getReceiptItemsById } from '@/lib/receipts';
 
 export type Option = {
     value: string;
@@ -22,12 +23,11 @@ export type StudentWithCourses = Prisma.StudentGetPayload<{
     };
 }>;
 
-export type ReceiptsWithItemsAndStudents = Prisma.ReceiptGetPayload<{
+export type ReceiptsWithStudents = Prisma.ReceiptGetPayload<{
     select: {
         id: true;
         total: true;
         createdAt: true;
-        items: true;
         student: {
             select: {
                 firstName: true;
@@ -36,6 +36,8 @@ export type ReceiptsWithItemsAndStudents = Prisma.ReceiptGetPayload<{
         };
     };
 }>;
+
+export type ReceiptItems = Awaited<ReturnType<typeof getReceiptItemsById>>;
 
 export type CashRegisterIncomingItem = {
     id: number;

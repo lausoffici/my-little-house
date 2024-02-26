@@ -22,8 +22,9 @@ export const incomingListSearchParamsSchema = z.object({
 export const receiptsByDateSchema = z.object({
     page: z.string().default('1'),
     size: z.string().default('10'),
-    sortBy: z.string().default('student'),
+    sortBy: z.string().default('studentId'),
     sortOrder: z.string().default('asc'),
+    receiptId: z.string().optional(),
     day: z.string().optional(),
     month: z.string().optional(),
     year: z.string().optional()

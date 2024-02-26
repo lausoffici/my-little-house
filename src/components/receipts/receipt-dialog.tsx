@@ -1,22 +1,22 @@
 'use client';
 
-import { ExternalLinkIcon } from 'lucide-react';
 import { Vesper_Libre } from 'next/font/google';
 import Image from 'next/image';
 import React, { useRef } from 'react';
-import { useState } from 'react';
 import ReactToPrint from 'react-to-print';
 
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { useSearchParams } from '@/hooks/use-search-params';
 import { formatCurrency, formateDate, padWithZeros } from '@/lib/utils';
-import { ReceiptsWithItemsAndStudents } from '@/types';
+import { ReceiptItems, ReceiptsWithStudents } from '@/types';
 
 import Logo from '../common/sidebar/logo';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader } from '../ui/card';
 
 type ReceiptsDialogProps = {
-    receipt: ReceiptsWithItemsAndStudents;
+    receipt: ReceiptsWithStudents;
+    items: ReceiptItems;
 };
 
 const vesper = Vesper_Libre({
@@ -24,24 +24,29 @@ const vesper = Vesper_Libre({
     weight: '400'
 });
 
-export default function ReceiptsDialog({ receipt }: ReceiptsDialogProps) {
-    const [isOpen, setIsOpen] = useState(false);
+export default function ReceiptDialog({ receipt, items }: ReceiptsDialogProps) {
     const receiptRef = useRef(null);
-
-    const fullName = `${receipt.student.firstName} ${receipt.student.lastName}`;
+    const { setSearchParam, searchParams } = useSearchParams();
 
     const handlePrint = () => {
         window.print();
     };
 
+    function handleOpen() {
+        setSearchParam('receiptId', receipt.id.toString());
+    }
+
+    function handleClose() {
+        setSearchParam('receiptId', '');
+    }
+
+    function onOpenChange(open: boolean) {
+        if (open) handleOpen();
+        else handleClose();
+    }
+
     return (
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogTrigger asChild>
-                <Button size='sm' className='py-0 px-2'>
-                    <span className='mr-2'>#{padWithZeros(receipt.id)}</span>
-                    <ExternalLinkIcon width={15} height={15} />
-                </Button>
-            </DialogTrigger>
+        <Dialog open={searchParams.get('receiptId') === receipt.id.toString()} onOpenChange={onOpenChange}>
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>Comprobante</DialogTitle>
@@ -67,7 +72,7 @@ export default function ReceiptsDialog({ receipt }: ReceiptsDialogProps) {
                     <CardContent>
                         <div className='my-4'>
                             <span className=' mr-2'>Estudiante:</span>
-                            <span className='font-semibold'>{fullName}</span>
+                            <span className='font-semibold'>{`${receipt.student.firstName} ${receipt.student.lastName}`}</span>
                         </div>
 
                         <div className='flex justify-between py-2'>
@@ -76,7 +81,7 @@ export default function ReceiptsDialog({ receipt }: ReceiptsDialogProps) {
                         </div>
                         <div className='border-b-2 border-gray-600 w-full'></div>
                         <div className='flex flex-col gap-2 py-2'>
-                            {receipt.items.map((item) => (
+                            {items?.map((item) => (
                                 <div key={item.id} className='flex justify-between gap-2'>
                                     <span className='italic '>{item.description}</span>
                                     <span>{formatCurrency(item.amount)}</span>
@@ -97,7 +102,7 @@ export default function ReceiptsDialog({ receipt }: ReceiptsDialogProps) {
                     </CardFooter>
                 </Card>
                 <DialogFooter className='flex flex-row justify-between w-full '>
-                    <Button variant='outline' onClick={() => setIsOpen(false)}>
+                    <Button variant='outline' onClick={handleClose}>
                         Cerrar
                     </Button>
                     <ReactToPrint

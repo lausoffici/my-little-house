@@ -120,6 +120,5 @@ input[type='number'] {
     @page {
         /* A6 paper size */
         size: 105mm 148mm;
-        orientation: landscape;
     }
 }

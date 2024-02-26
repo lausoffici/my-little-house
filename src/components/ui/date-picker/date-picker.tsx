@@ -5,7 +5,7 @@ import React, { useRef, useState } from 'react';
 import { DateValue, useButton, useDatePicker, useInteractOutside } from 'react-aria';
 import { DatePickerStateOptions, useDatePickerState } from 'react-stately';
 
-import { useForwardedRef } from '@/lib/useFowardedRef';
+import { useForwardedRef } from '@/lib/use-fowarded-ref';
 import { cn } from '@/lib/utils';
 
 import { Button } from '../button';
