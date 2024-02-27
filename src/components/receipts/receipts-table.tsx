@@ -18,7 +18,7 @@ interface ReceiptsTableProps {
 
 export default function ReceiptsTable({ receiptsPromise, receiptItemsPromise }: ReceiptsTableProps) {
     const { data, totalPages } = React.use(receiptsPromise);
-    const receiptItems = React.use(receiptItemsPromise);
+    const receiptItems = receiptItemsPromise ? React.use(receiptItemsPromise) : null;
     const { searchParams } = useSearchParams();
 
     const table = useURLManagedDataTable<ReceiptsWithStudents>({
@@ -32,7 +32,7 @@ export default function ReceiptsTable({ receiptsPromise, receiptItemsPromise }: 
     return (
         <>
             <DataTable table={table} columns={columns} />
-            {receipt && <ReceiptDialog receipt={receipt} key={receipt.id} items={receiptItems} />}
+            {receipt && <ReceiptDialog receipt={receipt} items={receiptItems} />}
         </>
     );
 }

@@ -18,11 +18,6 @@ export const columns: ColumnDef<ReceiptsWithStudents>[] = [
             const student = row.original.student;
             return <span>{`${student.lastName} ${student.firstName} `}</span>;
         },
-        sortingFn: ({ original: a }, { original: b }) => {
-            const lastNameA = a.student.lastName.toUpperCase();
-            const lastNameB = b.student.lastName.toUpperCase();
-            return lastNameA.localeCompare(lastNameB);
-        },
         enableHiding: false
     },
     {

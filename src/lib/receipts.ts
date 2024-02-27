@@ -56,12 +56,11 @@ export const getReceiptsByDate = async (searchParams: SearchParams) => {
     return { data: receipts, totalPages };
 };
 
-export const getReceiptItemsById = async (searchParams: SearchParams) => {
-    if (searchParams.receiptId) {
-        return await prisma.item.findMany({
-            where: {
-                receiptId: Number(searchParams.receiptId)
-            }
-        });
-    } else return null;
-};
+export const getReceiptItemsById = (searchParams: SearchParams) =>
+    searchParams.receiptId
+        ? prisma.item.findMany({
+              where: {
+                  receiptId: Number(searchParams.receiptId)
+              }
+          })
+        : null;
