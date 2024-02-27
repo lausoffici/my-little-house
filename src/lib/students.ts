@@ -92,33 +92,35 @@ const generateInvoices = async (
     const currentMonth = date.getMonth() + 1;
     const currentYear = date.getFullYear();
 
-    for (const id of courseIds) {
-        const currentCourse = await tx.course.findUnique({
-            where: {
-                id: Number(id)
-            }
-        });
-
-        // Create invoices for every month since current until December
-
-        const invoicesData: InvoiceDataType[] = [];
-
-        for (let i = currentMonth; i < 13; i++) {
-            invoicesData.push({
-                month: i,
-                year: currentYear,
-                description: `${currentCourse?.name} - ${getMonthName(i)}` || 'description',
-                amount: currentCourse?.amount || 1,
-                balance: 0,
-                state: 'I',
-                expiredAt: new Date(`${i}-15-${currentYear}`),
-                courseId: Number(id),
-                studentId: studentId
+    await Promise.all(
+        courseIds.map(async (id) => {
+            const currentCourse = await tx.course.findUnique({
+                where: {
+                    id: Number(id)
+                }
             });
-        }
 
-        await tx.invoice.createMany({ data: invoicesData });
-    }
+            // Create invoices for every month since current until December
+
+            const invoicesData: InvoiceDataType[] = [];
+
+            for (let i = currentMonth; i < 13; i++) {
+                invoicesData.push({
+                    month: i,
+                    year: currentYear,
+                    description: `${currentCourse?.name} - ${getMonthName(i)}` || 'description',
+                    amount: currentCourse?.amount || 1,
+                    balance: 0,
+                    state: 'I',
+                    expiredAt: new Date(`${i}-15-${currentYear}`),
+                    courseId: Number(id),
+                    studentId: studentId
+                });
+            }
+
+            await tx.invoice.createMany({ data: invoicesData });
+        })
+    );
 };
 
 export const createStudent = async (_: unknown, createdStudent: FormData) => {
