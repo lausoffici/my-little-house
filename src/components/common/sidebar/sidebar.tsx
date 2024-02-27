@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React from 'react';
-import { FiLock, FiMonitor, FiSmile } from 'react-icons/fi';
+import { FiDollarSign, FiLock, FiMonitor, FiSmile } from 'react-icons/fi';
 
 import { cn } from '@/lib/utils';
 
@@ -13,7 +13,8 @@ import Logo from './logo';
 const LinkItems = [
     { name: 'Estudiantes', icon: <FiSmile />, href: '/students' },
     { name: 'Cursos', icon: <FiMonitor />, href: '/courses' },
-    { name: 'Caja', icon: <FiLock />, href: '/cash-register' }
+    { name: 'Caja', icon: <FiLock />, href: '/cash-register' },
+    { name: 'Vencimientos', icon: <FiDollarSign />, href: '/expirations?sortBy=expiredAt&sortOrder=asc' }
 ];
 
 interface NavItemProps {
@@ -24,7 +25,7 @@ interface NavItemProps {
 }
 
 const NavItem = ({ children, href, icon, path }: NavItemProps) => {
-    const isActive = path === href;
+    const isActive = path.startsWith(href.split('?')[0]);
 
     return (
         <Link
