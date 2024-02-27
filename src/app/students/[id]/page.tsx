@@ -3,6 +3,7 @@ import React from 'react';
 import DeleteStudentDialog from '@/components/students/delete-student-dialog';
 import EditStudentDialog from '@/components/students/edit-student-dialog';
 import StudentDetail from '@/components/students/student-detail';
+import StudentInvoicesFilters from '@/components/students/student-invoices-filters';
 import StudentInvoicesTable from '@/components/students/student-invoices-table/student-invoices-table';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,10 +14,10 @@ import { getStudentById, getStudentInvoices } from '@/lib/students';
 import { formateDate } from '@/lib/utils';
 import { PageProps } from '@/types';
 
-export default async function StudentPage({ params: { id } }: PageProps<{ id: string }>) {
+export default async function StudentPage({ params: { id }, searchParams }: PageProps<{ id: string }>) {
     const student = await getStudentById(Number(id));
     const courseOptions = await getCourseOptions();
-    const invoicesPromise = getStudentInvoices(Number(id));
+    const invoicesPromise = getStudentInvoices(Number(id), searchParams);
 
     if (!student) {
         return <div>Student not found</div>;
@@ -85,7 +86,8 @@ export default async function StudentPage({ params: { id } }: PageProps<{ id: st
                 </Card>
                 <Card className='w-2/4'>
                     <CardHeader>
-                        <CardTitle>Cuotas</CardTitle>
+                        <CardTitle className='mb-4'>Cuotas</CardTitle>
+                        <StudentInvoicesFilters />
                     </CardHeader>
                     <CardContent>
                         <React.Suspense fallback='Cargando...'>

@@ -1,10 +1,12 @@
 'use server';
 
+import { InvoiceState } from '@prisma/client';
+
 import { SearchParams } from '@/types';
 
 import prisma from './prisma';
 import { studentFormSchema } from './validations/form';
-import { studentListSearchParamsSchema } from './validations/params';
+import { studentInvoiceListSearchParamsSchema, studentListSearchParamsSchema } from './validations/params';
 
 export const getStudentById = async (id: number) => {
     if (isNaN(id)) throw new Error('Invalid student id');
@@ -267,10 +269,31 @@ export const deleteStudent = async (id: number) => {
     });
 };
 
-export const getStudentInvoices = async (id: number) => {
-    return await prisma.invoice.findMany({
-        where: {
-            studentId: id
+export const getStudentInvoices = async (id: number, searchParams: SearchParams) => {
+    const { page, size, sortBy, sortOrder, showAll } = studentInvoiceListSearchParamsSchema.parse(searchParams);
+
+    const pageNumber = Number(page);
+    const pageSize = Number(size);
+
+    const whereClause = {
+        studentId: id,
+        state: showAll === 'true' ? undefined : ('I' as InvoiceState)
+    };
+
+    const invoicesCount = await prisma.invoice.count({
+        where: whereClause
+    });
+
+    const totalPages = Math.ceil(invoicesCount / pageSize);
+
+    const invoices = await prisma.invoice.findMany({
+        where: whereClause,
+        skip: (pageNumber - 1) * pageSize,
+        take: pageSize,
+        orderBy: {
+            [sortBy]: sortOrder
         }
     });
+
+    return { invoices, totalPages };
 };

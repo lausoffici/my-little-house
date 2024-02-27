@@ -47,3 +47,11 @@ export const expiredInvoiceListSearchParamsSchema = z.object({
 });
 
 export const invoiceStateSchema = z.nativeEnum(InvoiceState);
+
+export const studentInvoiceListSearchParamsSchema = z.object({
+    page: z.string().default('1'),
+    size: z.string().default('10'),
+    sortBy: z.string().default('id'),
+    sortOrder: z.string().default('asc'),
+    showAll: z.string().default('false')
+});
