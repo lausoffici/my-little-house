@@ -2,13 +2,9 @@ import React from 'react';
 
 import InvoicesTable from '@/components/invoices/invoices-table/invoices-table';
 import { getExpiredInvoiceList } from '@/lib/invoices';
-import { SearchParams } from '@/types';
+import { PageProps } from '@/types';
 
-export interface ExpirationsPageProps {
-    searchParams: SearchParams;
-}
-
-export default async function ExpirationsPage({ searchParams }: ExpirationsPageProps) {
+export default async function ExpirationsPage({ searchParams }: PageProps) {
     const expiredInvoicesPromise = getExpiredInvoiceList(searchParams);
 
     return (

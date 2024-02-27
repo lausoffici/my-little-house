@@ -4,13 +4,9 @@ import AddStudentDialog from '@/components/students/add-student-dialog/add-stude
 import StudentsTable from '@/components/students/students-table/students-table';
 import { getCourseOptions } from '@/lib/courses';
 import { getStudentList } from '@/lib/students';
-import { SearchParams } from '@/types';
+import { PageProps } from '@/types';
 
-export interface StudentsPageProps {
-    searchParams: SearchParams;
-}
-
-export default async function Students({ searchParams }: StudentsPageProps) {
+export default async function Students({ searchParams }: PageProps) {
     const courseOptions = await getCourseOptions();
     const studentsPromise = getStudentList(searchParams);
 

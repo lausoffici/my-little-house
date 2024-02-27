@@ -2,6 +2,11 @@ import { type Prisma } from '@prisma/client';
 
 import { variants } from '@/components/ui/badge';
 
+export interface PageProps<T extends object = {}> {
+    params: T;
+    searchParams: Record<string, string | string[] | undefined>;
+}
+
 export type Option = {
     value: string;
     label: string;
