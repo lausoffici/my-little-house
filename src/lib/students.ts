@@ -3,7 +3,7 @@
 import { Prisma, PrismaClient } from '@prisma/client';
 import { DefaultArgs } from '@prisma/client/runtime/library';
 
-import { SearchParams } from '@/types';
+import { InvoiceDataType, SearchParams } from '@/types';
 
 import prisma from './prisma';
 import { getMonthName } from './utils';
@@ -88,6 +88,10 @@ const generateInvoices = async (
     courseIds: string[],
     studentId: number
 ) => {
+    const date = new Date(Date.now());
+    const currentMonth = date.getMonth() + 1;
+    const currentYear = date.getFullYear();
+
     for (const id of courseIds) {
         const currentCourse = await tx.course.findUnique({
             where: {
@@ -95,26 +99,25 @@ const generateInvoices = async (
             }
         });
 
-        const date = new Date(Date.now());
-        const currentMonth = date.getMonth() + 1;
-        const currentYear = date.getFullYear();
-
         // Create invoices for every month since current until December
+
+        const invoicesData: InvoiceDataType[] = [];
+
         for (let i = currentMonth; i < 13; i++) {
-            await tx.invoice.create({
-                data: {
-                    month: i,
-                    year: currentYear,
-                    description: `${currentCourse?.name} - ${getMonthName(i)}` || 'description',
-                    amount: currentCourse?.amount || 1,
-                    balance: 0,
-                    state: 'I',
-                    expiredAt: new Date(`${i}-15-${currentYear}`),
-                    courseId: Number(id),
-                    studentId: studentId
-                }
+            invoicesData.push({
+                month: i,
+                year: currentYear,
+                description: `${currentCourse?.name} - ${getMonthName(i)}` || 'description',
+                amount: currentCourse?.amount || 1,
+                balance: 0,
+                state: 'I',
+                expiredAt: new Date(`${i}-15-${currentYear}`),
+                courseId: Number(id),
+                studentId: studentId
             });
         }
+
+        await tx.invoice.createMany({ data: invoicesData });
     }
 };
 
@@ -266,15 +269,17 @@ export const editStudent = async (_: unknown, editedStudent: FormData) => {
                     }))
                 });
 
-                for (const id of currentStudentCoursesId.split(',')) {
-                    await tx.invoice.deleteMany({
-                        where: {
-                            studentId,
-                            courseId: Number(id),
-                            state: 'I'
-                        }
-                    });
-                }
+                await Promise.all(
+                    currentStudentCoursesId.split(',').map((id) =>
+                        tx.invoice.deleteMany({
+                            where: {
+                                studentId,
+                                courseId: Number(id),
+                                state: 'I'
+                            }
+                        })
+                    )
+                );
 
                 await generateInvoices(tx, newCoursesIds, studentId);
             }

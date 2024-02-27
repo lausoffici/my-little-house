@@ -1,14 +1,13 @@
-import { type Prisma } from '@prisma/client';
+import { InvoiceState, type Prisma } from '@prisma/client';
 
 import { variants } from '@/components/ui/badge';
 import { getExpiredInvoiceList } from '@/lib/invoices';
+import { getReceiptItemsById, getReceiptsByDate } from '@/lib/receipts';
 
 export interface PageProps<T extends object = {}> {
     params: T;
     searchParams: Record<string, string | string[] | undefined>;
 }
-import { variants } from '@/components/ui/badge';
-import { getReceiptItemsById, getReceiptsByDate } from '@/lib/receipts';
 
 export type Option = {
     value: string;
@@ -47,3 +46,15 @@ export type CashRegisterIncomingItem = {
 export type InvoicesStatusType = Record<string, { text: string; color: keyof (typeof variants)['variant'] }>;
 
 export type InvoiceListItem = Awaited<ReturnType<typeof getExpiredInvoiceList>>['data'][0];
+
+export type InvoiceDataType = {
+    month: number;
+    year: number;
+    description: string;
+    amount: number;
+    balance: number;
+    state: InvoiceState;
+    expiredAt: Date;
+    studentId: number;
+    courseId: number;
+};
