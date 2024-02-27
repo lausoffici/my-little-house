@@ -7,6 +7,8 @@ export interface PageProps<T extends object = {}> {
     params: T;
     searchParams: Record<string, string | string[] | undefined>;
 }
+import { variants } from '@/components/ui/badge';
+import { getReceiptItemsById, getReceiptsByDate } from '@/lib/receipts';
 
 export type Option = {
     value: string;
@@ -27,6 +29,10 @@ export type StudentWithCourses = Prisma.StudentGetPayload<{
         };
     };
 }>;
+
+export type ReceiptsWithStudents = Awaited<ReturnType<typeof getReceiptsByDate>>['data'][0];
+
+export type ReceiptItems = Awaited<ReturnType<typeof getReceiptItemsById>>;
 
 export type CashRegisterIncomingItem = {
     id: number;

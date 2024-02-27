@@ -7,7 +7,7 @@ import { DateTimePicker } from '@/components/ui/date-picker/date-picker';
 import { getDatePickerFormattedDate } from '@/lib/utils';
 import { getAppliedDateFromSearchParams } from '@/lib/utils/cash-register.utils';
 
-export default function CashRegisterDatePicker() {
+export default function DatePickerWithURLParams() {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();

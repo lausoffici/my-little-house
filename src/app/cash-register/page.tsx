@@ -1,10 +1,10 @@
 import React from 'react';
 
-import CashRegisterDatePicker from '@/components/cash-register/cash-register-date-picker';
 import IncomingsTable from '@/components/cash-register/incomings-table';
 import InitialBalance from '@/components/cash-register/initial-balance';
 import OutcomingsTable from '@/components/cash-register/outcomings-table';
 import TotalBalance from '@/components/cash-register/total-balance';
+import DatePickerWithURLParams from '@/components/ui/date-picker/date-picker-with-url-params';
 import { getCashRegisterBalance, getExpendituresByDate, getIncomingsListByDate } from '@/lib/cash-register';
 import { PageProps } from '@/types';
 
@@ -23,7 +23,7 @@ export default async function CashRegister({ searchParams }: PageProps) {
                     </p>
                 </div>
                 <div className='w-full max-w-[160px]'>
-                    <CashRegisterDatePicker />
+                    <DatePickerWithURLParams />
                 </div>
             </div>
             <React.Suspense fallback='Cargando saldo inicial...'>
