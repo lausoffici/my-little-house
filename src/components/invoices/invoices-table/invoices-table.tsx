@@ -7,6 +7,7 @@ import DataTable from '@/components/ui/data-table';
 import { useURLManagedDataTable } from '@/hooks/use-url-managed-data-table';
 import { getExpiredInvoiceList } from '@/lib/invoices';
 import { formatCurrency } from '@/lib/utils';
+import { InvoiceListItem } from '@/types';
 
 import { columns } from './columns';
 
@@ -17,7 +18,7 @@ type InvoicesTableTableProps = {
 export default function InvoicesTable({ invoicesPromise }: InvoicesTableTableProps) {
     const { data, totalPages, totalExpiredAmount } = React.use(invoicesPromise);
 
-    const table = useURLManagedDataTable<Awaited<ReturnType<typeof getExpiredInvoiceList>>['data'][0]>({
+    const table = useURLManagedDataTable<InvoiceListItem>({
         data,
         columns,
         pageCount: totalPages

@@ -1,6 +1,7 @@
 import { type Prisma } from '@prisma/client';
 
 import { variants } from '@/components/ui/badge';
+import { getExpiredInvoiceList } from '@/lib/invoices';
 
 export interface PageProps<T extends object = {}> {
     params: T;
@@ -38,3 +39,5 @@ export type CashRegisterIncomingItem = {
 };
 
 export type InvoicesStatusType = Record<string, { text: string; color: keyof (typeof variants)['variant'] }>;
+
+export type InvoiceListItem = Awaited<ReturnType<typeof getExpiredInvoiceList>>['data'][0];
