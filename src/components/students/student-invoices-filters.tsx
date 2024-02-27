@@ -21,7 +21,7 @@ export default function StudentInvoicesFilters() {
                 htmlFor='showAll'
                 className='text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
             >
-                Mostrar todas las cuotas
+                Mostrar todas
             </label>
         </div>
     );
