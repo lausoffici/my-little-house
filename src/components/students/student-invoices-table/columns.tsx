@@ -1,13 +1,13 @@
 'use client';
 
 import { Invoice } from '@prisma/client';
-import { Label } from '@radix-ui/react-label';
 import { ColumnDef } from '@tanstack/react-table';
 import { MoreHorizontal } from 'lucide-react';
 
-import { Badge } from '@/components/ui/badge';
+import InvoiceStateBadge from '@/components/invoices/invoice-state-badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { DataTableColumnHeader } from '@/components/ui/data-table';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -15,23 +15,7 @@ import {
     DropdownMenuLabel,
     DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { capitalizeFirstLetter, getMonthName } from '@/lib/utils';
-import { InvoicesStatusType } from '@/types';
-
-const invoicesStatus: InvoicesStatusType = {
-    P: {
-        text: 'Pagado',
-        color: 'success'
-    },
-    B: {
-        text: 'Becado',
-        color: 'informative'
-    },
-    I: {
-        text: 'Pendiente',
-        color: 'destructive'
-    }
-};
+import { formatCurrency, getMonthName } from '@/lib/utils';
 
 export const columns: ColumnDef<Invoice>[] = [
     {
@@ -55,38 +39,26 @@ export const columns: ColumnDef<Invoice>[] = [
     },
     {
         accessorKey: 'description',
-        header: () => <Label className='font-bold'>Descripción</Label>
+        header: ({ column }) => <DataTableColumnHeader column={column} title='Descripción' />
     },
     {
         accessorKey: 'month',
-        header: () => <Label className='font-bold'>Mes</Label>,
-        cell: ({ row }) => {
-            const monthNumber = row.original;
-            const monthName = getMonthName(+monthNumber.month);
-
-            return <span>{capitalizeFirstLetter(monthName)}</span>;
-        },
-        enableSorting: true
+        header: ({ column }) => <DataTableColumnHeader column={column} title='Mes' />,
+        cell: ({ row }) => <span>{getMonthName(row.original.month)}</span>
     },
     {
         accessorKey: 'year',
-        header: () => <Label className='font-bold'>Año</Label>
+        header: ({ column }) => <DataTableColumnHeader column={column} title='Año' />
     },
     {
         accessorKey: 'amount',
-        header: () => <Label className='font-bold'>Precio</Label>,
-        cell: ({ row }) => {
-            const amount = row.original.amount;
-            return <Label className='font-bold'>{`$${amount}`}</Label>;
-        }
+        header: ({ column }) => <DataTableColumnHeader column={column} title='Importe' />,
+        cell: ({ row }) => <span>{formatCurrency(row.original.amount)}</span>
     },
     {
         accessorKey: 'state',
-        header: () => <Label className='font-bold'>Estado</Label>,
-        cell: ({ row }) => {
-            const invoice = row.original;
-            return <Badge variant={invoicesStatus[invoice.state].color}>{invoicesStatus[invoice.state].text}</Badge>;
-        }
+        header: ({ column }) => <DataTableColumnHeader column={column} title='Estado' />,
+        cell: ({ row }) => <InvoiceStateBadge state={row.original.state} />
     },
     {
         id: 'actions',

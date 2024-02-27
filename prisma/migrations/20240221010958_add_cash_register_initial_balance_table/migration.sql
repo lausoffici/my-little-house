@@ -11,3 +11,23 @@ CREATE TABLE "CashRegisterInitialBalance" (
 
 -- CreateIndex
 CREATE UNIQUE INDEX "CashRegisterInitialBalance_year_month_day_key" ON "CashRegisterInitialBalance"("year", "month", "day");
+
+ALTER SEQUENCE "Student_id_seq" RESTART WITH 25554;
+
+ALTER SEQUENCE "Course_id_seq" RESTART WITH 11076;
+
+ALTER SEQUENCE "Additional_id_seq" RESTART WITH 30833;
+
+ALTER SEQUENCE "EnrollmentYear_id_seq" RESTART WITH 1005;
+
+ALTER SEQUENCE "Expenditure_id_seq" RESTART WITH 31421;
+
+ALTER SEQUENCE "Invoice_id_seq" RESTART WITH 31421;
+
+ALTER SEQUENCE "Item_id_seq" RESTART WITH 63773;
+
+ALTER SEQUENCE "Receipt_id_seq" RESTART WITH 62494;
+
+ALTER SEQUENCE "StudentByCourse_id_seq" RESTART WITH 682;
+
+ALTER SEQUENCE "StudentEnrollment_id_seq" RESTART WITH 30150;

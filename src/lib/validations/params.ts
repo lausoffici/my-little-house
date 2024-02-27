@@ -1,3 +1,4 @@
+import { InvoiceState } from '@prisma/client';
 import { z } from 'zod';
 
 export const studentListSearchParamsSchema = z.object({
@@ -37,3 +38,12 @@ export const getCashRegisterBalanceSearchParamsSchema = z.object({
     month: z.string().optional(),
     year: z.string().optional()
 });
+
+export const expiredInvoiceListSearchParamsSchema = z.object({
+    page: z.string().default('1'),
+    size: z.string().default('10'),
+    sortBy: z.string().default('expiredAt'),
+    sortOrder: z.string().default('asc')
+});
+
+export const invoiceStateSchema = z.nativeEnum(InvoiceState);

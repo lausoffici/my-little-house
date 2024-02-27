@@ -11,8 +11,9 @@ import { Separator } from '@/components/ui/separator';
 import { getCourseOptions } from '@/lib/courses';
 import { getStudentById, getStudentInvoices } from '@/lib/students';
 import { formateDate } from '@/lib/utils';
+import { PageProps } from '@/types';
 
-export default async function StudentPage({ params: { id } }: { params: { id: string } }) {
+export default async function StudentPage({ params: { id } }: PageProps<{ id: string }>) {
     const student = await getStudentById(Number(id));
     const courseOptions = await getCourseOptions();
     const invoicesPromise = getStudentInvoices(Number(id));

@@ -6,13 +6,9 @@ import OutcomingsTable from '@/components/cash-register/outcomings-table';
 import TotalBalance from '@/components/cash-register/total-balance';
 import DatePickerWithURLParams from '@/components/ui/date-picker/date-picker-with-url-params';
 import { getCashRegisterBalance, getExpendituresByDate, getIncomingsListByDate } from '@/lib/cash-register';
-import { SearchParams } from '@/types';
+import { PageProps } from '@/types';
 
-export interface CashRegisterProps {
-    searchParams: SearchParams;
-}
-
-export default async function CashRegister({ searchParams }: CashRegisterProps) {
+export default async function CashRegister({ searchParams }: PageProps) {
     const incomingsPromise = getIncomingsListByDate(searchParams);
     const outcomingsPromise = getExpendituresByDate(searchParams);
     const initialBalancePromise = getCashRegisterBalance(searchParams);
