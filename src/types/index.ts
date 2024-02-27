@@ -38,19 +38,3 @@ export type CashRegisterIncomingItem = {
 };
 
 export type InvoicesStatusType = Record<string, { text: string; color: keyof (typeof variants)['variant'] }>;
-
-export type InvoiceListItem = Prisma.InvoiceGetPayload<{
-    include: {
-        student: {
-            select: {
-                firstName: true;
-                lastName: true;
-            };
-        };
-        course: {
-            select: {
-                name: true;
-            };
-        };
-    };
-}>;

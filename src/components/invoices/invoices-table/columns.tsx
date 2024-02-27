@@ -3,12 +3,12 @@
 import { ColumnDef } from '@tanstack/react-table';
 
 import { DataTableColumnHeader } from '@/components/ui/data-table';
+import { getExpiredInvoiceList } from '@/lib/invoices';
 import { formatCurrency, formateDate, getMonthName } from '@/lib/utils';
-import { InvoiceListItem } from '@/types';
 
 import InvoiceStateBadge from '../invoice-state-badge';
 
-export const columns: ColumnDef<InvoiceListItem>[] = [
+export const columns: ColumnDef<Awaited<ReturnType<typeof getExpiredInvoiceList>>['data'][0]>[] = [
     {
         accessorKey: 'student',
         header: ({ column }) => <DataTableColumnHeader column={column} title='Estudiante' />,
