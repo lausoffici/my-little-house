@@ -99,11 +99,9 @@ const generateInvoices = async (
         const currentMonth = date.getMonth() + 1;
         const currentYear = date.getFullYear();
 
-        const promises = [];
-
         // Create invoices for every month since current until December
         for (let i = currentMonth; i < 13; i++) {
-            const invoicePromises = await tx.invoice.create({
+            await tx.invoice.create({
                 data: {
                     month: i,
                     year: currentYear,
@@ -116,8 +114,6 @@ const generateInvoices = async (
                     studentId: studentId
                 }
             });
-
-            promises.push(invoicePromises);
         }
     }
 };
@@ -270,7 +266,7 @@ export const editStudent = async (_: unknown, editedStudent: FormData) => {
                     }))
                 });
 
-                for (const id of currentStudentCoursesId) {
+                for (const id of currentStudentCoursesId.split(',')) {
                     await tx.invoice.deleteMany({
                         where: {
                             studentId,
