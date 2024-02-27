@@ -1,10 +1,12 @@
 'use server';
 
-import { InvoiceState } from '@prisma/client';
+import { InvoiceState, Prisma, PrismaClient } from '@prisma/client';
+import { DefaultArgs } from '@prisma/client/runtime/library';
 
-import { SearchParams } from '@/types';
+import { InvoiceDataType, SearchParams } from '@/types';
 
 import prisma from './prisma';
+import { getMonthName } from './utils';
 import { studentFormSchema } from './validations/form';
 import { studentInvoiceListSearchParamsSchema, studentListSearchParamsSchema } from './validations/params';
 
@@ -78,14 +80,57 @@ export const getStudentList = async (searchParams: SearchParams) => {
     return { data: students, totalPages };
 };
 
+const generateInvoices = async (
+    tx: Omit<
+        PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>,
+        '$connect' | '$disconnect' | '$on' | '$transaction' | '$use' | '$extends'
+    >,
+    courseIds: string[],
+    studentId: number
+) => {
+    const date = new Date(Date.now());
+    const currentMonth = date.getMonth() + 1;
+    const currentYear = date.getFullYear();
+
+    await Promise.all(
+        courseIds.map(async (id) => {
+            const currentCourse = await tx.course.findUnique({
+                where: {
+                    id: Number(id)
+                }
+            });
+
+            // Create invoices for every month since current until December
+
+            const invoicesData: InvoiceDataType[] = [];
+
+            for (let i = currentMonth; i < 13; i++) {
+                invoicesData.push({
+                    month: i,
+                    year: currentYear,
+                    description: `${currentCourse?.name} - ${getMonthName(i)}` || 'description',
+                    amount: currentCourse?.amount || 1,
+                    balance: 0,
+                    state: 'I',
+                    expiredAt: new Date(`${i}-15-${currentYear}`),
+                    courseId: Number(id),
+                    studentId: studentId
+                });
+            }
+
+            await tx.invoice.createMany({ data: invoicesData });
+        })
+    );
+};
+
 export const createStudent = async (_: unknown, createdStudent: FormData) => {
-    const date = createdStudent.get('birthDate');
+    const birthDate = createdStudent.get('birthDate');
 
     const parsedData = studentFormSchema.safeParse({
         firstName: createdStudent.get('firstName'),
         lastName: createdStudent.get('lastName'),
         courses: createdStudent.get('courses'),
-        birthDate: date === '' ? undefined : date,
+        birthDate: birthDate === '' ? undefined : birthDate,
         dni: createdStudent.get('dni'),
         address: createdStudent.get('address'),
         city: createdStudent.get('city'),
@@ -106,29 +151,37 @@ export const createStudent = async (_: unknown, createdStudent: FormData) => {
 
     try {
         // Create the student
-        const student = await prisma.student.create({
-            data: {
-                firstName: parsedData.data.firstName,
-                lastName: parsedData.data.lastName,
-                birthDate: parsedData.data.birthDate,
-                dni: parsedData.data.dni,
-                address: parsedData.data.address,
-                city: parsedData.data.city,
-                phone: parsedData.data.phone,
-                mobilePhone: parsedData.data.mobilePhone,
-                momPhone: parsedData.data.momPhone,
-                dadPhone: parsedData.data.dadPhone,
-                observations: parsedData.data.observations,
+        const student = await prisma.$transaction(async (tx) => {
+            const student = await tx.student.create({
+                data: {
+                    firstName: parsedData.data.firstName,
+                    lastName: parsedData.data.lastName,
+                    birthDate: parsedData.data.birthDate,
+                    dni: parsedData.data.dni,
+                    address: parsedData.data.address,
+                    city: parsedData.data.city,
+                    phone: parsedData.data.phone,
+                    mobilePhone: parsedData.data.mobilePhone,
+                    momPhone: parsedData.data.momPhone,
+                    dadPhone: parsedData.data.dadPhone,
+                    observations: parsedData.data.observations,
 
-                // If the courses string is not empty, create the studentByCourse records
-                studentByCourse: {
-                    create: parsedData.data.courses
-                        ? parsedData.data.courses.split(',').map((id) => ({
-                              courseId: Number(id)
-                          }))
-                        : []
+                    // If the courses string is not empty, create the studentByCourse records
+                    studentByCourse: {
+                        create: parsedData.data.courses
+                            ? parsedData.data.courses.split(',').map((id) => ({
+                                  courseId: Number(id)
+                              }))
+                            : []
+                    }
                 }
+            });
+
+            if (parsedData.data.courses) {
+                await generateInvoices(tx, parsedData.data.courses.split(','), student.id);
             }
+
+            return student;
         });
 
         return {
@@ -145,11 +198,13 @@ export const createStudent = async (_: unknown, createdStudent: FormData) => {
 };
 
 export const editStudent = async (_: unknown, editedStudent: FormData) => {
+    const birthDate = editedStudent.get('birthDate');
+
     const parsedData = studentFormSchema.safeParse({
         firstName: editedStudent.get('firstName'),
         lastName: editedStudent.get('lastName'),
         courses: editedStudent.get('courses'),
-        birthDate: editedStudent.get('birthDate'),
+        birthDate: birthDate === '' ? undefined : birthDate,
         dni: editedStudent.get('dni'),
         address: editedStudent.get('address'),
         city: editedStudent.get('city'),
@@ -197,7 +252,9 @@ export const editStudent = async (_: unknown, editedStudent: FormData) => {
 
             const currentStudentCoursesId = student.studentByCourse.map(({ courseId }) => courseId).join(',');
 
-            // If the courses string is not empty and it's different from the current courses string, delete the current studentByCourse records and create the new ones
+            /* If the courses string is not empty and it's different from the current courses string, delete the current studentByCourse records and create the new ones
+             also delete all the unpaid invoices of that course */
+
             if (parsedData.data.courses && parsedData.data.courses !== currentStudentCoursesId) {
                 await tx.studentByCourse.deleteMany({
                     where: {
@@ -205,12 +262,28 @@ export const editStudent = async (_: unknown, editedStudent: FormData) => {
                     }
                 });
 
+                const newCoursesIds = parsedData.data.courses.split(',');
+
                 await tx.studentByCourse.createMany({
-                    data: parsedData.data.courses.split(',').map((id) => ({
-                        studentId: student.id,
+                    data: newCoursesIds.map((id) => ({
+                        studentId,
                         courseId: Number(id)
                     }))
                 });
+
+                await Promise.all(
+                    currentStudentCoursesId.split(',').map((id) =>
+                        tx.invoice.deleteMany({
+                            where: {
+                                studentId,
+                                courseId: Number(id),
+                                state: 'I'
+                            }
+                        })
+                    )
+                );
+
+                await generateInvoices(tx, newCoursesIds, studentId);
             }
 
             return student;
@@ -218,7 +291,7 @@ export const editStudent = async (_: unknown, editedStudent: FormData) => {
 
         return {
             error: false,
-            message: `Estudiante editado extosamente: ${student.firstName} ${student.lastName}`
+            message: `Estudiante editado exitosamente: ${student.firstName} ${student.lastName}`
         };
     } catch (e) {
         console.error(e);
