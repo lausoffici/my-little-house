@@ -44,3 +44,10 @@ export function padWithZeros(number: number) {
     let strNumber = String(number);
     return strNumber.padStart(7, '0');
 }
+
+export function getPaginationClause(page: number, size: number) {
+    return {
+        skip: (page - 1) * size,
+        take: size
+    };
+}

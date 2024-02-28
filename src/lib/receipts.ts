@@ -5,6 +5,7 @@ import { Prisma } from '@prisma/client';
 import { SearchParams } from '@/types';
 
 import prisma from './prisma';
+import { getPaginationClause } from './utils';
 import { getYearMonthDayFromSearchParams } from './utils/cash-register.utils';
 import { receiptsByDateSchema } from './validations/params';
 
@@ -35,7 +36,10 @@ export const getReceiptsByDate = async (searchParams: SearchParams) => {
 
     const totalPages = Math.ceil(totalReceiptsCount / pageSize);
 
+    const pagination = getPaginationClause(pageNumber, pageSize);
+
     const receipts = await prisma.receipt.findMany({
+        where: whereClause,
         select: {
             id: true,
             total: true,
@@ -47,10 +51,8 @@ export const getReceiptsByDate = async (searchParams: SearchParams) => {
                 }
             }
         },
-        where: whereClause,
-        skip: (pageNumber - 1) * pageSize,
-        take: pageSize,
-        orderBy: orderByClause
+        orderBy: orderByClause,
+        ...pagination
     });
 
     return { data: receipts, totalPages };

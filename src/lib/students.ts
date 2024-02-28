@@ -6,7 +6,7 @@ import { DefaultArgs } from '@prisma/client/runtime/library';
 import { InvoiceDataType, SearchParams } from '@/types';
 
 import prisma from './prisma';
-import { getMonthName } from './utils';
+import { getMonthName, getPaginationClause } from './utils';
 import { studentFormSchema } from './validations/form';
 import { studentInvoiceListSearchParamsSchema, studentListSearchParamsSchema } from './validations/params';
 
@@ -61,6 +61,8 @@ export const getStudentList = async (searchParams: SearchParams) => {
     // Calculate total pages
     const totalPages = Math.ceil(totalStudentsCount / pageSize);
 
+    const pagination = getPaginationClause(pageNumber, pageSize);
+
     const students = await prisma.student.findMany({
         where: whereClause,
         include: {
@@ -70,11 +72,10 @@ export const getStudentList = async (searchParams: SearchParams) => {
                 }
             }
         },
-        skip: (pageNumber - 1) * pageSize,
-        take: pageSize,
         orderBy: {
             [sortBy]: sortOrder
-        }
+        },
+        ...pagination
     });
 
     return { data: students, totalPages };
@@ -350,7 +351,7 @@ export const getStudentInvoices = async (id: number, searchParams: SearchParams)
 
     const whereClause = {
         studentId: id,
-        state: showAll === 'true' ? undefined : ('I' as InvoiceState)
+        state: showAll === 'true' ? undefined : InvoiceState.I
     };
 
     const invoicesCount = await prisma.invoice.count({
@@ -359,13 +360,14 @@ export const getStudentInvoices = async (id: number, searchParams: SearchParams)
 
     const totalPages = Math.ceil(invoicesCount / pageSize);
 
+    const pagination = getPaginationClause(pageNumber, pageSize);
+
     const invoices = await prisma.invoice.findMany({
         where: whereClause,
-        skip: (pageNumber - 1) * pageSize,
-        take: pageSize,
         orderBy: {
             [sortBy]: sortOrder
-        }
+        },
+        ...pagination
     });
 
     return { invoices, totalPages };
