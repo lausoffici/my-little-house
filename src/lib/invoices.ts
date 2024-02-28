@@ -3,6 +3,7 @@ import { InvoiceState } from '@prisma/client';
 import { SearchParams } from '@/types';
 
 import prisma from './prisma';
+import { getPaginationClause } from './utils';
 import { expiredInvoiceListSearchParamsSchema } from './validations/params';
 
 export const getExpiredInvoiceList = async (searchParams: SearchParams) => {
@@ -31,6 +32,8 @@ export const getExpiredInvoiceList = async (searchParams: SearchParams) => {
         where: whereClause
     });
 
+    const pagination = getPaginationClause(pageNumber, pageSize);
+
     const invoices = await prisma.invoice.findMany({
         where: whereClause,
         include: {
@@ -46,11 +49,10 @@ export const getExpiredInvoiceList = async (searchParams: SearchParams) => {
                 }
             }
         },
-        skip: (pageNumber - 1) * pageSize,
-        take: pageSize,
         orderBy: {
             [sortBy]: sortOrder
-        }
+        },
+        ...pagination
     });
 
     return { data: invoices, totalPages, totalExpiredAmount: totalExpiredAmount._sum.amount };

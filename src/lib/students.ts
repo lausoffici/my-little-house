@@ -1,14 +1,14 @@
 'use server';
 
-import { Prisma, PrismaClient } from '@prisma/client';
+import { InvoiceState, Prisma, PrismaClient } from '@prisma/client';
 import { DefaultArgs } from '@prisma/client/runtime/library';
 
 import { InvoiceDataType, SearchParams } from '@/types';
 
 import prisma from './prisma';
-import { getMonthName } from './utils';
+import { getMonthName, getPaginationClause } from './utils';
 import { studentFormSchema } from './validations/form';
-import { studentListSearchParamsSchema } from './validations/params';
+import { studentInvoiceListSearchParamsSchema, studentListSearchParamsSchema } from './validations/params';
 
 export const getStudentById = async (id: number) => {
     if (isNaN(id)) throw new Error('Invalid student id');
@@ -61,6 +61,8 @@ export const getStudentList = async (searchParams: SearchParams) => {
     // Calculate total pages
     const totalPages = Math.ceil(totalStudentsCount / pageSize);
 
+    const pagination = getPaginationClause(pageNumber, pageSize);
+
     const students = await prisma.student.findMany({
         where: whereClause,
         include: {
@@ -70,11 +72,10 @@ export const getStudentList = async (searchParams: SearchParams) => {
                 }
             }
         },
-        skip: (pageNumber - 1) * pageSize,
-        take: pageSize,
         orderBy: {
             [sortBy]: sortOrder
-        }
+        },
+        ...pagination
     });
 
     return { data: students, totalPages };
@@ -342,10 +343,32 @@ export const deleteStudent = async (id: number) => {
     });
 };
 
-export const getStudentInvoices = async (id: number) => {
-    return await prisma.invoice.findMany({
-        where: {
-            studentId: id
-        }
+export const getStudentInvoices = async (id: number, searchParams: SearchParams) => {
+    const { page, size, sortBy, sortOrder, showAll } = studentInvoiceListSearchParamsSchema.parse(searchParams);
+
+    const pageNumber = Number(page);
+    const pageSize = Number(size);
+
+    const whereClause = {
+        studentId: id,
+        state: showAll === 'true' ? undefined : InvoiceState.I
+    };
+
+    const invoicesCount = await prisma.invoice.count({
+        where: whereClause
     });
+
+    const totalPages = Math.ceil(invoicesCount / pageSize);
+
+    const pagination = getPaginationClause(pageNumber, pageSize);
+
+    const invoices = await prisma.invoice.findMany({
+        where: whereClause,
+        orderBy: {
+            [sortBy]: sortOrder
+        },
+        ...pagination
+    });
+
+    return { invoices, totalPages };
 };
