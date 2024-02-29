@@ -2,7 +2,7 @@ import React from 'react';
 
 import ReceiptsTable from '@/components/receipts/receipts-table';
 import DatePickerWithURLParams from '@/components/ui/date-picker/date-picker-with-url-params';
-import { getReceiptById, getReceiptsByDate } from '@/lib/receipts';
+import { getReceiptWithItemsById, getReceiptsByDate } from '@/lib/receipts';
 import { SearchParams } from '@/types';
 
 interface ReceiptsProps {
@@ -11,7 +11,7 @@ interface ReceiptsProps {
 
 export default function Receipts({ searchParams }: ReceiptsProps) {
     const receiptListPromise = getReceiptsByDate(searchParams);
-    const receiptDetailPromise = getReceiptById(searchParams);
+    const receiptDetailPromise = getReceiptWithItemsById(searchParams);
 
     return (
         <section>

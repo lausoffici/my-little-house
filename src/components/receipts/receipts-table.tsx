@@ -3,7 +3,7 @@
 import React from 'react';
 
 import { useURLManagedDataTable } from '@/hooks/use-url-managed-data-table';
-import { getReceiptById, getReceiptsByDate } from '@/lib/receipts';
+import { getReceiptWithItemsById, getReceiptsByDate } from '@/lib/receipts';
 import { ReceiptsWithStudents } from '@/types';
 
 import DataTable from '../ui/data-table/data-table';
@@ -12,7 +12,7 @@ import ReceiptDialog from './receipt-dialog';
 
 interface ReceiptsTableProps {
     receiptListPromise: ReturnType<typeof getReceiptsByDate>;
-    receiptDetailPromise: ReturnType<typeof getReceiptById>;
+    receiptDetailPromise: ReturnType<typeof getReceiptWithItemsById>;
 }
 
 export default function ReceiptsTable({ receiptListPromise, receiptDetailPromise }: ReceiptsTableProps) {

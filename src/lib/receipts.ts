@@ -58,7 +58,7 @@ export const getReceiptsByDate = async (searchParams: SearchParams) => {
     return { data: receipts, totalPages };
 };
 
-export const getReceiptById = (searchParams: SearchParams) => {
+export const getReceiptWithItemsById = (searchParams: SearchParams) => {
     const receiptId = Number(searchParams.receiptId);
 
     if (!receiptId) return Promise.resolve(null);

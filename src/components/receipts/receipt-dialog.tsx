@@ -9,13 +9,13 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useSearchParams } from '@/hooks/use-search-params';
-import { getReceiptById } from '@/lib/receipts';
+import { getReceiptWithItemsById } from '@/lib/receipts';
 import { formatCurrency, formateDate, padWithZeros } from '@/lib/utils';
 
 import Logo from '../common/sidebar/logo';
 
 type ReceiptsDialogProps = {
-    receipt: Awaited<ReturnType<typeof getReceiptById>>;
+    receipt: Awaited<ReturnType<typeof getReceiptWithItemsById>>;
 };
 
 const vesper = Vesper_Libre({
