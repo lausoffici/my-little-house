@@ -58,3 +58,16 @@ export type InvoiceDataType = {
     studentId: number;
     courseId: number;
 };
+
+export type AdditionalData = {
+    description: string;
+    amount: number;
+    paymentDate: Date;
+    studentId: number;
+};
+
+export type ItemsData = {
+    description: string;
+    amount: number;
+    receiptId: number;
+};

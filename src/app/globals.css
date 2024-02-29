@@ -115,10 +115,3 @@ input[type='number'] {
         scrollbar-width: none; /* Firefox */
     }
 }
-
-@media print {
-    @page {
-        /* A6 paper size */
-        size: 105mm 148mm;
-    }
-}

@@ -6,7 +6,7 @@ import { DefaultArgs } from '@prisma/client/runtime/library';
 import { InvoiceDataType, SearchParams } from '@/types';
 
 import prisma from './prisma';
-import { getMonthName, getPaginationClause } from './utils';
+import { getPaginationClause } from './utils';
 import { studentFormSchema } from './validations/form';
 import { studentInvoiceListSearchParamsSchema, studentListSearchParamsSchema } from './validations/params';
 
@@ -109,7 +109,7 @@ const generateInvoices = async (
                 invoicesData.push({
                     month: i,
                     year: currentYear,
-                    description: `${currentCourse?.name} - ${getMonthName(i)}` || 'description',
+                    description: `${currentCourse?.name}` || 'description',
                     amount: currentCourse?.amount || 1,
                     balance: 0,
                     state: 'I',

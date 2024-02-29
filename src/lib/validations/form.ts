@@ -39,3 +39,11 @@ export const studentFormSchema = z.object({
     observations: z.optional(z.string()),
     id: z.optional(z.string())
 });
+
+export const invoicesFormSchema = z.object({
+    invoices: z.array(z.string()),
+    studentId: z.string(),
+    receiptTotal: z.string(),
+    additionalsDescription: z.array(z.string()),
+    additionalsAmount: z.array(z.string())
+});

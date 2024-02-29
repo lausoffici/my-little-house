@@ -1,4 +1,5 @@
 import { InvoiceState } from '@prisma/client';
+import { cache } from 'react';
 
 import { SearchParams } from '@/types';
 
@@ -57,3 +58,12 @@ export const getExpiredInvoiceList = async (searchParams: SearchParams) => {
 
     return { data: invoices, totalPages, totalExpiredAmount: totalExpiredAmount._sum.amount };
 };
+
+export const getUnpaidInvoicesByStudent = cache(async (id: number) => {
+    return await prisma.invoice.findMany({
+        where: {
+            studentId: id,
+            state: 'I'
+        }
+    });
+});
