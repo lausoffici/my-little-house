@@ -6,17 +6,16 @@ import React, { useRef } from 'react';
 import ReactToPrint from 'react-to-print';
 
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useSearchParams } from '@/hooks/use-search-params';
+import { getReceiptById } from '@/lib/receipts';
 import { formatCurrency, formateDate, padWithZeros } from '@/lib/utils';
-import { ReceiptItems, ReceiptsWithStudents } from '@/types';
 
 import Logo from '../common/sidebar/logo';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader } from '../ui/card';
 
 type ReceiptsDialogProps = {
-    receipt: ReceiptsWithStudents;
-    items: ReceiptItems;
+    receipt: Awaited<ReturnType<typeof getReceiptById>>;
 };
 
 const vesper = Vesper_Libre({
@@ -24,16 +23,18 @@ const vesper = Vesper_Libre({
     weight: '400'
 });
 
-export default function ReceiptDialog({ receipt, items }: ReceiptsDialogProps) {
+export default function ReceiptDialog({ receipt }: ReceiptsDialogProps) {
     const receiptRef = useRef(null);
     const { setSearchParam, searchParams } = useSearchParams();
+
+    if (!receipt) return null;
 
     const handlePrint = () => {
         window.print();
     };
 
     function handleOpen() {
-        setSearchParam('receiptId', receipt.id.toString());
+        setSearchParam('receiptId', receipt?.id.toString() ?? '');
     }
 
     function handleClose() {
@@ -81,7 +82,7 @@ export default function ReceiptDialog({ receipt, items }: ReceiptsDialogProps) {
                         </div>
                         <div className='border-b-2 border-gray-600 w-full'></div>
                         <div className='flex flex-col gap-2 py-2'>
-                            {items?.map((item) => (
+                            {receipt.items.map((item) => (
                                 <div key={item.id} className='flex justify-between gap-2'>
                                     <span className='italic '>{item.description}</span>
                                     <span>{formatCurrency(item.amount)}</span>
