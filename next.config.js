@@ -9,7 +9,16 @@ const nextConfig = {
                 pathname: '/a/**'
             }
         ]
-    }
+    },
+    async redirects() {
+        return [
+          {
+            source: '/',
+            destination: '/students',
+            permanent: true,
+          },
+        ]
+      },
 };
 
 module.exports = nextConfig;
