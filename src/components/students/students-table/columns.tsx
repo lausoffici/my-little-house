@@ -7,7 +7,6 @@ import Link from 'next/link';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import { DataTableColumnHeader } from '@/components/ui/data-table';
 import {
     DropdownMenu,
@@ -19,25 +18,6 @@ import {
 import { StudentWithCourses } from '@/types';
 
 export const columns: ColumnDef<StudentWithCourses>[] = [
-    {
-        id: 'select',
-        header: ({ table }) => (
-            <Checkbox
-                checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')}
-                onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-                aria-label='Select all'
-            />
-        ),
-        cell: ({ row }) => (
-            <Checkbox
-                checked={row.getIsSelected()}
-                onCheckedChange={(value) => row.toggleSelected(!!value)}
-                aria-label='Select row'
-            />
-        ),
-        enableSorting: false,
-        enableHiding: false
-    },
     {
         accessorKey: 'lastName',
         header: ({ column }) => <DataTableColumnHeader column={column} title='Apellido' />

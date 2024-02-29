@@ -12,11 +12,11 @@ export const columns: ColumnDef<ReceiptsWithStudents>[] = [
     {
         accessorKey: 'studentId',
         header: ({ column }) => {
-            return <DataTableColumnHeader title='Apellido y Nombre' column={column} />;
+            return <DataTableColumnHeader title='Nombre y Apellido' column={column} />;
         },
         cell: ({ row }) => {
             const student = row.original.student;
-            return <span>{`${student.lastName} ${student.firstName} `}</span>;
+            return <span>{`${student.firstName} ${student.lastName}  `}</span>;
         },
         enableHiding: false
     },
