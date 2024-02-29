@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { ExclamationTriangleIcon } from '@radix-ui/react-icons';
 import { CheckIcon, PlusCircleIcon, X } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import React from 'react';
 import { useFormState } from 'react-dom';
 import { useForm } from 'react-hook-form';
@@ -74,7 +74,7 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
         defaultValues: {}
     });
 
-    function handleAditional() {
+    function addAditional() {
         setAdditionals((prev) => {
             if (prev) {
                 return [...prev, { id: uuid(), value: 0, label: '' }];
@@ -84,18 +84,20 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
         });
     }
 
-    const handleDeleteAditional = (aditional: string) => {
-        const filteredAditionals = additionals?.filter((el) => el.id !== aditional);
-        if (filteredAditionals) setAdditionals(filteredAditionals);
+    const deleteAditional = (aditional: string) => {
+        setAdditionals(additionals.filter((el) => el.id !== aditional));
     };
 
-    const getInvoiceById = (id: string) => {
-        const invoice = unpaidInvoices.find((invoice) => invoice.id === Number(id));
+    const getInvoiceById = useCallback(
+        (id: string) => {
+            const invoice = unpaidInvoices.find((invoice) => invoice.id === Number(id));
 
-        if (!invoice) throw new Error('Invoice not found');
+            if (!invoice) throw new Error('Invoice not found');
 
-        return invoice;
-    };
+            return invoice;
+        },
+        [unpaidInvoices]
+    );
 
     function handleDescriptionChange(e: React.ChangeEvent<HTMLInputElement>, id: string) {
         const { value } = e.target;
@@ -113,19 +115,15 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
         );
     }
 
-    function getTotal() {
-        if (selectedIds.length > 0 || additionals.length > 0) {
-            const selectedInvoicesAmount = selectedIds.map(getInvoiceById).map((invoice) => invoice.amount);
-            const additionalsAmounts = additionals.map((input) => input.value);
-            const totalAmounts = [...selectedInvoicesAmount, ...additionalsAmounts];
+    const total = useMemo(() => {
+        const selectedInvoicesAmount = selectedIds.map(getInvoiceById).map((invoice) => invoice.amount);
+        const additionalsAmounts = additionals.map((input) => input.value);
+        const totalAmounts = [...selectedInvoicesAmount, ...additionalsAmounts];
 
-            const total = totalAmounts.reduce((acc, current) => acc + current, 0);
+        const total = totalAmounts.reduce((acc, current) => acc + current, 0);
 
-            return total;
-        }
-
-        return 0;
-    }
+        return total;
+    }, [additionals, getInvoiceById, selectedIds]);
 
     return (
         <Form {...form}>
@@ -149,9 +147,9 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
                     )}
                 />
                 <input type='hidden' name='studentId' value={studentId} />
-                <input type='hidden' name='receiptTotal' value={getTotal()} />
-                {additionals && additionals.length > 0
-                    ? additionals?.map((aditional) => (
+                <input type='hidden' name='receiptTotal' value={total} />
+                {additionals.length > 0
+                    ? additionals.map((aditional) => (
                           <div className='flex gap-2' key={aditional.id}>
                               <FormField
                                   name={`additional-description`}
@@ -184,7 +182,7 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
                                       </FormItem>
                                   )}
                               />
-                              <Button variant='ghost' size='sm' onClick={() => handleDeleteAditional(aditional.id)}>
+                              <Button variant='ghost' size='sm' onClick={() => deleteAditional(aditional.id)}>
                                   <X className='h-3 w-3 text-muted-foreground hover:text-foreground' />
                               </Button>
                           </div>
@@ -192,8 +190,8 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
                     : null}
                 <Button
                     variant='secondary'
-                    onClick={handleAditional}
-                    disabled={additionals?.length === 10 ? true : false}
+                    onClick={addAditional}
+                    disabled={additionals.length === 10}
                     className='flex items-center gap-2'
                     type='button'
                 >
@@ -203,7 +201,7 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
                 <div className='px-1'>
                     <div className='w-full flex justify-between font-semibold'>
                         <span>Total: </span>
-                        <span>{formatCurrency(getTotal())}</span>
+                        <span>{formatCurrency(total)}</span>
                     </div>
                 </div>
             </form>
