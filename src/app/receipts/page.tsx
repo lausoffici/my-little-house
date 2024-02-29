@@ -2,7 +2,7 @@ import React from 'react';
 
 import ReceiptsTable from '@/components/receipts/receipts-table';
 import DatePickerWithURLParams from '@/components/ui/date-picker/date-picker-with-url-params';
-import { getReceiptItemsById, getReceiptsByDate } from '@/lib/receipts';
+import { getReceiptWithItemsById, getReceiptsByDate } from '@/lib/receipts';
 import { SearchParams } from '@/types';
 
 interface ReceiptsProps {
@@ -10,8 +10,8 @@ interface ReceiptsProps {
 }
 
 export default function Receipts({ searchParams }: ReceiptsProps) {
-    const receiptsPromise = getReceiptsByDate(searchParams);
-    const receiptItemsPromise = getReceiptItemsById(searchParams);
+    const receiptListPromise = getReceiptsByDate(searchParams);
+    const receiptDetailPromise = getReceiptWithItemsById(searchParams);
 
     return (
         <section>
@@ -22,7 +22,7 @@ export default function Receipts({ searchParams }: ReceiptsProps) {
                 </div>
             </div>
             <React.Suspense fallback='Cargando...'>
-                <ReceiptsTable receiptsPromise={receiptsPromise} receiptItemsPromise={receiptItemsPromise} />
+                <ReceiptsTable receiptListPromise={receiptListPromise} receiptDetailPromise={receiptDetailPromise} />
             </React.Suspense>
         </section>
     );

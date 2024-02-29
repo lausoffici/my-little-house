@@ -2,7 +2,7 @@ import { InvoiceState, type Prisma } from '@prisma/client';
 
 import { variants } from '@/components/ui/badge';
 import { getExpiredInvoiceList } from '@/lib/invoices';
-import { getReceiptItemsById, getReceiptsByDate } from '@/lib/receipts';
+import { getReceiptWithItemsById, getReceiptsByDate } from '@/lib/receipts';
 
 export interface PageProps<T extends object = {}> {
     params: T;
@@ -31,7 +31,7 @@ export type StudentWithCourses = Prisma.StudentGetPayload<{
 
 export type ReceiptsWithStudents = Awaited<ReturnType<typeof getReceiptsByDate>>['data'][0];
 
-export type ReceiptItems = Awaited<ReturnType<typeof getReceiptItemsById>>;
+export type ReceiptItems = Awaited<ReturnType<typeof getReceiptWithItemsById>>;
 
 export type CashRegisterIncomingItem = {
     id: number;
