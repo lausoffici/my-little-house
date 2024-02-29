@@ -1,5 +1,3 @@
-'use client';
-
 import { ArrowRightIcon, MagnifyingGlassIcon } from '@radix-ui/react-icons';
 import Link from 'next/link';
 import React, { useState } from 'react';
@@ -13,27 +11,46 @@ export const SearchBar = () => {
     const [inputValue, setInputValue] = useState('');
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [studentNames, setStudentNames] = useState<{ id: string; firstName: string; lastName: string }[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState('');
 
-    // Function to fetch student names from an API
     const debouncedFetchStudentNames = useDebouncedCallback(async (searchTerm: string) => {
         if (searchTerm.length < MINIMUM_CHARACTERS) {
             setStudentNames([]);
+            setError('');
             return;
         }
+
+        setError('');
+        setIsLoading(true);
+
         try {
             const response = await fetch(`/api/students?query=${searchTerm}`);
             if (!response.ok) throw new Error('Network response was not ok');
             const data = await response.json();
             setStudentNames(data.studentNames);
+
+            if (data.studentNames.length === 0) {
+                setError('No se encontraron estudiantes');
+            }
         } catch (error) {
             console.error('Failed to fetch student names:', error);
+            setError('Error al buscar estudiantes');
             setStudentNames([]);
+        } finally {
+            setIsLoading(false);
         }
-    }, 1_000);
+    }, 500);
 
     function handleSearch(searchTerm: string) {
         setInputValue(searchTerm);
-        debouncedFetchStudentNames(searchTerm);
+        if (searchTerm.length >= MINIMUM_CHARACTERS) {
+            setIsLoading(true);
+            debouncedFetchStudentNames(searchTerm);
+        } else {
+            setStudentNames([]);
+            setError('');
+        }
     }
 
     return (
@@ -41,7 +58,6 @@ export const SearchBar = () => {
             <MagnifyingGlassIcon className='absolute left-2.5 top-2.5 h-4 w-4 text-gray-500 dark:text-gray-400' />
             <div
                 onBlur={(e) => {
-                    // Nessary to prevent the dropdown from closing when clicking on a link
                     if (e.currentTarget.contains(e.relatedTarget)) {
                         return;
                     }
@@ -50,34 +66,66 @@ export const SearchBar = () => {
             >
                 <Input
                     className='w-full bg-white shadow-none appearance-none pl-8 dark:bg-gray-950'
-                    placeholder='Buscar...'
+                    placeholder='Search...'
                     onChange={(e) => handleSearch(e.target.value)}
                     onFocus={() => setIsDropdownOpen(true)}
                     value={inputValue}
+                    type='search'
                 />
-                {studentNames.length > 0 && isDropdownOpen && (
-                    <div className='absolute top-10 left-0 flex flex-col bg-white border rounded text-foreground w-full'>
-                        {studentNames.map(({ id, firstName, lastName }) => (
-                            <Link
-                                key={id}
-                                href={`/students/${id}`}
-                                className='flex justify-between items-center text-sm font-medium bg-white hover:bg-gray-200 p-2 last:border-b-0 border-b'
-                                onClick={() => {
-                                    setIsDropdownOpen(false);
-                                    setInputValue('');
-                                }}
-                            >
-                                <div>
-                                    {firstName} {lastName}
-                                </div>
-                                <span>
-                                    <ArrowRightIcon />
-                                </span>
-                            </Link>
-                        ))}
+
+                {isDropdownOpen && (
+                    <div className='absolute top-10 left-0 flex flex-col bg-white border rounded text-foreground w-full z-10'>
+                        <DropdownContent
+                            studentNames={studentNames}
+                            inputValue={inputValue}
+                            isLoading={isLoading}
+                            error={error}
+                        />
                     </div>
                 )}
             </div>
         </div>
     );
 };
+
+type DropdownContentProps = {
+    studentNames: { id: string; firstName: string; lastName: string }[];
+    inputValue: string;
+    isLoading: boolean;
+    error: string;
+};
+
+function DropdownContent({ studentNames, inputValue, isLoading, error }: DropdownContentProps) {
+    if (isLoading) {
+        return <div className='p-2 text-center font-medium text-xs text-gray-600'>Cargando...</div>;
+    }
+
+    if (error) {
+        return <div className='p-2 text-center font-medium text-xs text-gray-600'>{error}</div>;
+    }
+
+    if (studentNames.length > 0) {
+        return studentNames.map(({ id, firstName, lastName }) => (
+            <Link
+                key={id}
+                href={`/students/${id}`}
+                className='flex justify-between items-center text-sm font-medium bg-white hover:bg-gray-200 p-2 last:border-b-0 border-b'
+            >
+                <div>
+                    {firstName} {lastName}
+                </div>
+                <ArrowRightIcon />
+            </Link>
+        ));
+    }
+
+    if (inputValue.length >= MINIMUM_CHARACTERS) {
+        return <div className='p-2 text-center font-medium text-xs text-gray-600'>No se encontraron estudiantes</div>;
+    }
+
+    return (
+        <div className='p-2 text-center font-medium text-xs text-gray-600'>
+            Ingresa al menos {MINIMUM_CHARACTERS} caracteres
+        </div>
+    );
+}
