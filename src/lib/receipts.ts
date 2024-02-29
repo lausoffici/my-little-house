@@ -58,11 +58,29 @@ export const getReceiptsByDate = async (searchParams: SearchParams) => {
     return { data: receipts, totalPages };
 };
 
-export const getReceiptItemsById = (searchParams: SearchParams) =>
-    searchParams.receiptId
-        ? prisma.item.findMany({
-              where: {
-                  receiptId: Number(searchParams.receiptId)
-              }
-          })
-        : null;
+export const getReceiptWithItemsById = (searchParams: SearchParams) => {
+    const receiptId = Number(searchParams.receiptId);
+
+    if (!receiptId) return Promise.resolve(null);
+
+    return prisma.receipt.findFirst({
+        where: {
+            id: receiptId
+        },
+        include: {
+            items: {
+                select: {
+                    id: true,
+                    description: true,
+                    amount: true
+                }
+            },
+            student: {
+                select: {
+                    firstName: true,
+                    lastName: true
+                }
+            }
+        }
+    });
+};

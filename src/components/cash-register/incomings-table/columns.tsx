@@ -1,10 +1,9 @@
 'use client';
 
-import { ExternalLinkIcon } from '@radix-ui/react-icons';
 import { ColumnDef } from '@tanstack/react-table';
 import Link from 'next/link';
 
-import { Badge } from '@/components/ui/badge';
+import ReceiptBadge from '@/components/receipts/receipt-badge';
 import { DataTableColumnHeader } from '@/components/ui/data-table';
 import { formatCurrency } from '@/lib/utils';
 import { CashRegisterIncomingItem } from '@/types';
@@ -33,12 +32,8 @@ export const columns: ColumnDef<CashRegisterIncomingItem>[] = [
         cell: ({ row }) => {
             const { receiptId } = row.original;
             return (
-                <Link href={`/receipts/${receiptId}`}>
-                    <Badge>
-                        <div className='flex gap-1'>
-                            #{receiptId} <ExternalLinkIcon />
-                        </div>
-                    </Badge>
+                <Link href={`/receipts?receiptId=${receiptId}`}>
+                    <ReceiptBadge receiptId={receiptId} />
                 </Link>
             );
         }
