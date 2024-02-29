@@ -6,7 +6,6 @@ import { MoreHorizontal } from 'lucide-react';
 
 import InvoiceStateBadge from '@/components/invoices/invoice-state-badge';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import { DataTableColumnHeader } from '@/components/ui/data-table';
 import {
     DropdownMenu,
@@ -18,25 +17,6 @@ import {
 import { formatCurrency, getMonthName } from '@/lib/utils';
 
 export const columns: ColumnDef<Invoice>[] = [
-    {
-        id: 'select',
-        header: ({ table }) => (
-            <Checkbox
-                checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')}
-                onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-                aria-label='Select all'
-            />
-        ),
-        cell: ({ row }) => (
-            <Checkbox
-                checked={row.getIsSelected()}
-                onCheckedChange={(value) => row.toggleSelected(!!value)}
-                aria-label='Select row'
-            />
-        ),
-        enableSorting: false,
-        enableHiding: false
-    },
     {
         accessorKey: 'description',
         header: ({ column }) => <DataTableColumnHeader column={column} title='Descripción' />

@@ -11,7 +11,7 @@ export default function StudentInvoicesFilters() {
     }
 
     return (
-        <div className='flex items-center space-x-2'>
+        <div className='flex items-center space-x-2 w-full'>
             <Checkbox
                 id='showAll'
                 onCheckedChange={onShowAllChange}
