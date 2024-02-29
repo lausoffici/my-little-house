@@ -16,7 +16,12 @@ export const columns: ColumnDef<ReceiptsWithStudents>[] = [
         },
         cell: ({ row }) => {
             const student = row.original.student;
-            return <span>{`${student.firstName} ${student.lastName}  `}</span>;
+            return (
+                <span>
+                    {student.firstName}
+                    {student.lastName}
+                </span>
+            );
         },
         enableHiding: false
     },

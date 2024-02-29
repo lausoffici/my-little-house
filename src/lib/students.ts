@@ -93,6 +93,7 @@ const generateInvoices = async (
     let currentMonth = date.getMonth() + 1;
     const currentYear = date.getFullYear();
 
+    // If the current month is January or February is set to March
     if (currentMonth < 3) currentMonth = 3;
 
     await Promise.all(
