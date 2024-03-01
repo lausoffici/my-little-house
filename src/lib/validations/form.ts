@@ -1,3 +1,4 @@
+import { ReceiptPaymentMethod } from '@prisma/client';
 import { z } from 'zod';
 
 export const courseFormSchema = z.object({
@@ -40,10 +41,11 @@ export const studentFormSchema = z.object({
   id: z.optional(z.string())
 });
 
-export const invoicesFormSchema = z.object({
+export const receiptFormSchema = z.object({
   invoices: z.array(z.string()),
   studentId: z.string(),
   receiptTotal: z.string(),
   additionalsDescription: z.array(z.string()),
-  additionalsAmount: z.array(z.string())
+  additionalsAmount: z.array(z.string()),
+  paymentMethod: z.nativeEnum(ReceiptPaymentMethod)
 });

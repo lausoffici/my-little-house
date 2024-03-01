@@ -1,5 +1,7 @@
 'use server';
 
+import { ReceiptPaymentMethod } from '@prisma/client';
+
 import { CashRegisterIncomingItem, SearchParams } from '@/types';
 
 import prisma from './prisma';
@@ -20,7 +22,8 @@ export const getIncomingsListByDate = async (searchParams: SearchParams) => {
       createdAt: {
         gte: startDate,
         lt: endDate
-      }
+      },
+      paymentMethod: ReceiptPaymentMethod.CASH
     }
   };
 

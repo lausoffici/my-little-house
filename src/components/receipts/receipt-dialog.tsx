@@ -1,5 +1,6 @@
 'use client';
 
+import { ReceiptPaymentMethod } from '@prisma/client';
 import { Vesper_Libre } from 'next/font/google';
 import Image from 'next/image';
 import React, { useRef } from 'react';
@@ -13,6 +14,8 @@ import { getReceiptWithItemsById } from '@/lib/receipts';
 import { formatCurrency, formateDate, padWithZeros } from '@/lib/utils';
 
 import Logo from '../common/sidebar/logo';
+import { Badge } from '../ui/badge';
+import { Separator } from '../ui/separator';
 
 type ReceiptsDialogProps = {
   receipt: Awaited<ReturnType<typeof getReceiptWithItemsById>>;
@@ -22,6 +25,11 @@ const vesper = Vesper_Libre({
   subsets: ['latin'],
   weight: '400'
 });
+
+const paymentMethod = {
+  [ReceiptPaymentMethod.CASH]: 'Efectivo',
+  [ReceiptPaymentMethod.TRANSFER]: 'Transferencia'
+};
 
 export default function ReceiptDialog({ receipt }: ReceiptsDialogProps) {
   const receiptRef = useRef(null);
@@ -53,29 +61,28 @@ export default function ReceiptDialog({ receipt }: ReceiptsDialogProps) {
           <DialogTitle>Comprobante</DialogTitle>
         </DialogHeader>
         <Card ref={receiptRef} className='print:block print:m-2 print:scale-90'>
-          <CardHeader className='py-1'>
-            <div className='flex justify-between px-7'>
-              <Image src='/assets/old-logo.png' alt='casa' width={100} height={80} />
-              <div className='flex flex-col justify-center items-center'>
+          <CardHeader>
+            <div className='flex justify-between items-start text-sm font-semibold'>
+              <span>{formateDate(receipt.createdAt)}</span>
+              <div className='flex flex-col items-center font-medium'>
                 <Logo />
                 <h1>INGLÉS</h1>
               </div>
+              <span>#{padWithZeros(receipt.id)}</span>
             </div>
-            <div className='border-b-2 border-gray-200 w-full'></div>
-            <CardDescription className='flex flex-col items-end'>
-              <div className='w-full flex justify-between items-center mt-1'>
-                <span>(Documento no válido como factura)</span>
-                <span>#{padWithZeros(receipt.id)}</span>
-              </div>
-            </CardDescription>
-            <span className='text-sm'>{formateDate(receipt.createdAt)}</span>
           </CardHeader>
-          <CardContent>
-            <div className='my-4'>
-              <span className=' mr-2'>Estudiante:</span>
-              <span className='font-semibold'>{`${receipt.student.firstName} ${receipt.student.lastName}`}</span>
+          <Separator />
+          <CardContent className='p-6'>
+            <div className='text-md mb-4'>
+              <div>
+                <span className='mr-2'>Estudiante:</span>
+                <span className='font-semibold'>{`${receipt.student.firstName} ${receipt.student.lastName}`}</span>
+              </div>
+              <div>
+                <span className='mr-2'>Método de pago:</span>
+                <span className='font-semibold'>{paymentMethod[receipt.paymentMethod]}</span>
+              </div>
             </div>
-
             <div className='flex justify-between py-2'>
               <span className='font-semibold'>Concepto</span>
               <span className='font-semibold'>Importe</span>
@@ -89,14 +96,13 @@ export default function ReceiptDialog({ receipt }: ReceiptsDialogProps) {
                 </div>
               ))}
             </div>
-
             <div className='border-b-2 border-gray-600 w-full'></div>
             <div className='flex justify-between py-2'>
               <span className='font-bold'>TOTAL</span>
               <span className='font-semibold'>{formatCurrency(receipt.total)}</span>
             </div>
           </CardContent>
-          <CardFooter className='pt-7 flex justify-center items-center'>
+          <CardFooter className='flex justify-center items-center'>
             <div className={`border border-gray-500 py-1 px-3 ${vesper.className}`}>
               Enseñanza de calidad con calidez desde 1987
             </div>

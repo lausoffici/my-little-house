@@ -91,13 +91,19 @@ model Additional {
   items       Item[]
 }
 
+enum ReceiptPaymentMethod {
+  CASH
+  TRANSFER
+}
+
 model Receipt {
-  id        Int      @id @default(autoincrement())
-  total     Float    @default(0)
-  items     Item[]
-  studentId Int
-  student   Student  @relation(fields: [studentId], references: [id])
-  createdAt DateTime @default(now())
+  id            Int                  @id @default(autoincrement())
+  total         Float                @default(0)
+  items         Item[]
+  studentId     Int
+  student       Student              @relation(fields: [studentId], references: [id])
+  createdAt     DateTime             @default(now())
+  paymentMethod ReceiptPaymentMethod @default(CASH)
 }
 
 model Item {
