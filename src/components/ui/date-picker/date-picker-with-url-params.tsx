@@ -8,27 +8,27 @@ import { getDatePickerFormattedDate } from '@/lib/utils';
 import { getAppliedDateFromSearchParams } from '@/lib/utils/cash-register.utils';
 
 export default function DatePickerWithURLParams() {
-    const router = useRouter();
-    const pathname = usePathname();
-    const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
-    const appliedDate = getAppliedDateFromSearchParams(searchParams);
-    const defaultValue = getDatePickerFormattedDate(appliedDate);
+  const appliedDate = getAppliedDateFromSearchParams(searchParams);
+  const defaultValue = getDatePickerFormattedDate(appliedDate);
 
-    function handleChange(value: DateValue) {
-        const currentParams = new URLSearchParams(searchParams.toString());
+  function handleChange(value: DateValue) {
+    const currentParams = new URLSearchParams(searchParams.toString());
 
-        currentParams.set('day', value.day.toString());
-        currentParams.set('month', value.month.toString());
-        currentParams.set('year', value.year.toString());
+    currentParams.set('day', value.day.toString());
+    currentParams.set('month', value.month.toString());
+    currentParams.set('year', value.year.toString());
 
-        router.replace(`${pathname}?${currentParams.toString()}`, { scroll: false });
-    }
+    router.replace(`${pathname}?${currentParams.toString()}`, { scroll: false });
+  }
 
-    return (
-        <div className='font-medium'>
-            <label className='text-sm'>Fecha</label>
-            <DateTimePicker aria-label='Fecha' defaultValue={defaultValue} onChange={handleChange} />
-        </div>
-    );
+  return (
+    <div className='font-medium'>
+      <label className='text-sm'>Fecha</label>
+      <DateTimePicker aria-label='Fecha' defaultValue={defaultValue} onChange={handleChange} />
+    </div>
+  );
 }

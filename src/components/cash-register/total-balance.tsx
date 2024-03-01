@@ -7,30 +7,30 @@ import { getCashRegisterBalance, getExpendituresByDate, getIncomingsListByDate }
 import { formatCurrency } from '@/lib/utils';
 
 type TotalBalanceProps = {
-    incomingsPromise: ReturnType<typeof getIncomingsListByDate>;
-    outcomingsPromise: ReturnType<typeof getExpendituresByDate>;
-    initialBalancePromise: ReturnType<typeof getCashRegisterBalance>;
+  incomingsPromise: ReturnType<typeof getIncomingsListByDate>;
+  outcomingsPromise: ReturnType<typeof getExpendituresByDate>;
+  initialBalancePromise: ReturnType<typeof getCashRegisterBalance>;
 };
 
 export default function TotalBalance({
-    incomingsPromise,
-    outcomingsPromise,
-    initialBalancePromise
+  incomingsPromise,
+  outcomingsPromise,
+  initialBalancePromise
 }: TotalBalanceProps) {
-    const incomings = React.use(incomingsPromise);
-    const outcomings = React.use(outcomingsPromise);
-    const initialBalance = React.use(initialBalancePromise);
+  const incomings = React.use(incomingsPromise);
+  const outcomings = React.use(outcomingsPromise);
+  const initialBalance = React.use(initialBalancePromise);
 
-    const initialBalanceAmount = initialBalance?.balance ?? 0;
+  const initialBalanceAmount = initialBalance?.balance ?? 0;
 
-    const totalBalance = incomings.totalAmount - outcomings.totalAmount + initialBalanceAmount;
+  const totalBalance = incomings.totalAmount - outcomings.totalAmount + initialBalanceAmount;
 
-    return (
-        <div className='flex items-center'>
-            <h2 className='text-xl font-bold mr-2'>Saldo total:</h2>
-            <Badge variant='outline' className='text-foreground w-fit text-sm'>
-                {formatCurrency(totalBalance)}
-            </Badge>
-        </div>
-    );
+  return (
+    <div className='flex items-center'>
+      <h2 className='text-xl font-bold mr-2'>Saldo total:</h2>
+      <Badge variant='outline' className='text-foreground w-fit text-sm'>
+        {formatCurrency(totalBalance)}
+      </Badge>
+    </div>
+  );
 }

@@ -4,25 +4,25 @@ import { getStudentNamesByTerm } from '@/lib/students';
 import { studentNamesListQueryParamsSchema } from '@/lib/validations/params';
 
 export async function GET(req: NextRequest) {
-    const { searchParams } = new URL(req.url);
+  const { searchParams } = new URL(req.url);
 
-    const searchTerm = searchParams.get('query');
+  const searchTerm = searchParams.get('query');
 
-    const query = studentNamesListQueryParamsSchema.parse(searchTerm);
+  const query = studentNamesListQueryParamsSchema.parse(searchTerm);
 
-    try {
-        const studentNames = await getStudentNamesByTerm(query);
+  try {
+    const studentNames = await getStudentNamesByTerm(query);
 
-        return Response.json({ studentNames });
-    } catch (error) {
-        console.error('Failed to fetch student names:', error);
-        return Response.json(
-            {
-                error: 'Failed to fetch student names'
-            },
-            {
-                status: 500
-            }
-        );
-    }
+    return Response.json({ studentNames });
+  } catch (error) {
+    console.error('Failed to fetch student names:', error);
+    return Response.json(
+      {
+        error: 'Failed to fetch student names'
+      },
+      {
+        status: 500
+      }
+    );
+  }
 }

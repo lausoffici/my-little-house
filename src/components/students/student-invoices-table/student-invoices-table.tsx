@@ -10,17 +10,17 @@ import { getStudentInvoices } from '@/lib/students';
 import { columns } from './columns';
 
 type StudentInvoicesTableProps = {
-    invoicesPromise: ReturnType<typeof getStudentInvoices>;
+  invoicesPromise: ReturnType<typeof getStudentInvoices>;
 };
 
 export default function StudentInvoicesTable({ invoicesPromise }: StudentInvoicesTableProps) {
-    const { invoices, totalPages } = React.use(invoicesPromise);
+  const { invoices, totalPages } = React.use(invoicesPromise);
 
-    const table = useURLManagedDataTable<Invoice>({
-        data: invoices,
-        columns,
-        pageCount: totalPages
-    });
+  const table = useURLManagedDataTable<Invoice>({
+    data: invoices,
+    columns,
+    pageCount: totalPages
+  });
 
-    return <DataTable table={table} columns={columns} />;
+  return <DataTable table={table} columns={columns} />;
 }

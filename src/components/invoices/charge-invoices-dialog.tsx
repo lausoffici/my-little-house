@@ -7,45 +7,45 @@ import { getUnpaidInvoicesByStudent } from '@/lib/invoices';
 
 import { Button } from '../ui/button';
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
 } from '../ui/dialog';
 import ChargeInvoicesForm, { CHARGE_INVOICE_FORM_ID } from './charge-invoices-form';
 
 interface ChargeInvoicesDialogProps {
-    unpaidInvoicesPromise: ReturnType<typeof getUnpaidInvoicesByStudent>;
+  unpaidInvoicesPromise: ReturnType<typeof getUnpaidInvoicesByStudent>;
 }
 
 export default function ChargeInvoicesDialog({ unpaidInvoicesPromise }: ChargeInvoicesDialogProps) {
-    const [openInvoiceDialog, setOpenInvoiceDialog] = useState(false);
+  const [openInvoiceDialog, setOpenInvoiceDialog] = useState(false);
 
-    return (
-        <Dialog open={openInvoiceDialog} onOpenChange={setOpenInvoiceDialog}>
-            <DialogTrigger>
-                <Button size='sm'>Cobrar</Button>
-            </DialogTrigger>
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>Cobrar cuota</DialogTitle>
-                    <DialogDescription>Seleccione el monto a cobrar</DialogDescription>
-                </DialogHeader>
-                <React.Suspense fallback='Cargando...'>
-                    <ChargeInvoicesForm unpaidInvoicesPromise={unpaidInvoicesPromise} />
-                </React.Suspense>
-                <DialogFooter>
-                    <Button variant='outline' onClick={() => setOpenInvoiceDialog(false)}>
-                        Cancelar
-                    </Button>
-                    <Button form={CHARGE_INVOICE_FORM_ID} type='submit'>
-                        Generar comprobante
-                    </Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
-    );
+  return (
+    <Dialog open={openInvoiceDialog} onOpenChange={setOpenInvoiceDialog}>
+      <DialogTrigger>
+        <Button size='sm'>Cobrar</Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Cobrar cuota</DialogTitle>
+          <DialogDescription>Seleccione el monto a cobrar</DialogDescription>
+        </DialogHeader>
+        <React.Suspense fallback='Cargando...'>
+          <ChargeInvoicesForm unpaidInvoicesPromise={unpaidInvoicesPromise} />
+        </React.Suspense>
+        <DialogFooter>
+          <Button variant='outline' onClick={() => setOpenInvoiceDialog(false)}>
+            Cancelar
+          </Button>
+          <Button form={CHARGE_INVOICE_FORM_ID} type='submit'>
+            Generar comprobante
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
 }
