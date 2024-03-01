@@ -3,51 +3,51 @@ import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
 export function cn(...inputs: ClassValue[]) {
-    return twMerge(clsx(inputs));
+  return twMerge(clsx(inputs));
 }
 
 export function formatCurrency(amount: number) {
-    return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', minimumFractionDigits: 0 }).format(
-        amount
-    );
+  return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', minimumFractionDigits: 0 }).format(
+    amount
+  );
 }
 
 export function formateDate(date: Date) {
-    return date.toISOString().replace(/T.*/, '').split('-').reverse().join('/');
+  return date.toISOString().replace(/T.*/, '').split('-').reverse().join('/');
 }
 
 export function getDatePickerFormattedDate(date: Date) {
-    return toCalendarDate(parseAbsolute(date.toISOString(), 'UTC'));
+  return toCalendarDate(parseAbsolute(date.toISOString(), 'UTC'));
 }
 
 export function capitalizeFirstLetter(string: string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
+  return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
 export function getMonthName(monthNumber: number) {
-    const date = new Date();
-    date.setMonth(monthNumber - 1);
+  const date = new Date();
+  date.setMonth(monthNumber - 1);
 
-    return capitalizeFirstLetter(date.toLocaleString('es', { month: 'long' }));
+  return capitalizeFirstLetter(date.toLocaleString('es', { month: 'long' }));
 }
 
 export const isToday = (date: Date) => {
-    const today = new Date();
-    return (
-        date.getDate() === today.getDate() &&
-        date.getMonth() === today.getMonth() &&
-        date.getFullYear() === today.getFullYear()
-    );
+  const today = new Date();
+  return (
+    date.getDate() === today.getDate() &&
+    date.getMonth() === today.getMonth() &&
+    date.getFullYear() === today.getFullYear()
+  );
 };
 
 export function padWithZeros(number: number) {
-    let strNumber = String(number);
-    return strNumber.padStart(7, '0');
+  let strNumber = String(number);
+  return strNumber.padStart(7, '0');
 }
 
 export function getPaginationClause(page: number, size: number) {
-    return {
-        skip: (page - 1) * size,
-        take: size
-    };
+  return {
+    skip: (page - 1) * size,
+    take: size
+  };
 }

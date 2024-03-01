@@ -14,28 +14,28 @@ export const filterableColumns = ['studentByCourse'];
 export const searchableColumns = ['lastName'];
 
 type StudentsTableProps = {
-    studentsPromise: ReturnType<typeof getStudentList>;
-    courseOptions: Option[];
+  studentsPromise: ReturnType<typeof getStudentList>;
+  courseOptions: Option[];
 };
 
 export default function StudentsTable({ studentsPromise, courseOptions }: StudentsTableProps) {
-    const { data, totalPages } = React.use(studentsPromise);
+  const { data, totalPages } = React.use(studentsPromise);
 
-    const table = useURLManagedDataTable<StudentWithCourses>({
-        data,
-        columns,
-        pageCount: totalPages,
-        searchableColumns,
-        filterableColumns
-    });
+  const table = useURLManagedDataTable<StudentWithCourses>({
+    data,
+    columns,
+    pageCount: totalPages,
+    searchableColumns,
+    filterableColumns
+  });
 
-    return (
-        <>
-            <div className='flex items-center py-4'>
-                <StudentsTableFilters table={table} courseOptions={courseOptions} />
-            </div>
+  return (
+    <>
+      <div className='flex items-center py-4'>
+        <StudentsTableFilters table={table} courseOptions={courseOptions} />
+      </div>
 
-            <DataTable table={table} columns={columns} />
-        </>
-    );
+      <DataTable table={table} columns={columns} />
+    </>
+  );
 }

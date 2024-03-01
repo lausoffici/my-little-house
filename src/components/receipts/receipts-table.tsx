@@ -11,24 +11,24 @@ import { columns } from './columns';
 import ReceiptDialog from './receipt-dialog';
 
 interface ReceiptsTableProps {
-    receiptListPromise: ReturnType<typeof getReceiptsByDate>;
-    receiptDetailPromise: ReturnType<typeof getReceiptWithItemsById>;
+  receiptListPromise: ReturnType<typeof getReceiptsByDate>;
+  receiptDetailPromise: ReturnType<typeof getReceiptWithItemsById>;
 }
 
 export default function ReceiptsTable({ receiptListPromise, receiptDetailPromise }: ReceiptsTableProps) {
-    const { data, totalPages } = React.use(receiptListPromise);
-    const receipt = React.use(receiptDetailPromise);
+  const { data, totalPages } = React.use(receiptListPromise);
+  const receipt = React.use(receiptDetailPromise);
 
-    const table = useURLManagedDataTable<ReceiptsWithStudents>({
-        data,
-        columns,
-        pageCount: totalPages
-    });
+  const table = useURLManagedDataTable<ReceiptsWithStudents>({
+    data,
+    columns,
+    pageCount: totalPages
+  });
 
-    return (
-        <>
-            <DataTable table={table} columns={columns} />
-            <ReceiptDialog receipt={receipt} />
-        </>
-    );
+  return (
+    <>
+      <DataTable table={table} columns={columns} />
+      <ReceiptDialog receipt={receipt} />
+    </>
+  );
 }

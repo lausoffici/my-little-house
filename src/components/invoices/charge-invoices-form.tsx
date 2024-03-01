@@ -24,187 +24,183 @@ import { MultiSelect } from '../ui/multi-select';
 import { useToast } from '../ui/use-toast';
 
 const initialState = {
-    message: '',
-    error: false,
-    receipt: null
+  message: '',
+  error: false,
+  receipt: null
 };
 
 export const CHARGE_INVOICE_FORM_ID = 'invoice-form';
 
 interface ChargeInvoicesFormProps {
-    unpaidInvoicesPromise: ReturnType<typeof getUnpaidInvoicesByStudent>;
+  unpaidInvoicesPromise: ReturnType<typeof getUnpaidInvoicesByStudent>;
 }
 
 export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvoicesFormProps) {
-    const [additionals, setAdditionals] = useState<{ id: string; value: number }[]>([]);
-    const [selectedIds, setSelected] = useState<string[]>([]);
-    const [state, action] = useFormState(generateReceipt, initialState);
-    const { id: studentId } = useParams<{ id: string }>();
-    const { toast } = useToast();
-    const router = useRouter();
+  const [additionals, setAdditionals] = useState<{ id: string; value: number }[]>([]);
+  const [selectedIds, setSelected] = useState<string[]>([]);
+  const [state, action] = useFormState(generateReceipt, initialState);
+  const { id: studentId } = useParams<{ id: string }>();
+  const { toast } = useToast();
+  const router = useRouter();
 
-    useEffect(() => {
-        if (state === undefined || state.message === '') return;
+  useEffect(() => {
+    if (state === undefined || state.message === '') return;
 
-        if (state?.error) {
-            toast({
-                description: state?.message,
-                icon: <ExclamationTriangleIcon width='20px' height='20px' />,
-                variant: 'destructive'
-            });
-        } else {
-            toast({
-                description: state?.message,
-                icon: <CheckIcon width='20px' height='20px' />,
-                variant: 'success'
-            });
-            router.push(`/receipts?receiptId=${state.receipt?.id}`);
-        }
-    }, [router, state, toast]);
+    if (state?.error) {
+      toast({
+        description: state?.message,
+        icon: <ExclamationTriangleIcon width='20px' height='20px' />,
+        variant: 'destructive'
+      });
+    } else {
+      toast({
+        description: state?.message,
+        icon: <CheckIcon width='20px' height='20px' />,
+        variant: 'success'
+      });
+      router.push(`/receipts?receiptId=${state.receipt?.id}`);
+    }
+  }, [router, state, toast]);
 
-    const unpaidInvoices = React.use(unpaidInvoicesPromise);
+  const unpaidInvoices = React.use(unpaidInvoicesPromise);
 
-    const invoicesOptions: Option[] = unpaidInvoices.map((invoice) => ({
-        value: String(invoice.id),
-        label: `${invoice.description} - ${getMonthName(invoice.month)} ${invoice.year} ${formatCurrency(invoice.amount)}`
-    }));
+  const invoicesOptions: Option[] = unpaidInvoices.map((invoice) => ({
+    value: String(invoice.id),
+    label: `${invoice.description} - ${getMonthName(invoice.month)} ${invoice.year} ${formatCurrency(invoice.amount)}`
+  }));
 
-    const form = useForm<z.infer<typeof invoicesFormSchema>>({
-        resolver: zodResolver(invoicesFormSchema),
-        defaultValues: {}
+  const form = useForm<z.infer<typeof invoicesFormSchema>>({
+    resolver: zodResolver(invoicesFormSchema),
+    defaultValues: {}
+  });
+
+  function addAditional() {
+    setAdditionals((prev) => {
+      if (prev) {
+        return [...prev, { id: uuid(), value: 0, label: '' }];
+      } else {
+        return [{ id: uuid(), value: 0, label: '' }];
+      }
     });
+  }
 
-    function addAditional() {
-        setAdditionals((prev) => {
-            if (prev) {
-                return [...prev, { id: uuid(), value: 0, label: '' }];
-            } else {
-                return [{ id: uuid(), value: 0, label: '' }];
-            }
-        });
-    }
+  const deleteAditional = (aditional: string) => {
+    setAdditionals(additionals.filter((el) => el.id !== aditional));
+  };
 
-    const deleteAditional = (aditional: string) => {
-        setAdditionals(additionals.filter((el) => el.id !== aditional));
-    };
+  const getInvoiceById = useCallback(
+    (id: string) => {
+      const invoice = unpaidInvoices.find((invoice) => invoice.id === Number(id));
 
-    const getInvoiceById = useCallback(
-        (id: string) => {
-            const invoice = unpaidInvoices.find((invoice) => invoice.id === Number(id));
+      if (!invoice) throw new Error('Invoice not found');
 
-            if (!invoice) throw new Error('Invoice not found');
+      return invoice;
+    },
+    [unpaidInvoices]
+  );
 
-            return invoice;
-        },
-        [unpaidInvoices]
+  function handleDescriptionChange(e: React.ChangeEvent<HTMLInputElement>, id: string) {
+    const { value } = e.target;
+    setAdditionals(additionals.map((aditional) => (aditional.id === id ? { ...aditional, label: value } : aditional)));
+  }
+
+  function handleInputChange(e: React.ChangeEvent<HTMLInputElement>, id: string) {
+    const { value } = e.target;
+    const numValue = Number(value);
+
+    setAdditionals(
+      additionals.map((aditional) => (aditional.id === id ? { ...aditional, value: numValue } : aditional))
     );
+  }
 
-    function handleDescriptionChange(e: React.ChangeEvent<HTMLInputElement>, id: string) {
-        const { value } = e.target;
-        setAdditionals(
-            additionals.map((aditional) => (aditional.id === id ? { ...aditional, label: value } : aditional))
-        );
-    }
+  const total = useMemo(() => {
+    const selectedInvoicesAmount = selectedIds.map(getInvoiceById).map((invoice) => invoice.amount);
+    const additionalsAmounts = additionals.map((input) => input.value);
+    const totalAmounts = [...selectedInvoicesAmount, ...additionalsAmounts];
 
-    function handleInputChange(e: React.ChangeEvent<HTMLInputElement>, id: string) {
-        const { value } = e.target;
-        const numValue = Number(value);
+    const total = totalAmounts.reduce((acc, current) => acc + current, 0);
 
-        setAdditionals(
-            additionals.map((aditional) => (aditional.id === id ? { ...aditional, value: numValue } : aditional))
-        );
-    }
+    return total;
+  }, [additionals, getInvoiceById, selectedIds]);
 
-    const total = useMemo(() => {
-        const selectedInvoicesAmount = selectedIds.map(getInvoiceById).map((invoice) => invoice.amount);
-        const additionalsAmounts = additionals.map((input) => input.value);
-        const totalAmounts = [...selectedInvoicesAmount, ...additionalsAmounts];
-
-        const total = totalAmounts.reduce((acc, current) => acc + current, 0);
-
-        return total;
-    }, [additionals, getInvoiceById, selectedIds]);
-
-    return (
-        <Form {...form}>
-            <form className='space-y-3 py-3' action={action} id={CHARGE_INVOICE_FORM_ID}>
+  return (
+    <Form {...form}>
+      <form className='space-y-3 py-3' action={action} id={CHARGE_INVOICE_FORM_ID}>
+        <FormField
+          control={form.control}
+          name='invoices'
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Cuotas Impagas</FormLabel>
+              <MultiSelect
+                className='w-[462px]'
+                options={invoicesOptions}
+                selected={selectedIds}
+                notFoundMessage='Cuota no encontrada'
+                {...field}
+                onChange={setSelected}
+                name='invoices'
+              />
+            </FormItem>
+          )}
+        />
+        <input type='hidden' name='studentId' value={studentId} />
+        <input type='hidden' name='receiptTotal' value={total} />
+        {additionals.length > 0
+          ? additionals.map((aditional) => (
+              <div className='flex gap-2' key={aditional.id}>
                 <FormField
-                    control={form.control}
-                    name='invoices'
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Cuotas Impagas</FormLabel>
-                            <MultiSelect
-                                className='w-[462px]'
-                                options={invoicesOptions}
-                                selected={selectedIds}
-                                notFoundMessage='Cuota no encontrada'
-                                {...field}
-                                onChange={setSelected}
-                                name='invoices'
-                            />
-                        </FormItem>
-                    )}
+                  name={`additional-description`}
+                  render={({ field }) => (
+                    <FormItem className='w-11/12'>
+                      <Input
+                        placeholder='Descripción'
+                        autoComplete='off'
+                        required
+                        {...field}
+                        onChange={(e) => handleDescriptionChange(e, aditional.id)}
+                      />
+                    </FormItem>
+                  )}
                 />
-                <input type='hidden' name='studentId' value={studentId} />
-                <input type='hidden' name='receiptTotal' value={total} />
-                {additionals.length > 0
-                    ? additionals.map((aditional) => (
-                          <div className='flex gap-2' key={aditional.id}>
-                              <FormField
-                                  name={`additional-description`}
-                                  render={({ field }) => (
-                                      <FormItem className='w-11/12'>
-                                          <Input
-                                              placeholder='Descripción'
-                                              autoComplete='off'
-                                              required
-                                              {...field}
-                                              onChange={(e) => handleDescriptionChange(e, aditional.id)}
-                                          />
-                                      </FormItem>
-                                  )}
-                              />
-                              <FormField
-                                  name='additional-amount'
-                                  render={({ field }) => (
-                                      <FormItem>
-                                          <Input
-                                              type='number'
-                                              placeholder='$ valor'
-                                              autoComplete='off'
-                                              {...field}
-                                              required
-                                              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                                                  handleInputChange(e, aditional.id)
-                                              }
-                                          />
-                                      </FormItem>
-                                  )}
-                              />
-                              <Button variant='ghost' size='sm' onClick={() => deleteAditional(aditional.id)}>
-                                  <X className='h-3 w-3 text-muted-foreground hover:text-foreground' />
-                              </Button>
-                          </div>
-                      ))
-                    : null}
-                <Button
-                    variant='secondary'
-                    onClick={addAditional}
-                    disabled={additionals.length === 10}
-                    className='flex items-center gap-2'
-                    type='button'
-                >
-                    <PlusCircleIcon width={15} />
-                    Agregar adicional
+                <FormField
+                  name='additional-amount'
+                  render={({ field }) => (
+                    <FormItem>
+                      <Input
+                        type='number'
+                        placeholder='$ valor'
+                        autoComplete='off'
+                        {...field}
+                        required
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange(e, aditional.id)}
+                      />
+                    </FormItem>
+                  )}
+                />
+                <Button variant='ghost' size='sm' onClick={() => deleteAditional(aditional.id)}>
+                  <X className='h-3 w-3 text-muted-foreground hover:text-foreground' />
                 </Button>
-                <div className='px-1'>
-                    <div className='w-full flex justify-between font-semibold'>
-                        <span>Total: </span>
-                        <span>{formatCurrency(total)}</span>
-                    </div>
-                </div>
-            </form>
-        </Form>
-    );
+              </div>
+            ))
+          : null}
+        <Button
+          variant='secondary'
+          onClick={addAditional}
+          disabled={additionals.length === 10}
+          className='flex items-center gap-2'
+          type='button'
+        >
+          <PlusCircleIcon width={15} />
+          Agregar adicional
+        </Button>
+        <div className='px-1'>
+          <div className='w-full flex justify-between font-semibold'>
+            <span>Total: </span>
+            <span>{formatCurrency(total)}</span>
+          </div>
+        </div>
+      </form>
+    </Form>
+  );
 }
