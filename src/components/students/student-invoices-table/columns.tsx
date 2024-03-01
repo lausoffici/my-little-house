@@ -2,18 +2,9 @@
 
 import { Invoice } from '@prisma/client';
 import { ColumnDef } from '@tanstack/react-table';
-import { MoreHorizontal } from 'lucide-react';
 
 import InvoiceStateBadge from '@/components/invoices/invoice-state-badge';
-import { Button } from '@/components/ui/button';
 import { DataTableColumnHeader } from '@/components/ui/data-table';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
 import { formatCurrency, getMonthName } from '@/lib/utils';
 
 export const columns: ColumnDef<Invoice>[] = [
@@ -39,26 +30,5 @@ export const columns: ColumnDef<Invoice>[] = [
         accessorKey: 'state',
         header: ({ column }) => <DataTableColumnHeader column={column} title='Estado' />,
         cell: ({ row }) => <InvoiceStateBadge state={row.original.state} />
-    },
-    {
-        id: 'actions',
-        cell: () => {
-            return (
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant='ghost' className='h-8 w-8 p-0'>
-                            <span className='sr-only'>Abrir Menú</span>
-                            <MoreHorizontal className='h-4 w-4' />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align='end'>
-                        <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-                        <DropdownMenuItem>
-                            <span>Ver comprobante</span>
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            );
-        }
     }
 ];

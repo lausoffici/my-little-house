@@ -47,9 +47,11 @@ const Ilustration = ({ path }: { path: string }) => {
     const imagesByPath: Record<string, string> = {
         '/students': '/assets/students.png',
         '/courses': '/assets/courses.png',
-        '/cash-register': '/assets/cash-register.png'
+        '/cash-register': '/assets/cash-register.png',
+        '/receipts': '/assets/receipts.png',
+        '/expirations': '/assets/expirations.png'
     };
-    const src = imagesByPath[path] ?? '/assets/book.png';
+    const src = imagesByPath[path] ?? '/assets/cat.png';
     return <Image src={src} width={200} height={200} alt='Ilustration' />;
 };
 
