@@ -14,32 +14,32 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-    title: 'My Little House',
-    description: 'Website developed for an English teaching establishment',
-    icons: [{ rel: 'icon', url: Favicon.src }]
+  title: 'My Little House',
+  description: 'Website developed for an English teaching establishment',
+  icons: [{ rel: 'icon', url: Favicon.src }]
 };
 
 type RootLayoutProps = {
-    children: React.ReactNode;
+  children: React.ReactNode;
 };
 
 export default async function RootLayout({ children }: RootLayoutProps) {
-    const session = await getServerSession(authOptions);
+  const session = await getServerSession(authOptions);
 
-    return (
-        <html lang='en'>
-            <body className={`${inter.className} flex`}>
-                <ThemeProvider attribute='class' defaultTheme='system' enableSystem disableTransitionOnChange>
-                    <div className='flex h-screen w-full'>
-                        <Sidebar />
-                        <div className='flex-1 flex flex-col overflow-hidden'>
-                            <TopNavigationBar user={session?.user} />
-                            <main className='p-6 overflow-auto'>{children}</main>
-                        </div>
-                    </div>
-                    <Toaster />
-                </ThemeProvider>
-            </body>
-        </html>
-    );
+  return (
+    <html lang='en'>
+      <body className={`${inter.className} flex`}>
+        <ThemeProvider attribute='class' defaultTheme='system' enableSystem disableTransitionOnChange>
+          <div className='flex h-screen w-full'>
+            <Sidebar />
+            <div className='flex-1 flex flex-col overflow-hidden'>
+              <TopNavigationBar user={session?.user} />
+              <main className='p-6 overflow-auto'>{children}</main>
+            </div>
+          </div>
+          <Toaster />
+        </ThemeProvider>
+      </body>
+    </html>
+  );
 }
