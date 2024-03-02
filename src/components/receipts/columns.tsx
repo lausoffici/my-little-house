@@ -1,33 +1,36 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
+import Link from 'next/link';
 
-import { formatCurrency, formateDate } from '@/lib/utils';
-import { ReceiptsWithStudents } from '@/types';
+import { paymentMethodLabels } from '@/components/receipts/receipt-dialog';
+import { DataTableColumnHeader } from '@/components/ui/data-table';
+import { formatCurrency, formatTime } from '@/lib/utils';
+import { ReceiptWithStudent } from '@/types';
 
-import { DataTableColumnHeader } from '../ui/data-table';
-import { ReceiptDialogTrigger } from './receipt-dialog-trigger';
+import { ReceiptBadge } from './receipt-badge';
 
-export const columns: ColumnDef<ReceiptsWithStudents>[] = [
+export const columns: ColumnDef<ReceiptWithStudent>[] = [
   {
     accessorKey: 'studentId',
-    header: ({ column }) => {
-      return <DataTableColumnHeader title='Nombre y Apellido' column={column} />;
-    },
+    header: ({ column }) => <DataTableColumnHeader title='Estudiante' column={column} />,
     cell: ({ row }) => {
       const student = row.original.student;
       return (
-        <span>
+        <Link className='underline' href={`/students/${student.id}`}>
           {student.firstName} {student.lastName}
-        </span>
+        </Link>
       );
     },
     enableHiding: false
   },
   {
     accessorKey: 'createdAt',
-    header: ({ column }) => <DataTableColumnHeader title='Fecha de creación' column={column} />,
-    cell: ({ row }) => <span>{formateDate(row.original.createdAt)}</span>
+    header: ({ column }) => <DataTableColumnHeader column={column} title='Hora' />,
+    cell: ({ row }) => {
+      const { createdAt } = row.original;
+      return <span>{formatTime(createdAt)}</span>;
+    }
   },
   {
     accessorKey: 'total',
@@ -35,8 +38,16 @@ export const columns: ColumnDef<ReceiptsWithStudents>[] = [
     cell: ({ row }) => <span>{formatCurrency(row.original.total)}</span>
   },
   {
+    accessorKey: 'paymentMethod',
+    header: ({ column }) => <DataTableColumnHeader column={column} title='Metodo de pago' />,
+    cell: ({ row }) => {
+      const { paymentMethod } = row.original;
+      return <span>{paymentMethodLabels[paymentMethod]}</span>;
+    }
+  },
+  {
     accessorKey: 'id',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='ID' />,
-    cell: ({ row }) => <ReceiptDialogTrigger receiptId={row.original.id} />
+    header: ({ column }) => <DataTableColumnHeader column={column} title='Comprobante' />,
+    cell: ({ row }) => <ReceiptBadge receiptId={row.original.id} />
   }
 ];

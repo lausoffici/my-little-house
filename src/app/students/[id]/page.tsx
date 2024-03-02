@@ -13,7 +13,7 @@ import { Separator } from '@/components/ui/separator';
 import { getCourseOptions } from '@/lib/courses';
 import { getUnpaidInvoicesByStudent } from '@/lib/invoices';
 import { getStudentById, getStudentInvoices } from '@/lib/students';
-import { formateDate } from '@/lib/utils';
+import { formatDate } from '@/lib/utils';
 import { PageProps } from '@/types';
 
 export default async function StudentPage({ params: { id }, searchParams }: PageProps<{ id: string }>) {
@@ -53,7 +53,7 @@ export default async function StudentPage({ params: { id }, searchParams }: Page
               <Separator />
               <StudentDetail label='Apellido' info={lastName} />
               <Separator />
-              <StudentDetail label='Fecha de Nacimiento' info={birthDate ? formateDate(birthDate) : null} />
+              <StudentDetail label='Fecha de Nacimiento' info={birthDate ? formatDate(birthDate) : null} />
               <Separator />
               <StudentDetail label='Dni' info={dni} />
               <Separator />

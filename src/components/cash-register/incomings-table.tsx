@@ -9,13 +9,12 @@ import {
 } from '@tanstack/react-table';
 import React from 'react';
 
+import { columns } from '@/components/receipts/columns';
 import { Badge } from '@/components/ui/badge';
 import DataTable from '@/components/ui/data-table';
 import { getIncomingsListByDate } from '@/lib/cash-register';
 import { formatCurrency } from '@/lib/utils';
-import { CashRegisterIncomingItem } from '@/types';
-
-import { columns } from './columns';
+import { ReceiptWithStudent } from '@/types';
 
 type IncomingsTableProps = {
   incomingsPromise: ReturnType<typeof getIncomingsListByDate>;
@@ -24,7 +23,7 @@ type IncomingsTableProps = {
 export default function IncomingsTable({ incomingsPromise }: IncomingsTableProps) {
   const { data, totalAmount } = React.use(incomingsPromise);
 
-  const table = useReactTable<CashRegisterIncomingItem>({
+  const table = useReactTable<ReceiptWithStudent>({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
@@ -42,7 +41,6 @@ export default function IncomingsTable({ incomingsPromise }: IncomingsTableProps
           {formatCurrency(totalAmount)}
         </Badge>
       </div>
-
       <DataTable table={table} columns={columns} withRowSelection={false} />
     </>
   );

@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '
 import { Separator } from '@/components/ui/separator';
 import { useSearchParams } from '@/hooks/use-search-params';
 import { getReceiptWithItemsById } from '@/lib/receipts';
-import { formatCurrency, formateDate, padWithZeros } from '@/lib/utils';
+import { formatCurrency, formatDate, padWithZeros } from '@/lib/utils';
 
 import Logo from '../common/sidebar/logo';
 
@@ -24,7 +24,7 @@ const vesper = Vesper_Libre({
   weight: '400'
 });
 
-const paymentMethod = {
+export const paymentMethodLabels = {
   [ReceiptPaymentMethod.CASH]: 'Efectivo',
   [ReceiptPaymentMethod.TRANSFER]: 'Transferencia'
 };
@@ -61,7 +61,7 @@ export default function ReceiptDialog({ receipt }: ReceiptsDialogProps) {
         <Card ref={receiptRef} className='print:block print:m-2 print:scale-90'>
           <CardHeader>
             <div className='flex justify-between items-start text-sm font-semibold'>
-              <span>{formateDate(receipt.createdAt)}</span>
+              <span>{formatDate(receipt.createdAt)}</span>
               <div className='flex flex-col items-center font-medium'>
                 <Logo />
                 <h1>INGLÉS</h1>
@@ -78,7 +78,7 @@ export default function ReceiptDialog({ receipt }: ReceiptsDialogProps) {
               </div>
               <div>
                 <span className='mr-2'>Método de pago:</span>
-                <span className='font-semibold'>{paymentMethod[receipt.paymentMethod]}</span>
+                <span className='font-semibold'>{paymentMethodLabels[receipt.paymentMethod]}</span>
               </div>
             </div>
             <div className='flex justify-between py-2'>
