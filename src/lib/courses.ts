@@ -95,7 +95,8 @@ export const editCourse = async (id: number, editedCourse: FormData) => {
         ]
       },
       data: {
-        amount: parsedData.data.amount
+        amount: parsedData.data.amount,
+        description: parsedData.data.name
       }
     });
 
