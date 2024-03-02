@@ -83,11 +83,6 @@ export const editCourse = async (id: number, editedCourse: FormData) => {
             }
           },
           {
-            month: {
-              lte: 12
-            }
-          },
-          {
             year: {
               equals: currentDate.getFullYear()
             }
