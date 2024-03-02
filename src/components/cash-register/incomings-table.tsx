@@ -7,9 +7,9 @@ import {
   getSortedRowModel,
   useReactTable
 } from '@tanstack/react-table';
-import React, { useMemo } from 'react';
+import React from 'react';
 
-import { getReceiptColumns } from '@/components/receipts/columns';
+import { columns } from '@/components/receipts/columns';
 import { Badge } from '@/components/ui/badge';
 import DataTable from '@/components/ui/data-table';
 import { getIncomingsListByDate } from '@/lib/cash-register';
@@ -22,8 +22,6 @@ type IncomingsTableProps = {
 
 export default function IncomingsTable({ incomingsPromise }: IncomingsTableProps) {
   const { data, totalAmount } = React.use(incomingsPromise);
-
-  const columns = useMemo(getReceiptColumns, []);
 
   const table = useReactTable<ReceiptWithStudent>({
     data,

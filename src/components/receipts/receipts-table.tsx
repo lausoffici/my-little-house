@@ -7,7 +7,7 @@ import { useURLManagedDataTable } from '@/hooks/use-url-managed-data-table';
 import { getReceiptWithItemsById, getReceiptsByDate } from '@/lib/receipts';
 import { ReceiptWithStudent } from '@/types';
 
-import { getReceiptColumns } from './columns';
+import { columns } from './columns';
 import ReceiptDialog from './receipt-dialog';
 
 interface ReceiptsTableProps {
@@ -18,8 +18,6 @@ interface ReceiptsTableProps {
 export default function ReceiptsTable({ receiptListPromise, receiptDetailPromise }: ReceiptsTableProps) {
   const { data, totalPages } = React.use(receiptListPromise);
   const receipt = React.use(receiptDetailPromise);
-
-  const columns = React.useMemo(() => getReceiptColumns(true), []);
 
   const table = useURLManagedDataTable<ReceiptWithStudent>({
     data,

@@ -1,7 +1,6 @@
 import { InvoiceState, type Prisma } from '@prisma/client';
 
 import { variants } from '@/components/ui/badge';
-import { getIncomingsListByDate } from '@/lib/cash-register';
 import { getExpiredInvoiceList } from '@/lib/invoices';
 import { getReceiptWithItemsById } from '@/lib/receipts';
 

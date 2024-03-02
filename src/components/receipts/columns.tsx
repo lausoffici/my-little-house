@@ -10,9 +10,7 @@ import { ReceiptWithStudent } from '@/types';
 
 import { ReceiptBadge } from './receipt-badge';
 
-export const getReceiptColumns: (isInReceiptsPage?: boolean) => ColumnDef<ReceiptWithStudent>[] = (
-  isInReceiptsPage = false
-) => [
+export const columns: ColumnDef<ReceiptWithStudent>[] = [
   {
     accessorKey: 'studentId',
     header: ({ column }) => <DataTableColumnHeader title='Estudiante' column={column} />,
@@ -50,6 +48,6 @@ export const getReceiptColumns: (isInReceiptsPage?: boolean) => ColumnDef<Receip
   {
     accessorKey: 'id',
     header: ({ column }) => <DataTableColumnHeader column={column} title='Comprobante' />,
-    cell: ({ row }) => <ReceiptBadge receiptId={row.original.id} isInReceiptsPage={isInReceiptsPage} />
+    cell: ({ row }) => <ReceiptBadge receiptId={row.original.id} />
   }
 ];
