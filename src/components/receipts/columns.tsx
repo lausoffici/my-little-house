@@ -18,8 +18,7 @@ export const columns: ColumnDef<ReceiptsWithStudents>[] = [
       const student = row.original.student;
       return (
         <span>
-          {student.firstName}
-          {student.lastName}
+          {student.firstName} {student.lastName}
         </span>
       );
     },

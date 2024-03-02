@@ -1,6 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { ReceiptPaymentMethod } from '@prisma/client';
 import { ExclamationTriangleIcon } from '@radix-ui/react-icons';
 import { CheckIcon, PlusCircleIcon, X } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
@@ -11,17 +12,25 @@ import { useForm } from 'react-hook-form';
 import { v4 as uuid } from 'uuid';
 import { z } from 'zod';
 
+import { Button } from '@/components/ui/button';
 import { Form, FormField, FormItem, FormLabel } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { MultiSelect } from '@/components/ui/multi-select';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select';
+import { useToast } from '@/components/ui/use-toast';
 import { getUnpaidInvoicesByStudent } from '@/lib/invoices';
 import { generateReceipt } from '@/lib/receipts';
 import { formatCurrency, getMonthName } from '@/lib/utils';
-import { invoicesFormSchema } from '@/lib/validations/form';
+import { receiptFormSchema } from '@/lib/validations/form';
 import { Option } from '@/types';
-
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
-import { MultiSelect } from '../ui/multi-select';
-import { useToast } from '../ui/use-toast';
 
 const initialState = {
   message: '',
@@ -36,12 +45,13 @@ interface ChargeInvoicesFormProps {
 }
 
 export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvoicesFormProps) {
+  const router = useRouter();
+  const { toast } = useToast();
+
+  const [selectedInvoiceIds, setSelectedInvoiceIds] = useState<string[]>([]);
   const [additionals, setAdditionals] = useState<{ id: string; value: number }[]>([]);
-  const [selectedIds, setSelected] = useState<string[]>([]);
   const [state, action] = useFormState(generateReceipt, initialState);
   const { id: studentId } = useParams<{ id: string }>();
-  const { toast } = useToast();
-  const router = useRouter();
 
   useEffect(() => {
     if (state === undefined || state.message === '') return;
@@ -69,9 +79,11 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
     label: `${invoice.description} - ${getMonthName(invoice.month)} ${invoice.year} ${formatCurrency(invoice.amount)}`
   }));
 
-  const form = useForm<z.infer<typeof invoicesFormSchema>>({
-    resolver: zodResolver(invoicesFormSchema),
-    defaultValues: {}
+  const form = useForm<z.infer<typeof receiptFormSchema>>({
+    resolver: zodResolver(receiptFormSchema),
+    defaultValues: {
+      paymentMethod: ReceiptPaymentMethod.CASH
+    }
   });
 
   function addAditional() {
@@ -114,18 +126,39 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
   }
 
   const total = useMemo(() => {
-    const selectedInvoicesAmount = selectedIds.map(getInvoiceById).map((invoice) => invoice.amount);
+    const selectedInvoicesAmount = selectedInvoiceIds.map(getInvoiceById).map((invoice) => invoice.amount);
     const additionalsAmounts = additionals.map((input) => input.value);
     const totalAmounts = [...selectedInvoicesAmount, ...additionalsAmounts];
 
     const total = totalAmounts.reduce((acc, current) => acc + current, 0);
 
     return total;
-  }, [additionals, getInvoiceById, selectedIds]);
+  }, [additionals, getInvoiceById, selectedInvoiceIds]);
 
   return (
     <Form {...form}>
       <form className='space-y-3 py-3' action={action} id={CHARGE_INVOICE_FORM_ID}>
+        <FormField
+          control={form.control}
+          name='paymentMethod'
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Modo de pago</FormLabel>
+              <Select onValueChange={field.onChange} {...field}>
+                <SelectTrigger className='w-[min(100%,180px)]'>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectLabel>Metodos de pago</SelectLabel>
+                    <SelectItem value={ReceiptPaymentMethod.CASH}>Efectivo</SelectItem>
+                    <SelectItem value={ReceiptPaymentMethod.TRANSFER}>Transferencia</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </FormItem>
+          )}
+        />
         <FormField
           control={form.control}
           name='invoices'
@@ -135,10 +168,10 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
               <MultiSelect
                 className='w-[462px]'
                 options={invoicesOptions}
-                selected={selectedIds}
+                selected={selectedInvoiceIds}
                 notFoundMessage='Cuota no encontrada'
                 {...field}
-                onChange={setSelected}
+                onChange={setSelectedInvoiceIds}
                 name='invoices'
               />
             </FormItem>
@@ -194,13 +227,11 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
           <PlusCircleIcon width={15} />
           Agregar adicional
         </Button>
-        <div className='px-1'>
-          <div className='w-full flex justify-between font-semibold'>
-            <span>Total: </span>
-            <span>{formatCurrency(total)}</span>
-          </div>
-        </div>
       </form>
+      <div className='flex justify-between font-semibold mb-3'>
+        <span>Total: </span>
+        <span>{formatCurrency(total)}</span>
+      </div>
     </Form>
   );
 }
