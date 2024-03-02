@@ -23,7 +23,7 @@ type IncomingsTableProps = {
 export default function IncomingsTable({ incomingsPromise }: IncomingsTableProps) {
   const { data, totalAmount } = React.use(incomingsPromise);
 
-  const columns = useMemo(() => getReceiptColumns(), []);
+  const columns = useMemo(getReceiptColumns, []);
 
   const table = useReactTable<ReceiptWithStudent>({
     data,

@@ -8,7 +8,7 @@ import { DataTableColumnHeader } from '@/components/ui/data-table';
 import { formatCurrency, formatTime } from '@/lib/utils';
 import { ReceiptWithStudent } from '@/types';
 
-import { ReceiptBadge } from './receipt-dialog-trigger';
+import { ReceiptBadge } from './receipt-badge';
 
 export const getReceiptColumns: (isInReceiptsPage?: boolean) => ColumnDef<ReceiptWithStudent>[] = (
   isInReceiptsPage = false
