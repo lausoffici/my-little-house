@@ -1,5 +1,6 @@
 'use server';
 
+import { InvoiceState } from '@prisma/client';
 import { cache } from 'react';
 
 import { Option } from '@/types';
@@ -65,12 +66,44 @@ export const editCourse = async (id: number, editedCourse: FormData) => {
     };
   }
 
-  return await prisma.course.update({
-    where: {
-      id
-    },
-    data: parsedData.data
+  const course = await prisma.$transaction(async (tx) => {
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth() + 1;
+    const nextMonth = currentMonth + 1;
+
+    // Update all invoices for the course that are in the future and have not been paid
+    await tx.invoice.updateMany({
+      where: {
+        courseId: id,
+        state: InvoiceState.I,
+        AND: [
+          {
+            month: {
+              gte: nextMonth
+            }
+          },
+          {
+            year: {
+              equals: currentDate.getFullYear()
+            }
+          }
+        ]
+      },
+      data: {
+        amount: parsedData.data.amount,
+        description: parsedData.data.name
+      }
+    });
+
+    return tx.course.update({
+      where: {
+        id
+      },
+      data: parsedData.data
+    });
   });
+
+  return course;
 };
 
 export const deleteCourse = async (id: number) => {

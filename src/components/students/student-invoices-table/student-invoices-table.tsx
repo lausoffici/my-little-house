@@ -22,5 +22,5 @@ export default function StudentInvoicesTable({ invoicesPromise }: StudentInvoice
     pageCount: totalPages
   });
 
-  return <DataTable table={table} columns={columns} />;
+  return <DataTable table={table} columns={columns} withRowSelection={false} />;
 }
