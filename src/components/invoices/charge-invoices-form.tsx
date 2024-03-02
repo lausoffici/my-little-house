@@ -145,7 +145,7 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
             <FormItem>
               <FormLabel>Modo de pago</FormLabel>
               <Select onValueChange={field.onChange} {...field}>
-                <SelectTrigger className='w-[180px]'>
+                <SelectTrigger className='w-[min(100%,180px)]'>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
