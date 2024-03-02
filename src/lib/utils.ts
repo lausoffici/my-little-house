@@ -12,8 +12,19 @@ export function formatCurrency(amount: number) {
   );
 }
 
-export function formateDate(date: Date) {
+export function formatDate(date: Date) {
   return date.toISOString().replace(/T.*/, '').split('-').reverse().join('/');
+}
+
+export function formatTime(date: Date) {
+  const locales = 'default';
+  const options = {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+  } as const;
+
+  return new Date(date).toLocaleTimeString(locales, options);
 }
 
 export function getDatePickerFormattedDate(date: Date) {

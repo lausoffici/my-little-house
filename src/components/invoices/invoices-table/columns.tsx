@@ -3,7 +3,7 @@
 import { ColumnDef } from '@tanstack/react-table';
 
 import { DataTableColumnHeader } from '@/components/ui/data-table';
-import { formatCurrency, formateDate, getMonthName } from '@/lib/utils';
+import { formatCurrency, formatDate, getMonthName } from '@/lib/utils';
 import { InvoiceListItem } from '@/types';
 
 import InvoiceStateBadge from '../invoice-state-badge';
@@ -47,6 +47,6 @@ export const columns: ColumnDef<InvoiceListItem>[] = [
   {
     accessorKey: 'expiredAt',
     header: ({ column }) => <DataTableColumnHeader column={column} title='Vencimiento' />,
-    cell: ({ row }) => <span>{formateDate(row.original.expiredAt)}</span>
+    cell: ({ row }) => <span>{formatDate(row.original.expiredAt)}</span>
   }
 ];

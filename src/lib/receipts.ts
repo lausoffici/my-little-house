@@ -41,12 +41,10 @@ export const getReceiptsByDate = async (searchParams: SearchParams) => {
 
   const receipts = await prisma.receipt.findMany({
     where: whereClause,
-    select: {
-      id: true,
-      total: true,
-      createdAt: true,
+    include: {
       student: {
         select: {
+          id: true,
           firstName: true,
           lastName: true
         }
