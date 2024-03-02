@@ -1,6 +1,6 @@
 'use server';
 
-import { InvoiceState, Prisma, ReceiptPaymentMethod } from '@prisma/client';
+import { InvoiceState, Prisma } from '@prisma/client';
 
 import { SearchParams } from '@/types';
 

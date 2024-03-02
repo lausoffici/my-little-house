@@ -2,20 +2,18 @@
 
 import { ReceiptPaymentMethod } from '@prisma/client';
 import { Vesper_Libre } from 'next/font/google';
-import Image from 'next/image';
 import React, { useRef } from 'react';
 import ReactToPrint from 'react-to-print';
 
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader } from '@/components/ui/card';
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Separator } from '@/components/ui/separator';
 import { useSearchParams } from '@/hooks/use-search-params';
 import { getReceiptWithItemsById } from '@/lib/receipts';
 import { formatCurrency, formateDate, padWithZeros } from '@/lib/utils';
 
 import Logo from '../common/sidebar/logo';
-import { Badge } from '../ui/badge';
-import { Separator } from '../ui/separator';
 
 type ReceiptsDialogProps = {
   receipt: Awaited<ReturnType<typeof getReceiptWithItemsById>>;
