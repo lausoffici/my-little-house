@@ -79,8 +79,8 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
     label: `${invoice.description} - ${getMonthName(invoice.month)} ${invoice.year} ${formatCurrency(invoice.amount)}`
   }));
 
-  const form = useForm<z.infer<typeof invoicesFormSchema>>({
-    resolver: zodResolver(invoicesFormSchema),
+  const form = useForm<z.infer<typeof receiptFormSchema>>({
+    resolver: zodResolver(receiptFormSchema),
     defaultValues: {
       paymentMethod: ReceiptPaymentMethod.CASH
     }
