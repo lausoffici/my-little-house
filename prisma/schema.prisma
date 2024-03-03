@@ -78,7 +78,7 @@ model Invoice {
   student     Student      @relation(fields: [studentId], references: [id])
   courseId    Int?
   course      Course?      @relation(fields: [courseId], references: [id])
-  // items       Item[]
+  items       Item[]
 }
 
 model Additional {
@@ -113,7 +113,7 @@ model Item {
   receiptId    Int
   receipt      Receipt     @relation(fields: [receiptId], references: [id])
   invoiceId    Int?
-  // invoice      Invoice?    @relation(fields: [invoiceId], references: [id])
+  invoice      Invoice?    @relation(fields: [invoiceId], references: [id])
   additionalId Int?
   additional   Additional? @relation(fields: [additionalId], references: [id])
 }
