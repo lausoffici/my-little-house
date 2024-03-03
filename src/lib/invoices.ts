@@ -1,3 +1,5 @@
+'use server';
+
 import { InvoiceState } from '@prisma/client';
 import { cache } from 'react';
 
@@ -5,6 +7,7 @@ import { SearchParams } from '@/types';
 
 import prisma from './prisma';
 import { getPaginationClause } from './utils';
+import { scholarshipFormSchema } from './validations/form';
 import { expiredInvoiceListSearchParamsSchema } from './validations/params';
 
 export const getExpiredInvoiceList = async (searchParams: SearchParams) => {
@@ -63,7 +66,44 @@ export const getUnpaidInvoicesByStudent = cache(async (id: number) => {
   return await prisma.invoice.findMany({
     where: {
       studentId: id,
-      state: 'I'
+      state: InvoiceState.I
     }
   });
 });
+
+export const scholarshipInvoice = async (_: any, formData: FormData) => {
+  const parsedData = scholarshipFormSchema.safeParse({
+    invoiceId: Number(formData.get('invoiceId'))
+  });
+
+  if (!parsedData.success) {
+    console.error(parsedData.error.flatten().fieldErrors);
+    return {
+      error: true,
+      message: 'Error al becar: el recibo no existe'
+    };
+  }
+
+  try {
+    await prisma.invoice.update({
+      data: {
+        state: InvoiceState.B,
+        paymentDate: new Date()
+      },
+      where: {
+        id: parsedData.data.invoiceId
+      }
+    });
+
+    return {
+      error: false,
+      message: 'Cuota becada con éxito'
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      error: true,
+      message: 'Error al becar'
+    };
+  }
+};

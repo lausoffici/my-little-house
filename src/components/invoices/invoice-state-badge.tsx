@@ -20,5 +20,9 @@ const invoicesStatus: InvoicesStatusType = {
 
 export default function InvoiceStateBadge({ state }: { state: Invoice['state'] }) {
   const { color, text } = invoicesStatus[state];
-  return <Badge variant={color}>{text}</Badge>;
+  return (
+    <Badge variant={color} className='font-semibold'>
+      {text}
+    </Badge>
+  );
 }
