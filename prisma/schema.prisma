@@ -78,7 +78,7 @@ model Invoice {
   student     Student      @relation(fields: [studentId], references: [id])
   courseId    Int?
   course      Course?      @relation(fields: [courseId], references: [id])
-  // items       Item[]
+  items       Item[]
 }
 
 model Additional {
@@ -91,13 +91,19 @@ model Additional {
   items       Item[]
 }
 
+enum ReceiptPaymentMethod {
+  CASH
+  TRANSFER
+}
+
 model Receipt {
-  id        Int      @id @default(autoincrement())
-  total     Float    @default(0)
-  items     Item[]
-  studentId Int
-  student   Student  @relation(fields: [studentId], references: [id])
-  createdAt DateTime @default(now())
+  id            Int                  @id @default(autoincrement())
+  total         Float                @default(0)
+  items         Item[]
+  studentId     Int
+  student       Student              @relation(fields: [studentId], references: [id])
+  createdAt     DateTime             @default(now())
+  paymentMethod ReceiptPaymentMethod @default(CASH)
 }
 
 model Item {
@@ -107,7 +113,7 @@ model Item {
   receiptId    Int
   receipt      Receipt     @relation(fields: [receiptId], references: [id])
   invoiceId    Int?
-  // invoice      Invoice?    @relation(fields: [invoiceId], references: [id])
+  invoice      Invoice?    @relation(fields: [invoiceId], references: [id])
   additionalId Int?
   additional   Additional? @relation(fields: [additionalId], references: [id])
 }

@@ -1,6 +1,8 @@
 'use server';
 
-import { CashRegisterIncomingItem, SearchParams } from '@/types';
+import { ReceiptPaymentMethod } from '@prisma/client';
+
+import { SearchParams } from '@/types';
 
 import prisma from './prisma';
 import { formatCurrency } from './utils';
@@ -16,58 +18,34 @@ export const getIncomingsListByDate = async (searchParams: SearchParams) => {
   const endDate = new Date(yearNumber, monthNumber - 1, dayNumber + 1);
 
   const whereClause = {
-    receipt: {
-      createdAt: {
-        gte: startDate,
-        lt: endDate
-      }
-    }
+    createdAt: {
+      gte: startDate,
+      lt: endDate
+    },
+    paymentMethod: ReceiptPaymentMethod.CASH
   };
 
-  // Get the total amount of the items with sum
-  const totalAmount = await prisma.item.aggregate({
+  const totalAmount = await prisma.receipt.aggregate({
     _sum: {
-      amount: true
+      total: true
     },
     where: whereClause
   });
 
-  const items = await prisma.item.findMany({
+  const receipts = await prisma.receipt.findMany({
     where: whereClause,
-    select: {
-      id: true,
-      description: true,
-      amount: true,
-      receipt: {
+    include: {
+      student: {
         select: {
           id: true,
-          createdAt: true,
-          student: {
-            select: {
-              id: true,
-              firstName: true,
-              lastName: true
-            }
-          }
+          firstName: true,
+          lastName: true
         }
       }
     }
   });
 
-  // Transform the items to the desired structure
-  const transformedItems: CashRegisterIncomingItem[] = items.map((item) => {
-    const { receipt, ...itemData } = item;
-    const { student } = receipt;
-    return {
-      ...itemData,
-      receiptId: receipt.id,
-      studentId: student.id,
-      studentName: `${student.firstName} ${student.lastName}`,
-      createdAt: receipt.createdAt
-    };
-  });
-
-  return { data: transformedItems, totalAmount: totalAmount?._sum?.amount ?? 0 };
+  return { data: receipts, totalAmount: totalAmount?._sum?.total ?? 0 };
 };
 
 export const setCashRegisterBalance = async (_: unknown, formData: FormData) => {

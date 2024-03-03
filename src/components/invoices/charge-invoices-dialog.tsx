@@ -42,7 +42,7 @@ export default function ChargeInvoicesDialog({ unpaidInvoicesPromise }: ChargeIn
             Cancelar
           </Button>
           <Button form={CHARGE_INVOICE_FORM_ID} type='submit'>
-            Generar comprobante
+            Cobrar
           </Button>
         </DialogFooter>
       </DialogContent>

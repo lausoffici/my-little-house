@@ -1,13 +1,13 @@
 'use server';
 
-import { Prisma } from '@prisma/client';
+import { InvoiceState, Prisma } from '@prisma/client';
 
 import { SearchParams } from '@/types';
 
 import prisma from './prisma';
 import { getMonthName, getPaginationClause } from './utils';
 import { getYearMonthDayFromSearchParams } from './utils/cash-register.utils';
-import { invoicesFormSchema } from './validations/form';
+import { receiptFormSchema } from './validations/form';
 import { receiptsByDateSchema } from './validations/params';
 
 export const getReceiptsByDate = async (searchParams: SearchParams) => {
@@ -41,12 +41,10 @@ export const getReceiptsByDate = async (searchParams: SearchParams) => {
 
   const receipts = await prisma.receipt.findMany({
     where: whereClause,
-    select: {
-      id: true,
-      total: true,
-      createdAt: true,
+    include: {
       student: {
         select: {
+          id: true,
           firstName: true,
           lastName: true
         }
@@ -93,12 +91,13 @@ function combineAdditionals(descriptions: string[], amounts: string[]) {
 }
 
 export const generateReceipt = async (_: unknown, paidItems: FormData) => {
-  const parsedData = invoicesFormSchema.safeParse({
+  const parsedData = receiptFormSchema.safeParse({
     invoices: paidItems.get('invoices')?.toString().split(','),
     studentId: paidItems.get('studentId'),
     receiptTotal: paidItems.get('receiptTotal'),
     additionalsDescription: paidItems.getAll('additional-description'),
-    additionalsAmount: paidItems.getAll('additional-amount')
+    additionalsAmount: paidItems.getAll('additional-amount'),
+    paymentMethod: paidItems.get('paymentMethod')
   });
 
   if (!parsedData.success) {
@@ -109,7 +108,7 @@ export const generateReceipt = async (_: unknown, paidItems: FormData) => {
     };
   }
 
-  const { additionalsDescription, additionalsAmount, studentId, receiptTotal } = parsedData.data;
+  const { additionalsDescription, additionalsAmount, studentId, receiptTotal, paymentMethod } = parsedData.data;
 
   const additionals = combineAdditionals(additionalsDescription, additionalsAmount);
 
@@ -123,7 +122,7 @@ export const generateReceipt = async (_: unknown, paidItems: FormData) => {
               id: Number(id)
             },
             data: {
-              state: 'P'
+              state: InvoiceState.P
             }
           })
         )
@@ -132,7 +131,8 @@ export const generateReceipt = async (_: unknown, paidItems: FormData) => {
       const receipt = await tx.receipt.create({
         data: {
           studentId: Number(studentId),
-          total: Number(receiptTotal)
+          total: Number(receiptTotal),
+          paymentMethod
         }
       });
 
