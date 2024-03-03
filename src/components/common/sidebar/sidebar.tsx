@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import Logo from './logo';
 
 const LinkItems = [
+  { name: 'Resumen', icon: <FiDollarSign />, href: '/dashboard' },
   { name: 'Estudiantes', icon: <FiSmile />, href: '/students' },
   { name: 'Cursos', icon: <FiMonitor />, href: '/courses' },
   { name: 'Caja', icon: <FiLock />, href: '/cash-register' },
