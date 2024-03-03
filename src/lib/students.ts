@@ -6,7 +6,7 @@ import { DefaultArgs } from '@prisma/client/runtime/library';
 import { InvoiceDataType, SearchParams } from '@/types';
 
 import prisma from './prisma';
-import { getPaginationClause } from './utils';
+import { getPaginationClause, getTodaysData } from './utils';
 import { studentFormSchema } from './validations/form';
 import { studentInvoiceListSearchParamsSchema, studentListSearchParamsSchema } from './validations/params';
 
@@ -89,9 +89,7 @@ const generateInvoices = async (
   courseIds: string[],
   studentId: number
 ) => {
-  const date = new Date(Date.now());
-  let currentMonth = date.getMonth() + 1;
-  const currentYear = date.getFullYear();
+  let currentMonth = getTodaysData().currentMonth;
 
   // If the current month is January or February is set to March
   if (currentMonth < 3) currentMonth = 3;
@@ -115,12 +113,12 @@ const generateInvoices = async (
       for (let i = currentMonth; i < 13; i++) {
         invoicesData.push({
           month: i,
-          year: currentYear,
+          year: getTodaysData().currentYear,
           description: currentCourse.name,
           amount: currentCourse.amount,
           balance: 0,
           state: 'I',
-          expiredAt: new Date(`${i}-15-${currentYear}`),
+          expiredAt: new Date(`${i}-15-${getTodaysData().currentYear}`),
           courseId: Number(id),
           studentId: studentId
         });
@@ -129,6 +127,41 @@ const generateInvoices = async (
       await tx.invoice.createMany({ data: invoicesData });
     })
   );
+};
+
+const generateEnrollment = async (
+  tx: Omit<
+    PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>,
+    '$connect' | '$disconnect' | '$on' | '$transaction' | '$use' | '$extends'
+  >,
+  studentId: number
+) => {
+  const enrollmentYear = await tx.enrollmentYear.findFirst({
+    where: {
+      year: getTodaysData().currentYear
+    }
+  });
+
+  await tx.studentEnrollment.create({
+    data: {
+      year: getTodaysData().currentYear,
+      studentId: studentId
+    }
+  });
+
+  await tx.invoice.create({
+    data: {
+      month: 1,
+      year: getTodaysData().currentYear,
+      description: 'Matrícula',
+      amount: enrollmentYear?.amount || 0,
+      balance: 0,
+      state: 'I',
+      expiredAt: new Date(`${getTodaysData().currentMonth}-15-${getTodaysData().currentYear + 1}`),
+      courseId: null,
+      studentId: studentId
+    }
+  });
 };
 
 export const createStudent = async (_: unknown, createdStudent: FormData) => {
@@ -159,7 +192,7 @@ export const createStudent = async (_: unknown, createdStudent: FormData) => {
 
   try {
     // Create the student
-    const student = await prisma.$transaction(async (tx) => {
+    const studentData = await prisma.$transaction(async (tx) => {
       const student = await tx.student.create({
         data: {
           firstName: parsedData.data.firstName,
@@ -186,6 +219,17 @@ export const createStudent = async (_: unknown, createdStudent: FormData) => {
       });
 
       if (parsedData.data.courses) {
+        const currentEnrollment = await tx.studentEnrollment.findMany({
+          where: {
+            studentId: Number(student.id),
+            year: getTodaysData().currentYear
+          }
+        });
+
+        if (currentEnrollment.length === 0) {
+          await generateEnrollment(tx, Number(student.id));
+        }
+
         await generateInvoices(tx, parsedData.data.courses.split(','), student.id);
       }
 
@@ -194,7 +238,7 @@ export const createStudent = async (_: unknown, createdStudent: FormData) => {
 
     return {
       error: false,
-      message: `Estudiante creado extosamente: ${student.firstName} ${student.lastName}`
+      message: `Estudiante creado extosamente: ${studentData.firstName} ${studentData.lastName}`
     };
   } catch (e) {
     console.error(e);
@@ -259,6 +303,17 @@ export const editStudent = async (_: unknown, editedStudent: FormData) => {
       });
 
       const currentStudentCoursesId = student.studentByCourse.map(({ courseId }) => courseId).join(',');
+
+      const currentEnrollment = await tx.studentEnrollment.findMany({
+        where: {
+          studentId: Number(student.id),
+          year: getTodaysData().currentYear
+        }
+      });
+
+      if (currentEnrollment.length === 0) {
+        await generateEnrollment(tx, Number(student.id));
+      }
 
       /* If the courses string is not empty and it's different from the current courses string, delete the current studentByCourse records and create the new ones
              also delete all the unpaid invoices of that course */

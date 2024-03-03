@@ -39,6 +39,8 @@ export function getMonthName(monthNumber: number) {
   const date = new Date();
   date.setMonth(monthNumber - 1);
 
+  if (date.getMonth() <= 0) return '';
+
   return capitalizeFirstLetter(date.toLocaleString('es', { month: 'long' }));
 }
 
@@ -62,3 +64,12 @@ export function getPaginationClause(page: number, size: number) {
     take: size
   };
 }
+
+export const getTodaysData = () => {
+  const date = new Date();
+
+  return {
+    currentMonth: date.getMonth() + 1,
+    currentYear: date.getFullYear()
+  };
+};
