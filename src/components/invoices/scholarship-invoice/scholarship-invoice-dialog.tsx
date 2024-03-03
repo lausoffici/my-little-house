@@ -67,7 +67,7 @@ export function ScholarshipInvoiceDialog({
         <DialogTitle>Confirmar Beca</DialogTitle>
       </DialogHeader>
       <div className='my-3'>
-        ¿Desea becar <span className='font-semibold'>{invoiceFullDescription}</span>?
+        ¿Desea becar <b>{invoiceFullDescription}</b>?
       </div>
       <Form {...form}>
         <form action={action} id={SCHOLARSHIP_FORM_ID}>
