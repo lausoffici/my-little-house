@@ -122,7 +122,8 @@ export const generateReceipt = async (_: unknown, paidItems: FormData) => {
               id: Number(id)
             },
             data: {
-              state: InvoiceState.P
+              state: InvoiceState.P,
+              paymentDate: new Date()
             }
           })
         )

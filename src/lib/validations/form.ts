@@ -49,3 +49,7 @@ export const receiptFormSchema = z.object({
   additionalsAmount: z.array(z.string()),
   paymentMethod: z.nativeEnum(ReceiptPaymentMethod)
 });
+
+export const scholarshipFormSchema = z.object({
+  invoiceId: z.number()
+});

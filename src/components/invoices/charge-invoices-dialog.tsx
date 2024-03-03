@@ -26,7 +26,7 @@ export default function ChargeInvoicesDialog({ unpaidInvoicesPromise }: ChargeIn
 
   return (
     <Dialog open={openInvoiceDialog} onOpenChange={setOpenInvoiceDialog}>
-      <DialogTrigger>
+      <DialogTrigger asChild>
         <Button size='sm'>Cobrar</Button>
       </DialogTrigger>
       <DialogContent>
