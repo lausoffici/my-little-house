@@ -92,6 +92,7 @@ model Invoice {
   @@index([studentId, state])
   @@index([studentId, id])
   @@index([studentId, courseId, state])
+  @@index([studentId, courseId, state, year])
 }
 
 model Additional {
