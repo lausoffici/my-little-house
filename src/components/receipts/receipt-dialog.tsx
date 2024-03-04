@@ -71,7 +71,6 @@ export default function ReceiptDialog({ receipt }: ReceiptsDialogProps) {
           'image/png': blob
         })
       ]);
-      console.log('Image copied to clipboard');
     } catch (e) {
       console.error('Error copying image to clipboard', e);
     }
@@ -125,16 +124,13 @@ export default function ReceiptDialog({ receipt }: ReceiptsDialogProps) {
               <span className='font-semibold'>{formatCurrency(receipt.total)}</span>
             </div>
           </CardContent>
-          <CardFooter className='flex justify-center items-center p-2 text-gray-600'>
+          <CardFooter className='flex justify-center items-center p-2 pb-4 text-gray-600'>
             <div className={vesper.className}>Enseñanza de calidad con calidez desde 1987</div>
           </CardFooter>
         </Card>
         <DialogFooter className='flex flex-row justify-between w-full'>
-          <Button variant='outline' onClick={handleClose}>
-            Cerrar
-          </Button>
           <Button variant='outline' onClick={copyToClipboardAsImage}>
-            Copiar como imagen
+            Copiar
           </Button>
           <ReactToPrint
             trigger={() => <Button onClick={handlePrint}>Guardar/Imprimir</Button>}
