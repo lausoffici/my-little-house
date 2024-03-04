@@ -402,25 +402,27 @@ export const addDiscount = async (_: unknown, discountData: FormData) => {
   const studentByCourseId = Number(parsedData.data.studentByCourseId);
 
   try {
-    await prisma.studentByCourse.update({
-      where: {
-        id: studentByCourseId
-      },
-      data: {
-        discount
-      }
-    });
+    await prisma.$transaction(async (tx) => {
+      await tx.studentByCourse.update({
+        where: {
+          id: studentByCourseId
+        },
+        data: {
+          discount
+        }
+      });
 
-    await prisma.invoice.updateMany({
-      where: {
-        studentId,
-        courseId,
-        state: InvoiceState.I,
-        year: new Date().getFullYear()
-      },
-      data: {
-        discount
-      }
+      await tx.invoice.updateMany({
+        where: {
+          studentId,
+          courseId,
+          state: InvoiceState.I,
+          year: new Date().getFullYear()
+        },
+        data: {
+          discount
+        }
+      });
     });
 
     return {
