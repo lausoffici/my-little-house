@@ -27,22 +27,7 @@ export default async function StudentPage({ params: { id }, searchParams }: Page
     return <div>Student not found</div>;
   }
 
-  const {
-    firstName,
-    lastName,
-    birthDate,
-    dni,
-    address,
-    city,
-    phone,
-    mobilePhone,
-    momPhone,
-    dadPhone,
-    observations,
-    studentByCourse
-  } = student;
-
-  const fullName = `${firstName} ${lastName}`;
+  const fullName = `${student.firstName} ${student.lastName}`;
   const courses = student.studentByCourse.map(({ course }) => course);
 
   return (
@@ -62,30 +47,30 @@ export default async function StudentPage({ params: { id }, searchParams }: Page
           </CardHeader>
           <CardContent>
             <div className='flex flex-col gap-3 justify-center'>
-              <StudentDetail label='Nombre' info={firstName} />
+              <StudentDetail label='Nombre' info={student.firstName} />
               <Separator />
-              <StudentDetail label='Apellido' info={lastName} />
+              <StudentDetail label='Apellido' info={student.lastName} />
               <Separator />
-              <StudentDetail label='Fecha de Nacimiento' info={birthDate ? formatDate(birthDate) : null} />
+              <StudentDetail label='Fecha de Nacimiento' info={formatDate(student.birthDate)} />
               <Separator />
-              <StudentDetail label='Dni' info={dni} />
+              <StudentDetail label='Dni' info={student.dni} />
               <Separator />
-              <StudentDetail label='Dirección' info={address} />
+              <StudentDetail label='Dirección' info={student.address} />
               <Separator />
-              <StudentDetail label='Localidad' info={city} />
+              <StudentDetail label='Localidad' info={student.city} />
               <Separator />
-              <StudentDetail label='Teléfono' info={phone} />
+              <StudentDetail label='Teléfono' info={student.phone} />
               <Separator />
-              <StudentDetail label='Celular' info={mobilePhone} />
+              <StudentDetail label='Celular' info={student.mobilePhone} />
               <Separator />
-              <StudentDetail label='Celular Madre/tutora' info={momPhone} />
+              <StudentDetail label='Celular Madre/tutora' info={student.momPhone} />
               <Separator />
-              <StudentDetail label='Celular Padre/tutor' info={dadPhone} />
+              <StudentDetail label='Celular Padre/tutor' info={student.dadPhone} />
               <Separator />
-              <StudentDetail label='Observaciones' info={observations} />
+              <StudentDetail label='Observaciones' info={student.observations} />
               <Separator />
               <div className='flex items-center gap-2'>
-                <Label className='text-xs'>Cursos </Label>
+                <Label className='text-xs'>Cursos</Label>
                 <div>
                   {courses.map(({ id, name }) => (
                     <Badge variant='secondary' key={id} className='py-1 px-2 text-sm mr-2'>
@@ -105,7 +90,7 @@ export default async function StudentPage({ params: { id }, searchParams }: Page
             <div className='flex justify-between w-full mb-4'>
               <StudentInvoicesFilters />
               <div className='flex gap-2'>
-                <DiscountsFormDialog studentByCourse={studentByCourse} />
+                <DiscountsFormDialog studentByCourse={student.studentByCourse} />
                 <ChargeInvoicesDialog unpaidInvoicesPromise={unpaidInvoicesPromise} />
               </div>
             </div>

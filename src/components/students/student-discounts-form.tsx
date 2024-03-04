@@ -22,6 +22,7 @@ import {
 } from '@/components/ui/select';
 import { useToast } from '@/components/ui/use-toast';
 import { addDiscount, getStudentById } from '@/lib/students';
+import { formatPercentage } from '@/lib/utils';
 import { discountsFormSchema } from '@/lib/validations/form';
 
 const initialState = {
@@ -32,16 +33,7 @@ const initialState = {
 
 export const DICOUNTS_FORM_ID = 'invoice-form';
 
-const DISCOUNTS_OPTIONS = [
-  { label: '0%', value: 0 },
-  { label: '10%', value: 0.1 },
-  { label: '15%', value: 0.15 },
-  { label: '20%', value: 0.2 },
-  { label: '30%', value: 0.3 },
-  { label: '40%', value: 0.4 },
-  { label: '50%', value: 0.5 },
-  { label: '100%', value: 1 }
-];
+const DISCOUNTS = [0, 0.1, 0.15, 0.2, 0.3, 0.4, 0.5, 1];
 
 interface ChargeInvoicesFormProps {
   studentByCourse: NonNullable<Awaited<ReturnType<typeof getStudentById>>>['studentByCourse'];
@@ -129,9 +121,9 @@ export default function StudentDiscountsForm({ studentByCourse }: ChargeInvoices
                 <SelectContent>
                   <SelectGroup>
                     <SelectLabel>Descuentos</SelectLabel>
-                    {DISCOUNTS_OPTIONS.map(({ label, value }) => (
+                    {DISCOUNTS.map((value) => (
                       <SelectItem key={value} value={value.toString()}>
-                        {label}
+                        {formatPercentage(value)}
                       </SelectItem>
                     ))}
                   </SelectGroup>
