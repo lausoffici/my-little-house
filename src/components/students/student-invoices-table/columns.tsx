@@ -14,7 +14,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { formatCurrency, getMonthName } from '@/lib/utils';
+import { formatCurrency, formatPercentage, getMonthName } from '@/lib/utils';
+import { getDiscountedAmount } from '@/lib/utils/invoices.utils';
 
 export const columns: ColumnDef<Invoice>[] = [
   {
@@ -34,6 +35,16 @@ export const columns: ColumnDef<Invoice>[] = [
     accessorKey: 'amount',
     header: ({ column }) => <DataTableColumnHeader column={column} title='Importe' />,
     cell: ({ row }) => <span>{formatCurrency(row.original.amount)}</span>
+  },
+  {
+    accessorKey: 'discount',
+    header: ({ column }) => <DataTableColumnHeader column={column} title='Descuento' />,
+    cell: ({ row }) => <span>{formatPercentage(row.original.discount ?? 0)}</span>
+  },
+  {
+    accessorKey: 'amount',
+    header: ({ column }) => <DataTableColumnHeader column={column} title='Total' />,
+    cell: ({ row }) => <span>{formatCurrency(getDiscountedAmount(row.original))}</span>
   },
   {
     accessorKey: 'state',

@@ -1,13 +1,12 @@
 'use server';
 
-import { InvoiceState, Prisma, PrismaClient } from '@prisma/client';
-import { DefaultArgs } from '@prisma/client/runtime/library';
+import { InvoiceState, Prisma } from '@prisma/client';
 
 import { InvoiceDataType, SearchParams } from '@/types';
 
 import prisma from './prisma';
 import { getPaginationClause, getTodaysData } from './utils';
-import { studentFormSchema } from './validations/form';
+import { discountsFormSchema, studentFormSchema } from './validations/form';
 import { studentInvoiceListSearchParamsSchema, studentListSearchParamsSchema } from './validations/params';
 
 export const getStudentById = async (id: number) => {
@@ -81,15 +80,10 @@ export const getStudentList = async (searchParams: SearchParams) => {
   return { data: students, totalPages };
 };
 
-const generateInvoices = async (
-  tx: Omit<
-    PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>,
-    '$connect' | '$disconnect' | '$on' | '$transaction' | '$use' | '$extends'
-  >,
-  courseIds: string[],
-  studentId: number
-) => {
-  let currentMonth = getTodaysData().currentMonth;
+const generateInvoices = async (tx: Prisma.TransactionClient, courseIds: string[], studentId: number) => {
+  const todaysData = getTodaysData();
+  let currentMonth = todaysData.currentMonth;
+  const currentYear = todaysData.currentYear;
 
   // If the current month is January or February is set to March
   if (currentMonth < 3) currentMonth = 3;
@@ -113,12 +107,12 @@ const generateInvoices = async (
       for (let i = currentMonth; i < 13; i++) {
         invoicesData.push({
           month: i,
-          year: getTodaysData().currentYear,
+          year: currentYear,
           description: currentCourse.name,
           amount: currentCourse.amount,
           balance: 0,
           state: 'I',
-          expiredAt: new Date(`${i}-15-${getTodaysData().currentYear}`),
+          expiredAt: new Date(`${i}-15-${currentYear}`),
           courseId: Number(id),
           studentId: studentId
         });
@@ -129,22 +123,20 @@ const generateInvoices = async (
   );
 };
 
-const generateEnrollment = async (
-  tx: Omit<
-    PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>,
-    '$connect' | '$disconnect' | '$on' | '$transaction' | '$use' | '$extends'
-  >,
-  studentId: number
-) => {
+const generateEnrollment = async (tx: Prisma.TransactionClient, studentId: number) => {
+  const todaysData = getTodaysData();
+  let currentMonth = todaysData.currentMonth;
+  const currentYear = todaysData.currentYear;
+
   const enrollmentYear = await tx.enrollmentYear.findFirst({
     where: {
-      year: getTodaysData().currentYear
+      year: currentYear
     }
   });
 
   await tx.studentEnrollment.create({
     data: {
-      year: getTodaysData().currentYear,
+      year: currentYear,
       studentId: studentId
     }
   });
@@ -152,12 +144,12 @@ const generateEnrollment = async (
   await tx.invoice.create({
     data: {
       month: 1,
-      year: getTodaysData().currentYear,
+      year: currentYear,
       description: 'Matrícula',
       amount: enrollmentYear?.amount || 0,
       balance: 0,
       state: 'I',
-      expiredAt: new Date(`${getTodaysData().currentMonth}-15-${getTodaysData().currentYear + 1}`),
+      expiredAt: new Date(`${currentMonth}-15-${currentYear + 1}`),
       courseId: null,
       studentId: studentId
     }
@@ -219,10 +211,12 @@ export const createStudent = async (_: unknown, createdStudent: FormData) => {
       });
 
       if (parsedData.data.courses) {
+        const currentYear = getTodaysData().currentYear;
+
         const currentEnrollment = await tx.studentEnrollment.findMany({
           where: {
             studentId: Number(student.id),
-            year: getTodaysData().currentYear
+            year: currentYear
           }
         });
 
@@ -340,7 +334,7 @@ export const editStudent = async (_: unknown, editedStudent: FormData) => {
               where: {
                 studentId,
                 courseId: Number(id),
-                state: 'I'
+                state: InvoiceState.I
               }
             })
           )
@@ -433,4 +427,62 @@ export const getStudentInvoices = async (id: number, searchParams: SearchParams)
   });
 
   return { invoices, totalPages };
+};
+
+export const addDiscount = async (_: unknown, discountData: FormData) => {
+  const parsedData = discountsFormSchema.safeParse({
+    course: discountData.get('course'),
+    discount: discountData.get('discount'),
+    studentId: discountData.get('studentId'),
+    studentByCourseId: discountData.get('studentByCourseId')
+  });
+
+  if (!parsedData.success) {
+    console.error(parsedData.error.flatten().fieldErrors);
+    return {
+      error: true,
+      message: 'Error al agregar el descuento'
+    };
+  }
+
+  const courseId = Number(parsedData.data.course);
+  const discount = Number(parsedData.data.discount);
+  const studentId = Number(parsedData.data.studentId);
+  const studentByCourseId = Number(parsedData.data.studentByCourseId);
+
+  try {
+    await prisma.$transaction(async (tx) => {
+      await tx.studentByCourse.update({
+        where: {
+          id: studentByCourseId
+        },
+        data: {
+          discount
+        }
+      });
+
+      await tx.invoice.updateMany({
+        where: {
+          studentId,
+          courseId,
+          state: InvoiceState.I,
+          year: new Date().getFullYear()
+        },
+        data: {
+          discount
+        }
+      });
+    });
+
+    return {
+      error: false,
+      message: 'Descuento agregado exitosamente'
+    };
+  } catch (e) {
+    console.error(e);
+    return {
+      error: true,
+      message: 'Error al agregar el descuento'
+    };
+  }
 };

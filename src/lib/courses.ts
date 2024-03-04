@@ -76,18 +76,12 @@ export const editCourse = async (id: number, editedCourse: FormData) => {
       where: {
         courseId: id,
         state: InvoiceState.I,
-        AND: [
-          {
-            month: {
-              gte: nextMonth
-            }
-          },
-          {
-            year: {
-              equals: currentDate.getFullYear()
-            }
-          }
-        ]
+        month: {
+          gte: nextMonth
+        },
+        year: {
+          equals: currentDate.getFullYear()
+        }
       },
       data: {
         amount: parsedData.data.amount,

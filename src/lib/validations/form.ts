@@ -58,3 +58,10 @@ export const enrollmentFormSchema = z.object({
   year: z.string(),
   amount: z.string()
 });
+
+export const discountsFormSchema = z.object({
+  course: z.string({ required_error: 'El curso es requerido' }),
+  discount: z.string({ required_error: 'El descuento es requerido' }),
+  studentId: z.string(),
+  studentByCourseId: z.string()
+});

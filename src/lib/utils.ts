@@ -12,7 +12,8 @@ export function formatCurrency(amount: number) {
   );
 }
 
-export function formatDate(date: Date) {
+export function formatDate(date: Date | null) {
+  if (!date) return '';
   return date.toISOString().replace(/T.*/, '').split('-').reverse().join('/');
 }
 
@@ -72,4 +73,8 @@ export const getTodaysData = () => {
     currentMonth: date.getMonth() + 1,
     currentYear: date.getFullYear()
   };
+};
+
+export const formatPercentage = (value: number) => {
+  return `${value * 100}%`;
 };
