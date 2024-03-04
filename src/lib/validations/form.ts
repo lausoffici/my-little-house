@@ -53,3 +53,8 @@ export const receiptFormSchema = z.object({
 export const scholarshipFormSchema = z.object({
   invoiceId: z.number()
 });
+
+export const enrollmentFormSchema = z.object({
+  year: z.string(),
+  amount: z.string()
+});
