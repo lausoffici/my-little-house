@@ -12,7 +12,8 @@ export function formatCurrency(amount: number) {
   );
 }
 
-export function formatDate(date: Date) {
+export function formatDate(date: Date | null) {
+  if (!date) return '';
   return date.toISOString().replace(/T.*/, '').split('-').reverse().join('/');
 }
 
@@ -62,3 +63,7 @@ export function getPaginationClause(page: number, size: number) {
     take: size
   };
 }
+
+export const formatPercentage = (value: number) => {
+  return `${value * 100}%`;
+};

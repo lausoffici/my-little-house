@@ -53,3 +53,10 @@ export const receiptFormSchema = z.object({
 export const scholarshipFormSchema = z.object({
   invoiceId: z.number()
 });
+
+export const discountsFormSchema = z.object({
+  course: z.string({ required_error: 'El curso es requerido' }),
+  discount: z.string({ required_error: 'El descuento es requerido' }),
+  studentId: z.string(),
+  studentByCourseId: z.string()
+});
