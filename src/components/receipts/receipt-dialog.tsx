@@ -58,16 +58,11 @@ export default function ReceiptDialog({ receipt }: ReceiptsDialogProps) {
     if (!element) return;
 
     try {
-      const dataUrl = await domtoimage.toPng(element);
+      const blobImage = await domtoimage.toBlob(element);
 
-      // Convert the data URL to a Blob
-      const response = await fetch(dataUrl);
-      const blob = await response.blob();
-
-      // Use the Clipboard API to copy the image
       await navigator.clipboard.write([
         new ClipboardItem({
-          [blob.type]: blob
+          'image/png': blobImage
         })
       ]);
     } catch (error) {
