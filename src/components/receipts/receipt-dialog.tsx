@@ -1,7 +1,7 @@
 'use client';
 
 import { ReceiptPaymentMethod } from '@prisma/client';
-import html2canvas from 'html2canvas';
+import domtoimage from 'dom-to-image';
 import { Vesper_Libre } from 'next/font/google';
 import React, { useRef } from 'react';
 import ReactToPrint from 'react-to-print';
@@ -58,21 +58,20 @@ export default function ReceiptDialog({ receipt }: ReceiptsDialogProps) {
     if (!element) return;
 
     try {
-      const canvas = await html2canvas(element);
-      const blob: Blob | null = await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
+      const dataUrl = await domtoimage.toPng(element);
 
-      if (!blob) {
-        console.error('Error creating blob');
-        return;
-      }
+      // Convert the data URL to a Blob
+      const response = await fetch(dataUrl);
+      const blob = await response.blob();
 
+      // Use the Clipboard API to copy the image
       await navigator.clipboard.write([
         new ClipboardItem({
-          'image/png': blob
+          [blob.type]: blob
         })
       ]);
-    } catch (e) {
-      console.error('Error copying image to clipboard', e);
+    } catch (error) {
+      console.error('Something went wrong:', error);
     }
   };
 
