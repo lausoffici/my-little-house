@@ -154,6 +154,8 @@ model EnrollmentYear {
   id     Int @id @default(autoincrement())
   year   Int
   amount Int
+
+  @@index([year])
 }
 
 model CashRegisterInitialBalance {
