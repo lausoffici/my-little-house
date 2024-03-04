@@ -146,12 +146,16 @@ model StudentEnrollment {
   year      Int
   studentId Int
   student   Student @relation(fields: [studentId], references: [id])
+
+  @@index([year, studentId])
 }
 
 model EnrollmentYear {
   id     Int @id @default(autoincrement())
   year   Int
   amount Int
+
+  @@index([year])
 }
 
 model CashRegisterInitialBalance {
