@@ -59,6 +59,7 @@ model StudentByCourse {
   course    Course   @relation(fields: [courseId], references: [id])
   student   Student  @relation(fields: [studentId], references: [id])
   createdAt DateTime @default(now())
+  discount  Float    @default(0)
 
   @@unique([courseId, studentId])
   @@index(studentId)
@@ -85,6 +86,7 @@ model Invoice {
   courseId    Int?
   course      Course?      @relation(fields: [courseId], references: [id])
   items       Item[]
+  discount    Float        @default(0)
 
   @@index([courseId, state, month(sort: Desc), year])
   @@index([studentId, state])

@@ -4,6 +4,7 @@ import ChargeInvoicesDialog from '@/components/invoices/charge-invoices-dialog';
 import DeleteStudentDialog from '@/components/students/delete-student-dialog';
 import EditStudentDialog from '@/components/students/edit-student-dialog';
 import StudentDetail from '@/components/students/student-detail';
+import DiscountsFormDialog from '@/components/students/student-discounts-dialog';
 import StudentInvoicesFilters from '@/components/students/student-invoices-filters';
 import StudentInvoicesTable from '@/components/students/student-invoices-table/student-invoices-table';
 import { Badge } from '@/components/ui/badge';
@@ -26,8 +27,20 @@ export default async function StudentPage({ params: { id }, searchParams }: Page
     return <div>Student not found</div>;
   }
 
-  const { firstName, lastName, birthDate, dni, address, city, phone, mobilePhone, momPhone, dadPhone, observations } =
-    student;
+  const {
+    firstName,
+    lastName,
+    birthDate,
+    dni,
+    address,
+    city,
+    phone,
+    mobilePhone,
+    momPhone,
+    dadPhone,
+    observations,
+    studentByCourse
+  } = student;
 
   const fullName = `${firstName} ${lastName}`;
   const courses = student.studentByCourse.map(({ course }) => course);
@@ -42,7 +55,7 @@ export default async function StudentPage({ params: { id }, searchParams }: Page
       </div>
 
       <div className='flex flex-row gap-3'>
-        <Card className='w-2/4'>
+        <Card className='w-1/4'>
           <CardHeader className='flex flex-row justify-between w-full'>
             <CardTitle> Información personal</CardTitle>
             <EditStudentDialog student={student} courseOptions={courseOptions} />
@@ -84,15 +97,18 @@ export default async function StudentPage({ params: { id }, searchParams }: Page
             </div>
           </CardContent>
         </Card>
-        <Card className='w-2/4'>
+        <Card className='w-3/4'>
           <CardHeader>
-            <CardTitle className='mb-4'>Cuotas</CardTitle>
-            <div className='flex justify-between w-full'>
-              <StudentInvoicesFilters />
-              <ChargeInvoicesDialog unpaidInvoicesPromise={unpaidInvoicesPromise} />
-            </div>
+            <CardTitle>Cuotas</CardTitle>
           </CardHeader>
           <CardContent>
+            <div className='flex justify-between w-full mb-4'>
+              <StudentInvoicesFilters />
+              <div className='flex gap-2'>
+                <DiscountsFormDialog studentByCourse={studentByCourse} />
+                <ChargeInvoicesDialog unpaidInvoicesPromise={unpaidInvoicesPromise} />
+              </div>
+            </div>
             <React.Suspense fallback='Cargando...'>
               <StudentInvoicesTable invoicesPromise={invoicesPromise} />
             </React.Suspense>

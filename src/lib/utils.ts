@@ -62,3 +62,7 @@ export function getPaginationClause(page: number, size: number) {
     take: size
   };
 }
+
+export const formatPercentage = (value: number) => {
+  return `${value * 100}%`;
+};

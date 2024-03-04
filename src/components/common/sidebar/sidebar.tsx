@@ -12,9 +12,9 @@ import { cn } from '@/lib/utils';
 import Logo from './logo';
 
 const LinkItems = [
-  { name: 'Resumen', icon: <FiDollarSign />, href: '/dashboard' },
   { name: 'Estudiantes', icon: <FiSmile />, href: '/students' },
   { name: 'Cursos', icon: <FiMonitor />, href: '/courses' },
+  { name: 'Resumen', icon: <FiDollarSign />, href: '/dashboard' },
   { name: 'Caja', icon: <FiLock />, href: '/cash-register' },
   { name: 'Comprobantes', icon: <TfiReceipt />, href: '/receipts' },
   { name: 'Vencimientos', icon: <FiDollarSign />, href: '/expirations?sortBy=expiredAt&sortOrder=asc' }
