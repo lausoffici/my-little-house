@@ -340,7 +340,7 @@ export const editStudent = async (_: unknown, editedStudent: FormData) => {
               where: {
                 studentId,
                 courseId: Number(id),
-                state: 'I'
+                state: InvoiceState.I
               }
             })
           )
