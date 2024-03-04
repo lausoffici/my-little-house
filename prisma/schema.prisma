@@ -143,6 +143,8 @@ model StudentEnrollment {
   year      Int
   studentId Int
   student   Student @relation(fields: [studentId], references: [id])
+
+  @@index([year, studentId])
 }
 
 model EnrollmentYear {
