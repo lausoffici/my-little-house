@@ -11,3 +11,7 @@ export const parseInvoiceStatesSearchParam = (statesParam: string | undefined) =
       .filter(Boolean) ?? []
   );
 };
+
+export const getDiscountedAmount = ({ amount, discount }: { amount: number; discount: number }) => {
+  return amount * (1 - (discount ?? 0));
+};

@@ -3,7 +3,8 @@
 import { ColumnDef } from '@tanstack/react-table';
 
 import { DataTableColumnHeader } from '@/components/ui/data-table';
-import { formatCurrency, formatDate, getMonthName } from '@/lib/utils';
+import { formatCurrency, formatDate, formatPercentage, getMonthName } from '@/lib/utils';
+import { getDiscountedAmount } from '@/lib/utils/invoices.utils';
 import { InvoiceListItem } from '@/types';
 
 import InvoiceStateBadge from '../invoice-state-badge';
@@ -27,6 +28,16 @@ export const columns: ColumnDef<InvoiceListItem>[] = [
     accessorKey: 'amount',
     header: ({ column }) => <DataTableColumnHeader column={column} title='Importe' />,
     cell: ({ row }) => <span>{formatCurrency(row.original.amount)}</span>
+  },
+  {
+    accessorKey: 'discount',
+    header: ({ column }) => <DataTableColumnHeader column={column} title='Descuento' />,
+    cell: ({ row }) => <span>{formatPercentage(row.original.discount ?? 0)}</span>
+  },
+  {
+    accessorKey: 'amount',
+    header: ({ column }) => <DataTableColumnHeader column={column} title='Total' />,
+    cell: ({ row }) => <span>{formatCurrency(getDiscountedAmount(row.original))}</span>
   },
   {
     accessorKey: 'state',
