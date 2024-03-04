@@ -21,7 +21,7 @@ export const getExpiredInvoiceList = async (searchParams: SearchParams) => {
     expiredAt: { lt: new Date() }
   };
 
-  // Get the total count of students
+  // Get the total count of expired invoices
   const totalInvoicesCount = await prisma.invoice.count({
     where: whereClause
   });
@@ -29,12 +29,11 @@ export const getExpiredInvoiceList = async (searchParams: SearchParams) => {
   // Calculate total pages
   const totalPages = Math.ceil(totalInvoicesCount / pageSize);
 
-  const totalExpiredAmount = await prisma.invoice.aggregate({
-    _sum: {
-      amount: true
-    },
-    where: whereClause
-  });
+  const totalExpiredAmount = await prisma.$queryRaw<{ total: number }[]>`
+    SELECT SUM(amount * (1 - discount)) AS total
+    FROM "Invoice" 
+    WHERE state = 'I' AND "expiredAt" < NOW()
+  `;
 
   const pagination = getPaginationClause(pageNumber, pageSize);
 
@@ -59,7 +58,7 @@ export const getExpiredInvoiceList = async (searchParams: SearchParams) => {
     ...pagination
   });
 
-  return { data: invoices, totalPages, totalExpiredAmount: totalExpiredAmount._sum.amount };
+  return { data: invoices, totalPages, totalExpiredAmount: totalExpiredAmount[0].total };
 };
 
 export const getUnpaidInvoicesByStudent = cache(async (id: number) => {

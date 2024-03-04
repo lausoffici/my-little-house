@@ -6,7 +6,7 @@ import { InvoiceDataType, SearchParams } from '@/types';
 
 import prisma from './prisma';
 import { getPaginationClause, getTodaysData } from './utils';
-import { studentFormSchema } from './validations/form';
+import { discountsFormSchema, studentFormSchema } from './validations/form';
 import { studentInvoiceListSearchParamsSchema, studentListSearchParamsSchema } from './validations/params';
 
 export const getStudentById = async (id: number) => {
@@ -427,4 +427,62 @@ export const getStudentInvoices = async (id: number, searchParams: SearchParams)
   });
 
   return { invoices, totalPages };
+};
+
+export const addDiscount = async (_: unknown, discountData: FormData) => {
+  const parsedData = discountsFormSchema.safeParse({
+    course: discountData.get('course'),
+    discount: discountData.get('discount'),
+    studentId: discountData.get('studentId'),
+    studentByCourseId: discountData.get('studentByCourseId')
+  });
+
+  if (!parsedData.success) {
+    console.error(parsedData.error.flatten().fieldErrors);
+    return {
+      error: true,
+      message: 'Error al agregar el descuento'
+    };
+  }
+
+  const courseId = Number(parsedData.data.course);
+  const discount = Number(parsedData.data.discount);
+  const studentId = Number(parsedData.data.studentId);
+  const studentByCourseId = Number(parsedData.data.studentByCourseId);
+
+  try {
+    await prisma.$transaction(async (tx) => {
+      await tx.studentByCourse.update({
+        where: {
+          id: studentByCourseId
+        },
+        data: {
+          discount
+        }
+      });
+
+      await tx.invoice.updateMany({
+        where: {
+          studentId,
+          courseId,
+          state: InvoiceState.I,
+          year: new Date().getFullYear()
+        },
+        data: {
+          discount
+        }
+      });
+    });
+
+    return {
+      error: false,
+      message: 'Descuento agregado exitosamente'
+    };
+  } catch (e) {
+    console.error(e);
+    return {
+      error: true,
+      message: 'Error al agregar el descuento'
+    };
+  }
 };
