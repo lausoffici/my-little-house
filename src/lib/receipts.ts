@@ -94,8 +94,10 @@ function combineAdditionals(descriptions: string[], amounts: string[]) {
 }
 
 export const generateReceipt = async (_: unknown, paidItems: FormData) => {
+  const validInvoice = paidItems.get('invoices')?.toString() !== '';
+
   const parsedData = receiptFormSchema.safeParse({
-    invoices: paidItems.get('invoices')?.toString().split(','),
+    invoices: validInvoice ? paidItems.get('invoices')?.toString().split(',') : [],
     studentId: paidItems.get('studentId'),
     receiptTotal: paidItems.get('receiptTotal'),
     additionalsDescription: paidItems.getAll('additional-description'),
@@ -104,7 +106,6 @@ export const generateReceipt = async (_: unknown, paidItems: FormData) => {
   });
 
   if (!parsedData.success) {
-    console.error(parsedData.error.flatten().fieldErrors);
     return {
       error: true,
       message: 'Error al cobrar cuotas'
@@ -114,6 +115,13 @@ export const generateReceipt = async (_: unknown, paidItems: FormData) => {
   const { additionalsDescription, additionalsAmount, studentId, receiptTotal, paymentMethod } = parsedData.data;
 
   const additionals = combineAdditionals(additionalsDescription, additionalsAmount);
+
+  if (additionals.length === 0 && parsedData.data.invoices.length === 0) {
+    return {
+      error: true,
+      message: 'Error: seleccione al menos una cuota'
+    };
+  }
 
   try {
     const receipt = await prisma.$transaction(async (tx) => {

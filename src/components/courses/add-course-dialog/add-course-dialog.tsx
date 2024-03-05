@@ -1,8 +1,6 @@
 'use client';
 
-import { ExclamationTriangleIcon, PlusCircledIcon } from '@radix-ui/react-icons';
-import { CheckIcon } from '@radix-ui/react-icons';
-import { useRouter } from 'next/navigation';
+import { PlusCircledIcon } from '@radix-ui/react-icons';
 import { useState } from 'react';
 
 import CourseForm, { FORM_ID } from '@/components/courses/course-form';
@@ -16,41 +14,16 @@ import {
   DialogTitle,
   DialogTrigger
 } from '@/components/ui/dialog';
-import { useToast } from '@/components/ui/use-toast';
 import { createCourse } from '@/lib/courses';
 
 const defaultValues = {
   name: '',
-  amount: 0,
+  amount: undefined,
   observations: ''
 };
 
 export default function AddCourseDialog() {
   const [openDialog, setOpenDialog] = useState(false);
-  const { toast } = useToast();
-  const router = useRouter();
-
-  async function handleSubmit(newCourse: FormData) {
-    try {
-      await createCourse(newCourse);
-
-      toast({
-        description: `Curso creado exitosamente: ${newCourse.get('name')}`,
-        icon: <CheckIcon width='20px' height='20px' />,
-        variant: 'success'
-      });
-
-      setOpenDialog(false);
-      router.refresh();
-    } catch (err) {
-      toast({
-        description: `Ha ocurrido un error`,
-        icon: <ExclamationTriangleIcon width='20px' height='20px' />,
-        variant: 'destructive'
-      });
-      console.log(err);
-    }
-  }
 
   return (
     <Dialog open={openDialog} onOpenChange={setOpenDialog}>
@@ -64,7 +37,7 @@ export default function AddCourseDialog() {
           <DialogTitle>Nuevo Curso</DialogTitle>
           <DialogDescription>Complete el formulario para crear un nuevo curso</DialogDescription>
         </DialogHeader>
-        <CourseForm onFormSubmit={handleSubmit} defaultValues={defaultValues} />
+        <CourseForm action={createCourse} defaultValues={defaultValues} onOpenDialogChange={setOpenDialog} />
         <DialogFooter>
           <Button variant='outline' onClick={() => setOpenDialog(false)}>
             Cancelar
