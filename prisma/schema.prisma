@@ -143,18 +143,20 @@ model Expenditure {
 }
 
 model StudentEnrollment {
-  id        Int     @id @default(autoincrement())
-  year      Int
-  studentId Int
-  student   Student @relation(fields: [studentId], references: [id])
+  id         Int        @id @default(autoincrement())
+  year       Int
+  studentId  Int
+  student    Student    @relation(fields: [studentId], references: [id])
+  enrollment Enrollment @relation(fields: [year], references: [year])
 
   @@index([year, studentId])
 }
 
-model EnrollmentYear {
-  id     Int @id @default(autoincrement())
-  year   Int
-  amount Int
+model Enrollment {
+  id                 Int                 @id @default(autoincrement())
+  year               Int                 @unique
+  amount             Int
+  studentEnrollments StudentEnrollment[]
 
   @@index([year(sort: Asc)])
 }
