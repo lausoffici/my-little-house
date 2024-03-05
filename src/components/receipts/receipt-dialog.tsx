@@ -6,7 +6,6 @@ import { CheckIcon, ExclamationTriangleIcon } from '@radix-ui/react-icons';
 import domtoimage from 'dom-to-image';
 import { Loader2 } from 'lucide-react';
 import { Vesper_Libre } from 'next/font/google';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React, { useRef } from 'react';
 import { useForm } from 'react-hook-form';
@@ -147,7 +146,7 @@ export default function ReceiptDialog({ receipt }: ReceiptsDialogProps) {
         <DialogHeader>
           <DialogTitle>Comprobante</DialogTitle>
         </DialogHeader>
-        <Card ref={receiptRef} className='print:block print:m-2 print:scale-90'>
+        <Card ref={receiptRef} className='print:shadow-none print:border-none print:max-h-[148mm] print:min-w-[105mm]'>
           <CardHeader className='p-3'>
             <div className='flex flex-col items-center w-full'>
               <Logo />
@@ -216,13 +215,12 @@ export default function ReceiptDialog({ receipt }: ReceiptsDialogProps) {
             />
           </form>
         </Form>
-
         <DialogFooter className='flex flex-row justify-between w-full mt-4'>
           <Button variant='outline' onClick={copyToClipboardAsImage}>
             Copiar
           </Button>
           <ReactToPrint
-            trigger={() => <Button onClick={handlePrint}>Guardar/Imprimir</Button>}
+            trigger={() => <Button onClick={handlePrint}>Imprimir</Button>}
             content={() => receiptRef.current}
           />
         </DialogFooter>
