@@ -27,7 +27,6 @@ export const studentFormSchema = z.object({
     })
     .min(3, { message: 'El apellido debe tener al menos 3 caracteres' })
     .max(50),
-  courses: z.optional(z.string()),
   birthDate: z.optional(z.string()),
   dni: z.optional(z.string()),
   description: z.optional(z.string()),
@@ -59,4 +58,10 @@ export const discountsFormSchema = z.object({
   discount: z.string({ required_error: 'El descuento es requerido' }),
   studentId: z.string(),
   studentByCourseId: z.string()
+});
+
+export const enrollStudentFormSchema = z.object({
+  course: z.string({ required_error: 'El curso es requerido' }),
+  discount: z.string().optional(),
+  studentId: z.string()
 });

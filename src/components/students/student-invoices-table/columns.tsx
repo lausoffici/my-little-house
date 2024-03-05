@@ -42,7 +42,7 @@ export const columns: ColumnDef<Invoice>[] = [
     cell: ({ row }) => <span>{formatPercentage(row.original.discount ?? 0)}</span>
   },
   {
-    accessorKey: 'amount',
+    accessorKey: 'total',
     header: ({ column }) => <DataTableColumnHeader column={column} title='Total' />,
     cell: ({ row }) => <span>{formatCurrency(getDiscountedAmount(row.original))}</span>
   },

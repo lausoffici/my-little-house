@@ -27,7 +27,7 @@ export default function DiscountsFormDialog({ studentByCourse }: ChargeInvoicesD
   return (
     <Dialog open={openDialog} onOpenChange={setOpenDialog}>
       <DialogTrigger asChild>
-        <Button variant='secondary' size='sm'>
+        <Button variant='outline' size='sm'>
           Agregar descuento
         </Button>
       </DialogTrigger>
@@ -37,7 +37,7 @@ export default function DiscountsFormDialog({ studentByCourse }: ChargeInvoicesD
           <DialogDescription>Seleccione el curso y el porcentaje de descuento.</DialogDescription>
         </DialogHeader>
         <React.Suspense fallback='Cargando...'>
-          <StudentDiscountsForm studentByCourse={studentByCourse} />
+          <StudentDiscountsForm studentByCourse={studentByCourse} onOpenDialogChange={setOpenDialog} />
         </React.Suspense>
         <DialogFooter>
           <Button variant='outline' onClick={() => setOpenDialog(false)}>

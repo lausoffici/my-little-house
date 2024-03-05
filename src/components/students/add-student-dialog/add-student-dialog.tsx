@@ -14,13 +14,10 @@ import {
   DialogTrigger
 } from '@/components/ui/dialog';
 import { createStudent } from '@/lib/students';
-import { Option } from '@/types';
 
 import StudentForm, { STUDENT_FORM_ID } from '../student-form';
 
-type AddStudentDialogProps = { courseOptions: Option[] };
-
-export default function AddStudentDialog({ courseOptions }: AddStudentDialogProps) {
+export default function AddStudentDialog() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -35,7 +32,7 @@ export default function AddStudentDialog({ courseOptions }: AddStudentDialogProp
           <DialogTitle>Nuevo estudiante</DialogTitle>
           <DialogDescription>Complete el formulario para crear un nuevo estudiante</DialogDescription>
         </DialogHeader>
-        <StudentForm courseOptions={courseOptions} onOpenDialogChange={setIsOpen} action={createStudent} />
+        <StudentForm onOpenDialogChange={setIsOpen} action={createStudent} />
         <DialogFooter>
           <Button variant='outline' onClick={() => setIsOpen(false)}>
             Cancelar

@@ -1,12 +1,13 @@
 'use server';
 
-import { InvoiceState } from '@prisma/client';
+import { Course, InvoiceState, Prisma } from '@prisma/client';
 import { cache } from 'react';
 
-import { Option } from '@/types';
+import { InvoiceDataType, Option } from '@/types';
 
 import prisma from './prisma';
-import { courseFormSchema } from './validations/form';
+import { getTodaysData } from './utils';
+import { courseFormSchema, enrollStudentFormSchema } from './validations/form';
 
 export const getActiveCourses = cache(async () => {
   return await prisma.course.findMany({
@@ -109,4 +110,139 @@ export const deleteCourse = async (id: number) => {
       active: false
     }
   });
+};
+
+const generateInvoices = async (tx: Prisma.TransactionClient, course: Course, studentId: number, discount: number) => {
+  const todaysData = getTodaysData();
+  let currentMonth = todaysData.currentMonth;
+  const currentYear = todaysData.currentYear;
+
+  // If the current month is January or February is set to March
+  if (currentMonth < 3) currentMonth = 3;
+
+  // Create invoices for every month since current until December
+
+  const invoicesData: InvoiceDataType[] = [];
+
+  for (let i = currentMonth; i < 13; i++) {
+    invoicesData.push({
+      month: i,
+      year: currentYear,
+      description: course.name,
+      amount: course.amount,
+      balance: 0,
+      state: 'I',
+      expiredAt: new Date(`${i}-15-${currentYear}`),
+      courseId: course.id,
+      studentId: studentId,
+      discount
+    });
+  }
+
+  await tx.invoice.createMany({ data: invoicesData });
+};
+
+const generateEnrollment = async (tx: Prisma.TransactionClient, studentId: number) => {
+  const todaysData = getTodaysData();
+  let currentMonth = todaysData.currentMonth;
+  const currentYear = todaysData.currentYear;
+
+  const enrollmentYear = await tx.enrollmentYear.findFirst({
+    where: {
+      year: currentYear
+    }
+  });
+
+  await tx.studentEnrollment.create({
+    data: {
+      year: currentYear,
+      studentId: studentId
+    }
+  });
+
+  await tx.invoice.create({
+    data: {
+      month: 1,
+      year: currentYear,
+      description: 'Matrícula',
+      amount: enrollmentYear?.amount || 0,
+      balance: 0,
+      state: 'I',
+      expiredAt: new Date(`${currentMonth}-15-${currentYear + 1}`),
+      courseId: null,
+      studentId: studentId
+    }
+  });
+};
+
+export const enrollCourse = async (_: unknown, newCourse: FormData) => {
+  const parsedData = enrollStudentFormSchema.safeParse({
+    course: newCourse.get('course'),
+    discount: newCourse.get('discount'),
+    studentId: newCourse.get('studentId')
+  });
+
+  if (!parsedData.success) {
+    console.error(parsedData.error.flatten().fieldErrors);
+    return {
+      error: true,
+      message: 'Error al inscribir curso'
+    };
+  }
+
+  const courseId = Number(parsedData.data.course);
+  const discount = Number(parsedData.data.discount);
+  const studentId = Number(parsedData.data.studentId);
+
+  const currentYear = getTodaysData().currentYear;
+
+  try {
+    const course = await prisma.$transaction(async (tx) => {
+      // if there is no enrollment i creat one
+      const currentEnrollment = await tx.studentEnrollment.findMany({
+        where: {
+          studentId: studentId,
+          year: currentYear
+        }
+      });
+
+      if (currentEnrollment.length === 0) {
+        await generateEnrollment(tx, studentId);
+      }
+
+      // create the invoices per student for the course and add discount
+
+      await tx.studentByCourse.create({
+        data: {
+          courseId,
+          studentId,
+          discount
+        }
+      });
+
+      const currentCourse = await tx.course.findUnique({
+        where: {
+          id: courseId
+        }
+      });
+
+      if (!currentCourse) {
+        throw new Error('Curso no encontrado');
+      }
+
+      await generateInvoices(tx, currentCourse, studentId, discount);
+
+      return currentCourse;
+    });
+
+    return {
+      error: false,
+      message: `Estudiante inscripto a ${course.name} con éxito`
+    };
+  } catch (error: any) {
+    return {
+      error: true,
+      message: 'Error al inscribir al curso'
+    };
+  }
 };
