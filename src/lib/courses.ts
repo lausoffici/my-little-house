@@ -147,7 +147,7 @@ const generateEnrollment = async (tx: Prisma.TransactionClient, studentId: numbe
   let currentMonth = todaysData.currentMonth;
   const currentYear = todaysData.currentYear;
 
-  const enrollmentYear = await tx.enrollmentYear.findFirst({
+  const enrollment = await tx.enrollment.findFirst({
     where: {
       year: currentYear
     }
@@ -165,7 +165,7 @@ const generateEnrollment = async (tx: Prisma.TransactionClient, studentId: numbe
       month: 1,
       year: currentYear,
       description: 'Matrícula',
-      amount: enrollmentYear?.amount || 0,
+      amount: enrollment?.amount || 0,
       balance: 0,
       state: 'I',
       expiredAt: new Date(`${currentMonth}-15-${currentYear + 1}`),
