@@ -5,8 +5,9 @@ import { InvoiceState, Prisma } from '@prisma/client';
 import { SearchParams } from '@/types';
 
 import prisma from './prisma';
-import { getMonthName, getPaginationClause } from './utils';
+import { formatPercentage, getMonthName, getPaginationClause } from './utils';
 import { getYearMonthDayFromSearchParams } from './utils/cash-register.utils';
+import { getDiscountedAmount } from './utils/invoices.utils';
 import { receiptFormSchema } from './validations/form';
 import { receiptsByDateSchema } from './validations/params';
 
@@ -122,7 +123,8 @@ export const generateReceipt = async (_: unknown, paidItems: FormData) => {
               id: Number(id)
             },
             data: {
-              state: InvoiceState.P
+              state: InvoiceState.P,
+              paymentDate: new Date()
             }
           })
         )
@@ -153,11 +155,11 @@ export const generateReceipt = async (_: unknown, paidItems: FormData) => {
       }));
 
       await tx.item.createMany({
-        data: invoices.map(({ id, description, month, year, amount }) => ({
+        data: invoices.map(({ id, description, month, year, amount, discount }) => ({
           receiptId: receipt.id,
           invoiceId: id,
-          description: `${description} - ${getMonthName(month)} ${year}`,
-          amount
+          description: `${description} - ${getMonthName(month)} ${year} ${discount ? `(${formatPercentage(discount)})` : ''}`,
+          amount: getDiscountedAmount({ amount, discount })
         }))
       });
 

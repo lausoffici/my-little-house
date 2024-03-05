@@ -55,3 +55,9 @@ export const studentInvoiceListSearchParamsSchema = z.object({
   sortOrder: z.string().default('asc'),
   showAll: z.string().default('false')
 });
+
+export const dashboardSearchParamsSchema = z.object({
+  day: z.string().optional(),
+  month: z.string().optional(),
+  year: z.string().optional()
+});

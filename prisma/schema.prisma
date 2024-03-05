@@ -22,6 +22,8 @@ model Course {
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @default(now()) @updatedAt
   active          Boolean           @default(true)
+
+  @@index(active)
 }
 
 model Student {
@@ -45,6 +47,9 @@ model Student {
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @default(now()) @updatedAt
   active             Boolean             @default(true)
+
+  @@index(firstName)
+  @@index(lastName)
 }
 
 model StudentByCourse {
@@ -54,8 +59,10 @@ model StudentByCourse {
   course    Course   @relation(fields: [courseId], references: [id])
   student   Student  @relation(fields: [studentId], references: [id])
   createdAt DateTime @default(now())
+  discount  Float    @default(0)
 
   @@unique([courseId, studentId])
+  @@index(studentId)
 }
 
 enum InvoiceState {
@@ -79,6 +86,13 @@ model Invoice {
   courseId    Int?
   course      Course?      @relation(fields: [courseId], references: [id])
   items       Item[]
+  discount    Float        @default(0)
+
+  @@index([courseId, state, month(sort: Desc), year])
+  @@index([studentId, state])
+  @@index([studentId, id])
+  @@index([studentId, courseId, state])
+  @@index([studentId, courseId, state, year])
 }
 
 model Additional {
@@ -104,6 +118,8 @@ model Receipt {
   student       Student              @relation(fields: [studentId], references: [id])
   createdAt     DateTime             @default(now())
   paymentMethod ReceiptPaymentMethod @default(CASH)
+
+  @@index([createdAt(sort: Desc), paymentMethod])
 }
 
 model Item {
@@ -130,12 +146,16 @@ model StudentEnrollment {
   year      Int
   studentId Int
   student   Student @relation(fields: [studentId], references: [id])
+
+  @@index([year, studentId])
 }
 
 model EnrollmentYear {
   id     Int @id @default(autoincrement())
   year   Int
   amount Int
+
+  @@index([year])
 }
 
 model CashRegisterInitialBalance {
@@ -146,4 +166,5 @@ model CashRegisterInitialBalance {
   day     Int
 
   @@unique([year, month, day])
+  @@index([day, month, year])
 }

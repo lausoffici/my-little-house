@@ -29,6 +29,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { getUnpaidInvoicesByStudent } from '@/lib/invoices';
 import { generateReceipt } from '@/lib/receipts';
 import { formatCurrency, getMonthName } from '@/lib/utils';
+import { getDiscountedAmount } from '@/lib/utils/invoices.utils';
 import { receiptFormSchema } from '@/lib/validations/form';
 import { Option } from '@/types';
 
@@ -76,7 +77,7 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
 
   const invoicesOptions: Option[] = unpaidInvoices.map((invoice) => ({
     value: String(invoice.id),
-    label: `${invoice.description} - ${getMonthName(invoice.month)} ${invoice.year} ${formatCurrency(invoice.amount)}`
+    label: `${invoice.description} - ${getMonthName(invoice.month)} ${invoice.year} ${formatCurrency(getDiscountedAmount(invoice))}`
   }));
 
   const form = useForm<z.infer<typeof receiptFormSchema>>({
@@ -126,7 +127,7 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
   }
 
   const total = useMemo(() => {
-    const selectedInvoicesAmount = selectedInvoiceIds.map(getInvoiceById).map((invoice) => invoice.amount);
+    const selectedInvoicesAmount = selectedInvoiceIds.map(getInvoiceById).map(getDiscountedAmount);
     const additionalsAmounts = additionals.map((input) => input.value);
     const totalAmounts = [...selectedInvoicesAmount, ...additionalsAmounts];
 

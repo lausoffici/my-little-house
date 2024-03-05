@@ -1,3 +1,5 @@
+'use server';
+
 import { InvoiceState } from '@prisma/client';
 import { cache } from 'react';
 
@@ -5,6 +7,7 @@ import { SearchParams } from '@/types';
 
 import prisma from './prisma';
 import { getPaginationClause } from './utils';
+import { scholarshipFormSchema } from './validations/form';
 import { expiredInvoiceListSearchParamsSchema } from './validations/params';
 
 export const getExpiredInvoiceList = async (searchParams: SearchParams) => {
@@ -18,7 +21,7 @@ export const getExpiredInvoiceList = async (searchParams: SearchParams) => {
     expiredAt: { lt: new Date() }
   };
 
-  // Get the total count of students
+  // Get the total count of expired invoices
   const totalInvoicesCount = await prisma.invoice.count({
     where: whereClause
   });
@@ -26,12 +29,11 @@ export const getExpiredInvoiceList = async (searchParams: SearchParams) => {
   // Calculate total pages
   const totalPages = Math.ceil(totalInvoicesCount / pageSize);
 
-  const totalExpiredAmount = await prisma.invoice.aggregate({
-    _sum: {
-      amount: true
-    },
-    where: whereClause
-  });
+  const totalExpiredAmount = await prisma.$queryRaw<{ total: number }[]>`
+    SELECT SUM(amount * (1 - discount)) AS total
+    FROM "Invoice" 
+    WHERE state = 'I' AND "expiredAt" < NOW()
+  `;
 
   const pagination = getPaginationClause(pageNumber, pageSize);
 
@@ -56,14 +58,51 @@ export const getExpiredInvoiceList = async (searchParams: SearchParams) => {
     ...pagination
   });
 
-  return { data: invoices, totalPages, totalExpiredAmount: totalExpiredAmount._sum.amount };
+  return { data: invoices, totalPages, totalExpiredAmount: totalExpiredAmount[0].total };
 };
 
 export const getUnpaidInvoicesByStudent = cache(async (id: number) => {
   return await prisma.invoice.findMany({
     where: {
       studentId: id,
-      state: 'I'
+      state: InvoiceState.I
     }
   });
 });
+
+export const scholarshipInvoice = async (_: any, formData: FormData) => {
+  const parsedData = scholarshipFormSchema.safeParse({
+    invoiceId: Number(formData.get('invoiceId'))
+  });
+
+  if (!parsedData.success) {
+    console.error(parsedData.error.flatten().fieldErrors);
+    return {
+      error: true,
+      message: 'Error al becar: el recibo no existe'
+    };
+  }
+
+  try {
+    await prisma.invoice.update({
+      data: {
+        state: InvoiceState.B,
+        paymentDate: new Date()
+      },
+      where: {
+        id: parsedData.data.invoiceId
+      }
+    });
+
+    return {
+      error: false,
+      message: 'Cuota becada con éxito'
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      error: true,
+      message: 'Error al becar'
+    };
+  }
+};

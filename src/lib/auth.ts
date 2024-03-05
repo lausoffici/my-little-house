@@ -1,7 +1,12 @@
 import { NextAuthOptions } from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 
-const whitelist = ['lautarosoffici@gmail.com', 'julietapontino@gmail.com'];
+const whitelist = [
+  'lautarosoffici@gmail.com',
+  'julietapontino@gmail.com',
+  'gsoffici@gmail.com',
+  'secretariamlh@gmail.com'
+];
 
 export const authOptions: NextAuthOptions = {
   // Secret for Next-auth, without this JWT encryption/decryption won't work
