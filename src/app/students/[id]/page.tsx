@@ -52,9 +52,10 @@ export default async function StudentPage({ params: { id }, searchParams }: Page
             </div>
           </div>
         </div>
-        <div className='flex  flex-col gap-3'>
+
+        <div className='flex flex-col gap-1 justify-end'>
           <DeleteStudentDialog studentWithCourses={student} />
-          <div className='flex gap-2 w-full'>
+          <div className='flex gap-1'>
             <EnrollStudentDialog courseOptionsPromise={courseOptionsPromise} enrolledCourses={courses} />
             {courses.length > 0 && (
               <DeleteCourseEnrollmentDialog enrolledCourses={courses} studentByCourse={student.studentByCourse} />
@@ -105,12 +106,8 @@ export default async function StudentPage({ params: { id }, searchParams }: Page
             <div className='flex justify-between w-full mb-4'>
               <StudentInvoicesFilters />
               <div className='flex gap-2'>
-                {courses.length > 0 && (
-                  <>
-                    <DiscountsFormDialog studentByCourse={student.studentByCourse} />
-                    <ChargeInvoicesDialog unpaidInvoicesPromise={unpaidInvoicesPromise} />
-                  </>
-                )}
+                {courses.length > 0 && <DiscountsFormDialog studentByCourse={student.studentByCourse} />}
+                <ChargeInvoicesDialog unpaidInvoicesPromise={unpaidInvoicesPromise} />
               </div>
             </div>
             <React.Suspense fallback='Cargando...'>

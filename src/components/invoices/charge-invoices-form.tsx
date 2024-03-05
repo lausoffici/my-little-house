@@ -203,7 +203,7 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
                     <FormItem>
                       <Input
                         type='number'
-                        placeholder='$ valor'
+                        placeholder='Importe'
                         autoComplete='off'
                         {...field}
                         required

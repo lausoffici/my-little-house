@@ -22,7 +22,7 @@ export async function POST(request: Request) {
 
     const info = await transporter.sendMail({
       from: '"My Little House" noreply.mylittlehouse@gmail.com',
-      to: 'lautarosoffici@gmail.com',
+      to: email,
       subject: 'Comprobante de pago',
       text: 'Registro de Pago realizado',
       html: '<b>Registro de Pago realizado</b>',

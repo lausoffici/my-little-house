@@ -66,7 +66,7 @@ export const SearchBar = () => {
       >
         <Input
           className='w-full bg-white shadow-none appearance-none pl-8 dark:bg-gray-950'
-          placeholder='Search...'
+          placeholder='Buscar estudiante...'
           onChange={(e) => handleSearch(e.target.value)}
           onFocus={() => setIsDropdownOpen(true)}
           value={inputValue}
