@@ -1,6 +1,7 @@
 'use client';
 
 import { ReceiptPaymentMethod } from '@prisma/client';
+import { CheckIcon, ExclamationTriangleIcon } from '@radix-ui/react-icons';
 import domtoimage from 'dom-to-image';
 import { Vesper_Libre } from 'next/font/google';
 import React, { useRef } from 'react';
@@ -10,11 +11,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Separator } from '@/components/ui/separator';
+import { toast } from '@/components/ui/use-toast';
 import { useSearchParams } from '@/hooks/use-search-params';
 import { getReceiptWithItemsById } from '@/lib/receipts';
 import { formatCurrency, formatDate, padWithZeros } from '@/lib/utils';
 
-import { ReceiptCard } from './receipt-card';
+import Logo from '../common/sidebar/logo';
 
 type ReceiptsDialogProps = {
   receipt: Awaited<ReturnType<typeof getReceiptWithItemsById>>;
@@ -65,6 +67,53 @@ export default function ReceiptDialog({ receipt }: ReceiptsDialogProps) {
           'image/png': blobImage
         })
       ]);
+    } catch (error) {
+      console.error('Something went wrong:', error);
+    }
+  };
+
+  const sendImageAsEmail = async () => {
+    const element = receiptRef?.current;
+    if (!element) return;
+
+    try {
+      const blobImage = await domtoimage.toBlob(element);
+
+      // Convert blob to Base64
+      const reader = new FileReader();
+      reader.readAsDataURL(blobImage);
+      reader.onloadend = () => {
+        const base64data = reader.result;
+
+        // Send the Base64 image in a POST request
+        fetch('/api/send-email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            image: base64data
+          })
+        })
+          .then((res) => {
+            if (res.ok) {
+              toast({
+                description: 'Email enviado correctamente',
+                icon: <CheckIcon width='20px' height='20px' />,
+                variant: 'success'
+              });
+            } else {
+              toast({
+                description: 'Error al enviar email',
+                icon: <ExclamationTriangleIcon width='20px' height='20px' />,
+                variant: 'destructive'
+              });
+            }
+          })
+          .finally(() => {
+            handleClose();
+          });
+      };
     } catch (error) {
       console.error('Something went wrong:', error);
     }
@@ -125,6 +174,9 @@ export default function ReceiptDialog({ receipt }: ReceiptsDialogProps) {
         <DialogFooter className='flex flex-row justify-between w-full'>
           <Button variant='outline' onClick={copyToClipboardAsImage}>
             Copiar
+          </Button>
+          <Button variant='outline' onClick={sendImageAsEmail}>
+            Enviar por email
           </Button>
           <ReactToPrint
             trigger={() => <Button onClick={handlePrint}>Guardar/Imprimir</Button>}

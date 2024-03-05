@@ -1,7 +1,9 @@
 import nodemailer from 'nodemailer';
 
 export async function POST(request: Request) {
-  const res = await request.blob();
+  const res = await request.json();
+
+  const { image } = res;
 
   try {
     const transporter = nodemailer.createTransport({
@@ -17,15 +19,22 @@ export async function POST(request: Request) {
     const info = await transporter.sendMail({
       from: '"My Little House" noreply.mylittlehouse@gmail.com',
       to: 'lautarosoffici@gmail.com',
-      subject: 'Hello ✔',
-      text: 'Hello worldxD',
-      html: '<b>Hello world?</b>'
+      subject: 'Comprobante de pago',
+      text: 'Registro de Pago realizado',
+      html: '<b>Registro de Pago realizado</b>',
+      attachments: [
+        {
+          filename: 'image.png',
+          path: image,
+          encoding: 'base64'
+        }
+      ]
     });
 
     console.log('Message sent: %s', info.messageId);
-    return new Response('Email sent succesfully', { status: 200 });
+    return new Response('Email enviado correctamente', { status: 200 });
   } catch (error) {
     console.error('Error sending email', error);
-    return new Response('Error sending email', { status: 500 });
+    return new Response('Error al enviar email', { status: 500 });
   }
 }
