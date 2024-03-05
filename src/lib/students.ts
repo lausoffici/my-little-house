@@ -124,7 +124,8 @@ export const createStudent = async (_: unknown, createdStudent: FormData) => {
 
     return {
       error: false,
-      message: `Estudiante creado extosamente: ${student.firstName} ${student.lastName}`
+      message: `Estudiante creado extosamente: ${student.firstName} ${student.lastName}`,
+      id: student.id
     };
   } catch (e) {
     console.error(e);

@@ -40,6 +40,7 @@ interface StudentFormProps {
   ) => Promise<{
     error?: boolean;
     message: string;
+    id?: number;
   }>;
 }
 
@@ -61,7 +62,8 @@ const emptyDefaultValues = {
 
 const initialState = {
   message: '',
-  error: false
+  error: false,
+  id: undefined
 };
 
 export default function StudentForm({
@@ -93,7 +95,7 @@ export default function StudentForm({
         icon: <CheckIcon width='20px' height='20px' />,
         variant: 'success'
       });
-      router.refresh();
+      router.push(`/students/${state.id}`);
     }
     onOpenDialogChange(false);
   }, [onOpenDialogChange, router, state, toast]);
