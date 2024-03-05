@@ -35,7 +35,7 @@ export default function StudentsTable({ studentsPromise, courseOptions }: Studen
         <StudentsTableFilters table={table} courseOptions={courseOptions} />
       </div>
 
-      <DataTable table={table} columns={columns} />
+      <DataTable table={table} columns={columns} withRowSelection={false} />
     </>
   );
 }

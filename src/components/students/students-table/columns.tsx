@@ -4,6 +4,7 @@ import { Course } from '@prisma/client';
 import { ColumnDef } from '@tanstack/react-table';
 import { MoreHorizontal } from 'lucide-react';
 import Link from 'next/link';
+import { FiExternalLink } from 'react-icons/fi';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -18,6 +19,20 @@ import {
 import { StudentWithCourses } from '@/types';
 
 export const columns: ColumnDef<StudentWithCourses>[] = [
+  {
+    accessorKey: 'id',
+    header: ({ column }) => <DataTableColumnHeader column={column} title='Legajo' />,
+    cell: ({ row }) => {
+      const { id } = row.original;
+
+      return (
+        <Link className='flex underline items-center' href={`/students/${id}`}>
+          {id}
+          <FiExternalLink className='ml-1 ' />
+        </Link>
+      );
+    }
+  },
   {
     accessorKey: 'lastName',
     header: ({ column }) => <DataTableColumnHeader column={column} title='Apellido' />

@@ -16,6 +16,7 @@ interface StudentsTableFilters {
 }
 
 const columnNamesMap = {
+  id: 'Legajo',
   lastName: 'Apellido',
   firstName: 'Nombre',
   studentByCourse: 'Cursos',
