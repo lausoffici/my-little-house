@@ -142,10 +142,10 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
         <FormField
           control={form.control}
           name='paymentMethod'
-          render={({ field }) => (
+          render={({ field: { ref, ...fieldWithoutRef } }) => (
             <FormItem>
               <FormLabel>Modo de pago</FormLabel>
-              <Select onValueChange={field.onChange} {...field}>
+              <Select onValueChange={fieldWithoutRef.onChange} {...fieldWithoutRef}>
                 <SelectTrigger className='w-[min(100%,180px)]'>
                   <SelectValue />
                 </SelectTrigger>

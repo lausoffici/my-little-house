@@ -54,7 +54,7 @@ const DateTimePicker = React.forwardRef<HTMLDivElement, DatePickerStateOptions<D
           <Button
             {...buttonProps}
             variant='outline'
-            className='rounded-l-none h-[40px]'
+            className='rounded-l-none h-9'
             disabled={props.isDisabled}
             onClick={() => setOpen(true)}
           >
