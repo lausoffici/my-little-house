@@ -1,6 +1,7 @@
 'use client';
 
 import { ReceiptPaymentMethod } from '@prisma/client';
+import domtoimage from 'dom-to-image';
 import { Vesper_Libre } from 'next/font/google';
 import React, { useRef } from 'react';
 import ReactToPrint from 'react-to-print';
@@ -52,6 +53,23 @@ export default function ReceiptDialog({ receipt }: ReceiptsDialogProps) {
     else handleClose();
   }
 
+  const copyToClipboardAsImage = async () => {
+    const element = receiptRef?.current;
+    if (!element) return;
+
+    try {
+      const blobImage = await domtoimage.toBlob(element);
+
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          'image/png': blobImage
+        })
+      ]);
+    } catch (error) {
+      console.error('Something went wrong:', error);
+    }
+  };
+
   return (
     <Dialog open={searchParams.get('receiptId') === receipt.id.toString()} onOpenChange={onOpenChange}>
       <DialogContent>
@@ -100,15 +118,13 @@ export default function ReceiptDialog({ receipt }: ReceiptsDialogProps) {
               <span className='font-semibold'>{formatCurrency(receipt.total)}</span>
             </div>
           </CardContent>
-          <CardFooter className='flex justify-center items-center'>
-            <div className={`border border-gray-500 py-1 px-3 ${vesper.className}`}>
-              Enseñanza de calidad con calidez desde 1987
-            </div>
+          <CardFooter className='flex justify-center items-center p-2 pb-4 text-gray-600'>
+            <div className={vesper.className}>Enseñanza de calidad con calidez desde 1987</div>
           </CardFooter>
         </Card>
-        <DialogFooter className='flex flex-row justify-between w-full '>
-          <Button variant='outline' onClick={handleClose}>
-            Cerrar
+        <DialogFooter className='flex flex-row justify-between w-full'>
+          <Button variant='outline' onClick={copyToClipboardAsImage}>
+            Copiar
           </Button>
           <ReactToPrint
             trigger={() => <Button onClick={handlePrint}>Guardar/Imprimir</Button>}
