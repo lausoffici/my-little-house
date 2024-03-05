@@ -1,5 +1,6 @@
 import React from 'react';
 
+import DeleteCourseEnrollmentDialog from '@/components/courses/delete-course-enrollment/delete-course-enrollment-dialog';
 import ChargeInvoicesDialog from '@/components/invoices/charge-invoices-dialog';
 import DeleteStudentDialog from '@/components/students/delete-student-dialog';
 import EditStudentDialog from '@/components/students/edit-student-dialog';
@@ -51,11 +52,19 @@ export default async function StudentPage({ params: { id }, searchParams }: Page
             </div>
           </div>
         </div>
-        <DeleteStudentDialog studentWithCourses={student} />
+        <div className='flex  flex-col gap-3'>
+          <DeleteStudentDialog studentWithCourses={student} />
+          <div className='flex gap-2 w-full'>
+            <EnrollStudentDialog courseOptionsPromise={courseOptionsPromise} enrolledCourses={courses} />
+            {courses.length > 0 && (
+              <DeleteCourseEnrollmentDialog enrolledCourses={courses} studentByCourse={student.studentByCourse} />
+            )}
+          </div>
+        </div>
       </div>
 
       <div className='flex flex-row gap-3'>
-        <Card className='w-1/4'>
+        <Card className='w-[30%]'>
           <CardHeader className='flex flex-row justify-between w-full'>
             <CardTitle> Información personal</CardTitle>
             <EditStudentDialog student={student} />
@@ -88,7 +97,7 @@ export default async function StudentPage({ params: { id }, searchParams }: Page
             </div>
           </CardContent>
         </Card>
-        <Card className='w-3/4'>
+        <Card className='w-[70%]'>
           <CardHeader>
             <CardTitle>Cuotas</CardTitle>
           </CardHeader>
@@ -96,9 +105,12 @@ export default async function StudentPage({ params: { id }, searchParams }: Page
             <div className='flex justify-between w-full mb-4'>
               <StudentInvoicesFilters />
               <div className='flex gap-2'>
-                <EnrollStudentDialog courseOptionsPromise={courseOptionsPromise} enrolledCourses={courses} />
-                <DiscountsFormDialog studentByCourse={student.studentByCourse} />
-                <ChargeInvoicesDialog unpaidInvoicesPromise={unpaidInvoicesPromise} />
+                {courses.length > 0 && (
+                  <>
+                    <DiscountsFormDialog studentByCourse={student.studentByCourse} />
+                    <ChargeInvoicesDialog unpaidInvoicesPromise={unpaidInvoicesPromise} />
+                  </>
+                )}
               </div>
             </div>
             <React.Suspense fallback='Cargando...'>

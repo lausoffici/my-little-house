@@ -29,7 +29,7 @@ export default function EnrollStudentDialog({ courseOptionsPromise, enrolledCour
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant='outline' size='sm'>
+        <Button variant='outline' size='sm' className='w-full'>
           <span>Inscribir a curso</span>
         </Button>
       </DialogTrigger>
