@@ -9,11 +9,9 @@ import { useForm } from 'react-hook-form';
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { MultiSelect } from '@/components/ui/multi-select';
 import { Textarea } from '@/components/ui/textarea';
 import { getDatePickerFormattedDate } from '@/lib/utils';
 import { studentFormSchema } from '@/lib/validations/form';
-import { Option } from '@/types';
 
 import { DateTimePicker } from '../ui/date-picker/date-picker';
 import { useToast } from '../ui/use-toast';
@@ -21,7 +19,6 @@ import { useToast } from '../ui/use-toast';
 type StudentFormValues = {
   firstName: string;
   lastName: string;
-  courses?: string[];
   birthDate?: Date;
   dni?: string;
   address?: string;
@@ -36,7 +33,6 @@ type StudentFormValues = {
 
 interface StudentFormProps {
   defaultValues?: StudentFormValues;
-  courseOptions: Option[];
   onOpenDialogChange: (open: boolean) => void;
   action: (
     _: any,
@@ -52,7 +48,6 @@ export const STUDENT_FORM_ID = 'student-form';
 const emptyDefaultValues = {
   firstName: '',
   lastName: '',
-  courses: [],
   birthDate: undefined,
   dni: '',
   address: '',
@@ -71,7 +66,6 @@ const initialState = {
 
 export default function StudentForm({
   defaultValues = emptyDefaultValues,
-  courseOptions,
   onOpenDialogChange,
   action: serverAction
 }: StudentFormProps) {
@@ -155,24 +149,6 @@ export default function StudentForm({
               <FormControl>
                 <Input type='number' autoComplete='off' {...field} />
               </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name='courses'
-          render={({ field }) => (
-            <FormItem className='col-span-2'>
-              <FormLabel>Cursos</FormLabel>
-              <MultiSelect
-                options={courseOptions}
-                selected={field.value && field.value.length > 0 ? field.value : []}
-                className='w-[622px]'
-                notFoundMessage='Curso no encontrado'
-                {...field}
-                name='courses'
-              />
               <FormMessage />
             </FormItem>
           )}

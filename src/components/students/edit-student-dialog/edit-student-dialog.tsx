@@ -14,49 +14,30 @@ import {
   DialogTrigger
 } from '@/components/ui/dialog';
 import { editStudent } from '@/lib/students';
-import { Option, StudentWithCourses } from '@/types';
+import { StudentWithCourses } from '@/types';
 
 import StudentForm, { STUDENT_FORM_ID } from '../student-form';
 
 type EditStudentDialogProps = {
   student: StudentWithCourses;
-  courseOptions: Option[];
 };
 
-export default function EditStudentDialog({ student, courseOptions }: EditStudentDialogProps) {
+export default function EditStudentDialog({ student }: EditStudentDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
 
-  const {
-    firstName,
-    lastName,
-    birthDate,
-    dni,
-    address,
-    city,
-    phone,
-    mobilePhone,
-    momPhone,
-    dadPhone,
-    observations,
-    id
-  } = student;
-
-  const courses = student.studentByCourse.map(({ course }) => course.id.toString());
-
   const defaultValues = {
-    firstName,
-    lastName,
-    courses,
-    birthDate: birthDate || undefined,
-    dni: dni || undefined,
-    address: address || undefined,
-    city: city || undefined,
-    phone: phone || undefined,
-    mobilePhone: mobilePhone || undefined,
-    momPhone: momPhone || undefined,
-    dadPhone: dadPhone || undefined,
-    observations: observations || undefined,
-    id
+    firstName: student.firstName,
+    lastName: student.lastName,
+    birthDate: student.birthDate || undefined,
+    dni: student.dni || undefined,
+    address: student.address || undefined,
+    city: student.city || undefined,
+    phone: student.phone || undefined,
+    mobilePhone: student.mobilePhone || undefined,
+    momPhone: student.momPhone || undefined,
+    dadPhone: student.dadPhone || undefined,
+    observations: student.observations || undefined,
+    id: student.id
   };
 
   return (
@@ -71,12 +52,7 @@ export default function EditStudentDialog({ student, courseOptions }: EditStuden
           <DialogTitle>Editar estudiante</DialogTitle>
           <DialogDescription>Modifique el formulario para editar la información del estudiante</DialogDescription>
         </DialogHeader>
-        <StudentForm
-          action={editStudent}
-          defaultValues={defaultValues}
-          courseOptions={courseOptions}
-          onOpenDialogChange={setIsOpen}
-        />
+        <StudentForm action={editStudent} defaultValues={defaultValues} onOpenDialogChange={setIsOpen} />
         <DialogFooter>
           <Button variant='outline' onClick={() => setIsOpen(false)}>
             Cancelar
