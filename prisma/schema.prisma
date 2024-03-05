@@ -47,6 +47,7 @@ model Student {
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @default(now()) @updatedAt
   active             Boolean             @default(true)
+  email              String?
 
   @@index(firstName)
   @@index(lastName)

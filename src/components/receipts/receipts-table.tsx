@@ -28,7 +28,7 @@ export default function ReceiptsTable({ receiptListPromise, receiptDetailPromise
   return (
     <>
       <DataTable table={table} columns={columns} />
-      <ReceiptDialog receipt={receipt} />
+      {receipt && <ReceiptDialog receipt={receipt} />}
     </>
   );
 }

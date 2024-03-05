@@ -74,6 +74,8 @@ export default async function StudentPage({ params: { id }, searchParams }: Page
               <Separator />
               <StudentDetail label='Localidad' info={student.city} />
               <Separator />
+              <StudentDetail label='Email' info={student.email} />
+              <Separator />
               <StudentDetail label='Teléfono' info={student.phone} />
               <Separator />
               <StudentDetail label='Celular' info={student.mobilePhone} />

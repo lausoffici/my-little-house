@@ -77,8 +77,10 @@ export const getReceiptWithItemsById = (searchParams: SearchParams) => {
       },
       student: {
         select: {
+          id: true,
           firstName: true,
-          lastName: true
+          lastName: true,
+          email: true
         }
       }
     }

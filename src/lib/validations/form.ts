@@ -65,6 +65,10 @@ export const discountsFormSchema = z.object({
   studentByCourseId: z.string()
 });
 
+export const receiptEmailFormSchema = z.object({
+  email: z.string().email({ message: 'El email no es válido' })
+});
+
 export const enrollStudentFormSchema = z.object({
   course: z.string({ required_error: 'El curso es requerido' }),
   discount: z.string().optional(),
