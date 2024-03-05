@@ -74,3 +74,9 @@ export const enrollStudentFormSchema = z.object({
   discount: z.string().optional(),
   studentId: z.string()
 });
+
+export const deleteCourseEnrollmentSchema = z.object({
+  courseId: z.string(),
+  studentId: z.string(),
+  studentByCourseId: z.string()
+});

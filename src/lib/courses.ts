@@ -7,7 +7,7 @@ import { InvoiceDataType, Option } from '@/types';
 
 import prisma from './prisma';
 import { getTodaysData } from './utils';
-import { courseFormSchema, enrollStudentFormSchema } from './validations/form';
+import { courseFormSchema, deleteCourseEnrollmentSchema, enrollStudentFormSchema } from './validations/form';
 
 export const getActiveCourses = cache(async () => {
   return await prisma.course.findMany({
@@ -243,6 +243,53 @@ export const enrollCourse = async (_: unknown, newCourse: FormData) => {
     return {
       error: true,
       message: 'Error al inscribir al curso'
+    };
+  }
+};
+
+export const deleteCourseEnrollment = async (_: unknown, deletedCourse: FormData) => {
+  const parsedData = deleteCourseEnrollmentSchema.safeParse({
+    courseId: deletedCourse.get('courseId'),
+    studentId: deletedCourse.get('studentId'),
+    studentByCourseId: deletedCourse.get('studentByCourseId')
+  });
+
+  if (!parsedData.success) {
+    return {
+      errors: parsedData.error.flatten().fieldErrors
+    };
+  }
+
+  const courseId = Number(parsedData.data.courseId);
+  const studentId = Number(parsedData.data.studentId);
+  const studentByCourseId = Number(parsedData.data.studentByCourseId);
+
+  try {
+    await prisma.$transaction(async (tx) => {
+      await tx.studentByCourse.delete({
+        where: {
+          id: studentByCourseId
+        }
+      });
+
+      await tx.invoice.deleteMany({
+        where: {
+          courseId,
+          studentId,
+          state: InvoiceState.I
+        }
+      });
+    });
+
+    return {
+      error: false,
+      message: `Curso eliminado exitosamente`
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      error: false,
+      message: 'Error'
     };
   }
 };
