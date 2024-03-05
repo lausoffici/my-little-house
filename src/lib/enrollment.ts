@@ -4,7 +4,7 @@ import prisma from './prisma';
 import { enrollmentFormSchema } from './validations/form';
 
 export const getEnrollments = async () => {
-  return prisma.enrollmentYear.findMany({
+  return prisma.enrollment.findMany({
     orderBy: {
       year: 'asc'
     }
@@ -34,7 +34,7 @@ export const addEnrollment = async (_: unknown, newEnrollment: FormData) => {
       throw new Error(`La matrícula del año ${parsedData.data.year} ya fue creada`);
     }
 
-    const newEnrollment = await prisma.enrollmentYear.create({
+    const newEnrollment = await prisma.enrollment.create({
       data: {
         year: Number(parsedData.data.year),
         amount: Number(parsedData.data.amount)
