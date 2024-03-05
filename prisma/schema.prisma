@@ -155,7 +155,7 @@ model EnrollmentYear {
   year   Int
   amount Int
 
-  @@index([year])
+  @@index([year(sort: Asc)])
 }
 
 model CashRegisterInitialBalance {

@@ -4,7 +4,11 @@ import prisma from './prisma';
 import { enrollmentFormSchema } from './validations/form';
 
 export const getEnrollments = async () => {
-  return prisma.enrollmentYear.findMany({});
+  return prisma.enrollmentYear.findMany({
+    orderBy: {
+      year: 'asc'
+    }
+  });
 };
 
 export const addEnrollment = async (_: unknown, newEnrollment: FormData) => {
