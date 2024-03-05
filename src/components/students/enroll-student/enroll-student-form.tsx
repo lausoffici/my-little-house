@@ -1,10 +1,11 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ExclamationTriangleIcon } from '@radix-ui/react-icons';
-import { CheckIcon } from 'lucide-react';
+import { Course } from '@prisma/client';
+import { CheckIcon, ExclamationTriangleIcon } from '@radix-ui/react-icons';
 import { useParams, useRouter } from 'next/navigation';
-import React, { Dispatch, SetStateAction, useEffect } from 'react';
+import { Dispatch, SetStateAction, useEffect } from 'react';
+import React from 'react';
 import { useFormState } from 'react-dom';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -20,31 +21,44 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import { useToast } from '@/components/ui/use-toast';
-import { addDiscount, getStudentById } from '@/lib/students';
+import { enrollCourse, getCourseOptions } from '@/lib/courses';
 import { formatPercentage } from '@/lib/utils';
-import { discountsFormSchema } from '@/lib/validations/form';
+import { enrollStudentFormSchema } from '@/lib/validations/form';
+
+import { DISCOUNTS } from '../student-discounts-form';
+
+interface StudentFormProps {
+  onOpenDialogChange: Dispatch<SetStateAction<boolean>>;
+  courseOptionsPromise: ReturnType<typeof getCourseOptions>;
+  enrolledCourses: Course[];
+}
+
+export const ENROLL_STUDENT_FORM_ID = 'student-form';
 
 const initialState = {
   message: '',
-  error: false,
-  receipt: null
+  error: false
 };
 
-export const DICOUNTS_FORM_ID = 'invoice-form';
-
-export const DISCOUNTS = [0, 0.1, 0.15, 0.2, 0.3, 0.4, 0.5, 1];
-
-interface ChargeInvoicesFormProps {
-  studentByCourse: NonNullable<Awaited<ReturnType<typeof getStudentById>>>['studentByCourse'];
-  onOpenDialogChange: Dispatch<SetStateAction<boolean>>;
-}
-
-export default function StudentDiscountsForm({ studentByCourse, onOpenDialogChange }: ChargeInvoicesFormProps) {
-  const router = useRouter();
+export default function EnrollStudentForm({
+  onOpenDialogChange,
+  courseOptionsPromise,
+  enrolledCourses
+}: StudentFormProps) {
   const { toast } = useToast();
+  const router = useRouter();
 
-  const [state, action] = useFormState(addDiscount, initialState);
+  const [state, action] = useFormState(enrollCourse, initialState);
   const { id: studentId } = useParams<{ id: string }>();
+  const coursesOptions = React.use(courseOptionsPromise);
+
+  const availableCoursesOptions = coursesOptions.filter(
+    (course) => !enrolledCourses.map(({ id }) => id).includes(Number(course.value))
+  );
+
+  const form = useForm<z.infer<typeof enrollStudentFormSchema>>({
+    resolver: zodResolver(enrollStudentFormSchema)
+  });
 
   useEffect(() => {
     if (state === undefined || state.message === '') return;
@@ -64,40 +78,25 @@ export default function StudentDiscountsForm({ studentByCourse, onOpenDialogChan
       router.refresh();
       onOpenDialogChange(false);
     }
-  }, [router, state, toast, onOpenDialogChange]);
-
-  const form = useForm<z.infer<typeof discountsFormSchema>>({
-    resolver: zodResolver(discountsFormSchema)
-  });
-
-  const courseOptions = studentByCourse.map(({ course: { id, name } }) => {
-    return {
-      label: name,
-      value: id
-    };
-  });
-
-  const selectedStudentByCourseId = studentByCourse.find(
-    ({ course }) => course.id === Number(form.getValues('course'))
-  )?.id;
+  }, [onOpenDialogChange, router, state, toast]);
 
   return (
     <Form {...form}>
-      <form className='space-y-3 py-3' action={action} id={DICOUNTS_FORM_ID}>
+      <form action={action} id={ENROLL_STUDENT_FORM_ID} className='space-y-3 py-3'>
         <FormField
           control={form.control}
           name='course'
           render={({ field }) => (
             <FormItem>
               <FormLabel>Curso</FormLabel>
-              <Select onValueChange={field.onChange} {...field}>
+              <Select onValueChange={field.onChange} required {...field}>
                 <SelectTrigger className='w-full'>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
                     <SelectLabel>Cursos</SelectLabel>
-                    {courseOptions.map(({ value, label }) => (
+                    {availableCoursesOptions.map(({ value, label }) => (
                       <SelectItem key={value} value={value.toString()}>
                         {label}
                       </SelectItem>
@@ -135,7 +134,6 @@ export default function StudentDiscountsForm({ studentByCourse, onOpenDialogChan
           )}
         />
         <input type='hidden' name='studentId' value={studentId} />
-        <input type='hidden' name='studentByCourseId' value={selectedStudentByCourseId} />
       </form>
     </Form>
   );

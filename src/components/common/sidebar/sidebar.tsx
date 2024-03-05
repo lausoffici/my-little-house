@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React from 'react';
 import { FiDollarSign, FiLock, FiMonitor, FiSmile } from 'react-icons/fi';
-import { TfiReceipt } from 'react-icons/tfi';
+import { TfiHome, TfiReceipt } from 'react-icons/tfi';
 
 import { cn } from '@/lib/utils';
 
@@ -14,7 +14,7 @@ import Logo from './logo';
 const LinkItems = [
   { name: 'Estudiantes', icon: <FiSmile />, href: '/students' },
   { name: 'Cursos', icon: <FiMonitor />, href: '/courses' },
-  { name: 'Resumen', icon: <FiDollarSign />, href: '/dashboard' },
+  { name: 'Resumen', icon: <TfiHome />, href: '/dashboard' },
   { name: 'Caja', icon: <FiLock />, href: '/cash-register' },
   { name: 'Comprobantes', icon: <TfiReceipt />, href: '/receipts' },
   { name: 'Vencimientos', icon: <FiDollarSign />, href: '/expirations?sortBy=expiredAt&sortOrder=asc' }

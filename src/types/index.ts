@@ -57,4 +57,5 @@ export type InvoiceDataType = {
   expiredAt: Date;
   studentId: number;
   courseId: number;
+  discount: number;
 };

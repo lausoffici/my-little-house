@@ -3,6 +3,7 @@ import React from 'react';
 import ChargeInvoicesDialog from '@/components/invoices/charge-invoices-dialog';
 import DeleteStudentDialog from '@/components/students/delete-student-dialog';
 import EditStudentDialog from '@/components/students/edit-student-dialog';
+import EnrollStudentDialog from '@/components/students/enroll-student/enroll-student-dialog';
 import StudentDetail from '@/components/students/student-detail';
 import DiscountsFormDialog from '@/components/students/student-discounts-dialog';
 import StudentInvoicesFilters from '@/components/students/student-invoices-filters';
@@ -19,7 +20,7 @@ import { PageProps } from '@/types';
 
 export default async function StudentPage({ params: { id }, searchParams }: PageProps<{ id: string }>) {
   const student = await getStudentById(Number(id));
-  const courseOptions = await getCourseOptions();
+  const courseOptionsPromise = getCourseOptions();
   const invoicesPromise = getStudentInvoices(Number(id), searchParams);
   const unpaidInvoicesPromise = getUnpaidInvoicesByStudent(Number(id));
 
@@ -33,8 +34,22 @@ export default async function StudentPage({ params: { id }, searchParams }: Page
   return (
     <div className='flex flex-col gap-4'>
       <div className='flex justify-between'>
-        <div className='flex  flex-col gap-1'>
+        <div className='flex  flex-col gap-3'>
           <h1 className='text-3xl font-bold text-foreground'>{fullName}</h1>
+          <div className='flex items-center gap-2'>
+            <Label className='font-semibold leading-none tracking-tight'>Cursos:</Label>
+            <div>
+              {courses.length > 0 ? (
+                courses.map(({ id, name }) => (
+                  <Badge variant='secondary' key={id} className='py-1 px-2 text-sm mr-2'>
+                    {name}
+                  </Badge>
+                ))
+              ) : (
+                <span className='text-sm text-gray-500'>Ningún curso asignado</span>
+              )}
+            </div>
+          </div>
         </div>
         <DeleteStudentDialog studentWithCourses={student} />
       </div>
@@ -43,7 +58,7 @@ export default async function StudentPage({ params: { id }, searchParams }: Page
         <Card className='w-1/4'>
           <CardHeader className='flex flex-row justify-between w-full'>
             <CardTitle> Información personal</CardTitle>
-            <EditStudentDialog student={student} courseOptions={courseOptions} />
+            <EditStudentDialog student={student} />
           </CardHeader>
           <CardContent>
             <div className='flex flex-col gap-3 justify-center'>
@@ -70,17 +85,6 @@ export default async function StudentPage({ params: { id }, searchParams }: Page
               <StudentDetail label='Celular Padre/tutor' info={student.dadPhone} />
               <Separator />
               <StudentDetail label='Observaciones' info={student.observations} />
-              <Separator />
-              <div className='flex items-center gap-2'>
-                <Label className='text-xs'>Cursos</Label>
-                <div>
-                  {courses.map(({ id, name }) => (
-                    <Badge variant='secondary' key={id} className='py-1 px-2 text-sm mr-2'>
-                      {name}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
             </div>
           </CardContent>
         </Card>
@@ -92,6 +96,7 @@ export default async function StudentPage({ params: { id }, searchParams }: Page
             <div className='flex justify-between w-full mb-4'>
               <StudentInvoicesFilters />
               <div className='flex gap-2'>
+                <EnrollStudentDialog courseOptionsPromise={courseOptionsPromise} enrolledCourses={courses} />
                 <DiscountsFormDialog studentByCourse={student.studentByCourse} />
                 <ChargeInvoicesDialog unpaidInvoicesPromise={unpaidInvoicesPromise} />
               </div>
