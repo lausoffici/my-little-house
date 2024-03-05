@@ -1,9 +1,13 @@
 import nodemailer from 'nodemailer';
 
+import prisma from '@/lib/prisma';
+import { receiptEmailFormSchema } from '@/lib/validations/form';
+
 export async function POST(request: Request) {
   const res = await request.json();
 
-  const { image } = res;
+  const { image, studentId } = res;
+  const { email } = receiptEmailFormSchema.parse(res);
 
   try {
     const transporter = nodemailer.createTransport({
@@ -29,6 +33,15 @@ export async function POST(request: Request) {
           encoding: 'base64'
         }
       ]
+    });
+
+    await prisma.student.update({
+      where: {
+        id: studentId
+      },
+      data: {
+        email
+      }
     });
 
     console.log('Message sent: %s', info.messageId);

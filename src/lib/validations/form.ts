@@ -60,3 +60,7 @@ export const discountsFormSchema = z.object({
   studentId: z.string(),
   studentByCourseId: z.string()
 });
+
+export const receiptEmailFormSchema = z.object({
+  email: z.string().email({ message: 'El email no es válido' })
+});
