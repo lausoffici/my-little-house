@@ -4,6 +4,7 @@ import { ReceiptPaymentMethod } from '@prisma/client';
 import { CheckIcon, ExclamationTriangleIcon } from '@radix-ui/react-icons';
 import domtoimage from 'dom-to-image';
 import { Vesper_Libre } from 'next/font/google';
+import Image from 'next/image';
 import React, { useRef } from 'react';
 import ReactToPrint from 'react-to-print';
 
@@ -126,18 +127,21 @@ export default function ReceiptDialog({ receipt }: ReceiptsDialogProps) {
           <DialogTitle>Comprobante</DialogTitle>
         </DialogHeader>
         <Card ref={receiptRef} className='print:block print:m-2 print:scale-90'>
-          <CardHeader>
-            <div className='flex justify-between items-start text-sm font-semibold'>
-              <span>{formatDate(receipt.createdAt)}</span>
-              <div className='flex flex-col items-center font-medium'>
+          <CardHeader className='p-0 px-4'>
+            <div className='flex items-center'>
+              <Image src='/assets/old-logo.png' alt='casa' width={100} height={80} />
+              <div className='flex flex-col items-center w-full'>
                 <Logo />
                 <h1>INGLÉS</h1>
               </div>
-              <span>#{padWithZeros(receipt.id)}</span>
             </div>
           </CardHeader>
           <Separator />
-          <CardContent className='p-6'>
+          <CardContent className='p-4'>
+            <div className='flex justify-between text-sm text-gray-600 mb-4'>
+              <span>{formatDate(receipt.createdAt)}</span>
+              <span>#{padWithZeros(receipt.id)}</span>
+            </div>
             <div className='text-md mb-4'>
               <div>
                 <span className='mr-2'>Estudiante:</span>
@@ -148,7 +152,7 @@ export default function ReceiptDialog({ receipt }: ReceiptsDialogProps) {
                 <span className='font-semibold'>{paymentMethodLabels[receipt.paymentMethod]}</span>
               </div>
             </div>
-            <div className='flex justify-between py-2'>
+            <div className='flex justify-between pb-1'>
               <span className='font-semibold'>Concepto</span>
               <span className='font-semibold'>Importe</span>
             </div>
@@ -162,7 +166,7 @@ export default function ReceiptDialog({ receipt }: ReceiptsDialogProps) {
               ))}
             </div>
             <div className='border-b-2 border-gray-600 w-full'></div>
-            <div className='flex justify-between py-2'>
+            <div className='flex justify-between pt-2'>
               <span className='font-bold'>TOTAL</span>
               <span className='font-semibold'>{formatCurrency(receipt.total)}</span>
             </div>
