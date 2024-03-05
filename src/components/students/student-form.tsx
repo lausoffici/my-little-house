@@ -95,7 +95,8 @@ export default function StudentForm({
         icon: <CheckIcon width='20px' height='20px' />,
         variant: 'success'
       });
-      router.push(`/students/${state.id}`);
+      if (state.id) router.push(`/students/${state.id}`);
+      router.refresh();
     }
     onOpenDialogChange(false);
   }, [onOpenDialogChange, router, state, toast]);

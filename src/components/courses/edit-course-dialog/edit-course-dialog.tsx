@@ -1,14 +1,11 @@
 'use client';
 
 import { Course } from '@prisma/client';
-import { CheckIcon, ExclamationTriangleIcon } from '@radix-ui/react-icons';
-import { useRouter } from 'next/navigation';
 import { SetStateAction } from 'react';
 
 import CourseForm, { FORM_ID } from '@/components/courses/course-form';
 import { Button } from '@/components/ui/button';
 import { DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { useToast } from '@/components/ui/use-toast';
 import { editCourse } from '@/lib/courses';
 
 interface EditCourseDialogProps {
@@ -17,9 +14,7 @@ interface EditCourseDialogProps {
 }
 
 export default function EditCourseDialog({ course, onOpenChange }: EditCourseDialogProps) {
-  const { toast } = useToast();
-  const { name, amount, observations, id } = course;
-  const router = useRouter();
+  const { name, amount, observations } = course;
 
   const currentValue = {
     name,
@@ -27,33 +22,13 @@ export default function EditCourseDialog({ course, onOpenChange }: EditCourseDia
     observations: observations ?? ''
   };
 
-  async function handleSubmit(editedCourse: FormData) {
-    try {
-      toast({
-        description: `Curso editado exitosamente: ${editedCourse.get('name')} `,
-        icon: <CheckIcon width='20px' height='20px' />,
-        variant: 'success'
-      });
-      await editCourse(id, editedCourse);
-      onOpenChange(false);
-      router.refresh();
-    } catch (err) {
-      toast({
-        description: `Ha ocurrido un error`,
-        icon: <ExclamationTriangleIcon width='20px' height='20px' />,
-        variant: 'destructive'
-      });
-      console.error(err);
-    }
-  }
-
   return (
     <DialogContent>
       <DialogHeader>
         <DialogTitle>Editar Curso</DialogTitle>
         <DialogDescription>Modifique el formulario para editar el curso</DialogDescription>
       </DialogHeader>
-      <CourseForm onFormSubmit={handleSubmit} defaultValues={currentValue} />
+      <CourseForm action={editCourse} defaultValues={currentValue} onOpenDialogChange={onOpenChange} />
       <DialogFooter>
         <Button variant='outline' onClick={() => onOpenChange(false)}>
           Cancelar

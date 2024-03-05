@@ -36,7 +36,7 @@ export const getCourseOptions = cache(async () => {
   return options;
 });
 
-export const createCourse = async (newCourse: FormData) => {
+export const createCourse = async (_: unknown, newCourse: FormData) => {
   const parsedData = courseFormSchema.safeParse({
     name: newCourse.get('name'),
     amount: newCourse.get('amount'),
@@ -44,14 +44,28 @@ export const createCourse = async (newCourse: FormData) => {
   });
 
   if (!parsedData.success) {
+    console.log(parsedData.error.flatten().fieldErrors);
     return {
-      errors: parsedData.error.flatten().fieldErrors
+      error: true,
+      message: 'Error al crear curso'
     };
   }
 
-  return await prisma.course.create({
-    data: parsedData.data
-  });
+  try {
+    const course = await prisma.course.create({
+      data: parsedData.data
+    });
+
+    return {
+      error: false,
+      message: `Curso ${course.name} creado con éxito`
+    };
+  } catch (error) {
+    return {
+      error: true,
+      message: 'Error al crear el curso'
+    };
+  }
 };
 
 export const editCourse = async (id: number, editedCourse: FormData) => {
@@ -63,42 +77,55 @@ export const editCourse = async (id: number, editedCourse: FormData) => {
 
   if (!parsedData.success) {
     return {
-      errors: parsedData.error.flatten().fieldErrors
+      error: true,
+      message: 'Error al editar el curso'
     };
   }
 
-  const course = await prisma.$transaction(async (tx) => {
-    const currentDate = new Date();
-    const currentMonth = currentDate.getMonth() + 1;
-    const nextMonth = currentMonth + 1;
+  try {
+    const course = await prisma.$transaction(async (tx) => {
+      const currentDate = new Date();
+      const currentMonth = currentDate.getMonth() + 1;
+      const nextMonth = currentMonth + 1;
 
-    // Update all invoices for the course that are in the future and have not been paid
-    await tx.invoice.updateMany({
-      where: {
-        courseId: id,
-        state: InvoiceState.I,
-        month: {
-          gte: nextMonth
+      // Update all invoices for the course that are in the future and have not been paid
+      await tx.invoice.updateMany({
+        where: {
+          courseId: id,
+          state: InvoiceState.I,
+          month: {
+            gte: nextMonth
+          },
+          year: {
+            equals: currentDate.getFullYear()
+          }
         },
-        year: {
-          equals: currentDate.getFullYear()
+        data: {
+          amount: parsedData.data.amount,
+          description: parsedData.data.name
         }
-      },
-      data: {
-        amount: parsedData.data.amount,
-        description: parsedData.data.name
-      }
+      });
+
+      const updatedCourse = await tx.course.update({
+        where: {
+          id
+        },
+        data: parsedData.data
+      });
+
+      return updatedCourse;
     });
 
-    return tx.course.update({
-      where: {
-        id
-      },
-      data: parsedData.data
-    });
-  });
-
-  return course;
+    return {
+      error: false,
+      message: `${course.name} editado con éxito`
+    };
+  } catch (error) {
+    return {
+      error: true,
+      message: 'Error al editar curso'
+    };
+  }
 };
 
 export const deleteCourse = async (id: number) => {
