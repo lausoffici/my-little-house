@@ -29,7 +29,7 @@ export const studentFormSchema = z.object({
     .max(50),
   birthDate: z.optional(z.string()),
   dni: z.optional(z.string()),
-  email: z.optional(z.string().email()),
+  email: z.optional(z.string()),
   description: z.optional(z.string()),
   address: z.optional(z.string()),
   city: z.optional(z.string()),
