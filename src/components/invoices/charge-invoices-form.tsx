@@ -76,12 +76,7 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
         icon: <CheckIcon width='20px' height='20px' />,
         variant: 'success'
       });
-
-      router.refresh();
-
-      setTimeout(() => {
-        router.push(`/receipts?receiptId=${state.receipt?.id}`);
-      }, 500);
+      router.push(`/receipts?receiptId=${state.receipt?.id}`);
     }
   }, [form, router, state, toast]);
 

@@ -1,6 +1,7 @@
 'use server';
 
 import { InvoiceState, Prisma } from '@prisma/client';
+import { revalidatePath } from 'next/cache';
 
 import { SearchParams } from '@/types';
 
@@ -169,6 +170,8 @@ export const generateReceipt = async (_: unknown, paidItems: FormData) => {
 
       return receipt;
     });
+
+    revalidatePath(`/students/${studentId}`);
 
     return {
       error: false,
