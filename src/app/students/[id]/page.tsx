@@ -64,8 +64,25 @@ export default async function StudentPage({ params: { id }, searchParams }: Page
         </div>
       </div>
 
-      <div className='flex flex-row gap-3'>
-        <Card className='w-[30%]'>
+      <div className='flex flex-col gap-3'>
+        <Card>
+          <CardHeader>
+            <CardTitle>Cuotas</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className='flex justify-between w-full mb-4'>
+              <StudentInvoicesFilters />
+              <div className='flex gap-2'>
+                {courses.length > 0 && <DiscountsFormDialog studentByCourse={student.studentByCourse} />}
+                <ChargeInvoicesDialog unpaidInvoicesPromise={unpaidInvoicesPromise} />
+              </div>
+            </div>
+            <React.Suspense fallback='Cargando...'>
+              <StudentInvoicesTable invoicesPromise={invoicesPromise} />
+            </React.Suspense>
+          </CardContent>
+        </Card>
+        <Card>
           <CardHeader className='flex flex-row justify-between w-full'>
             <CardTitle> Información personal</CardTitle>
             <EditStudentDialog student={student} />
@@ -96,23 +113,6 @@ export default async function StudentPage({ params: { id }, searchParams }: Page
               <Separator />
               <StudentDetail label='Observaciones' info={student.observations} />
             </div>
-          </CardContent>
-        </Card>
-        <Card className='w-[70%]'>
-          <CardHeader>
-            <CardTitle>Cuotas</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className='flex justify-between w-full mb-4'>
-              <StudentInvoicesFilters />
-              <div className='flex gap-2'>
-                {courses.length > 0 && <DiscountsFormDialog studentByCourse={student.studentByCourse} />}
-                <ChargeInvoicesDialog unpaidInvoicesPromise={unpaidInvoicesPromise} />
-              </div>
-            </div>
-            <React.Suspense fallback='Cargando...'>
-              <StudentInvoicesTable invoicesPromise={invoicesPromise} />
-            </React.Suspense>
           </CardContent>
         </Card>
       </div>

@@ -1,6 +1,7 @@
 'use server';
 
 import { InvoiceState, Prisma } from '@prisma/client';
+import { revalidatePath } from 'next/cache';
 
 import { SearchParams } from '@/types';
 
@@ -169,7 +170,7 @@ export const generateReceipt = async (_: unknown, paidItems: FormData) => {
           receiptId: receipt.id,
           invoiceId: id,
           description: `${description} - ${getMonthName(month)} ${year} ${discount ? `(${formatPercentage(discount)})` : ''}`,
-          amount: getDiscountedAmount({ amount, discount })
+          amount: getDiscountedAmount(amount, discount)
         }))
       });
 
@@ -177,6 +178,8 @@ export const generateReceipt = async (_: unknown, paidItems: FormData) => {
 
       return receipt;
     });
+
+    revalidatePath(`/students/${studentId}`);
 
     return {
       error: false,

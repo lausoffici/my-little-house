@@ -54,6 +54,13 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
   const [state, action] = useFormState(generateReceipt, initialState);
   const { id: studentId } = useParams<{ id: string }>();
 
+  const form = useForm<z.infer<typeof receiptFormSchema>>({
+    resolver: zodResolver(receiptFormSchema),
+    defaultValues: {
+      paymentMethod: ReceiptPaymentMethod.CASH
+    }
+  });
+
   useEffect(() => {
     if (state === undefined || state.message === '') return;
 
@@ -71,21 +78,14 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
       });
       router.push(`/receipts?receiptId=${state.receipt?.id}`);
     }
-  }, [router, state, toast]);
+  }, [form, router, state, toast]);
 
   const unpaidInvoices = React.use(unpaidInvoicesPromise);
 
-  const invoicesOptions: Option[] = unpaidInvoices.map((invoice) => ({
-    value: String(invoice.id),
-    label: `${invoice.description} - ${getMonthName(invoice.month)} ${invoice.year} ${formatCurrency(getDiscountedAmount(invoice))}`
+  const invoicesOptions: Option[] = unpaidInvoices.map(({ id, description, month, year, amount, discount }) => ({
+    value: String(id),
+    label: `${description} - ${getMonthName(month)} ${year} ${formatCurrency(getDiscountedAmount(amount, discount))}`
   }));
-
-  const form = useForm<z.infer<typeof receiptFormSchema>>({
-    resolver: zodResolver(receiptFormSchema),
-    defaultValues: {
-      paymentMethod: ReceiptPaymentMethod.CASH
-    }
-  });
 
   function addAditional() {
     setAdditionals((prev) => {
@@ -103,11 +103,7 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
 
   const getInvoiceById = useCallback(
     (id: string) => {
-      const invoice = unpaidInvoices.find((invoice) => invoice.id === Number(id));
-
-      if (!invoice) throw new Error('Invoice not found');
-
-      return invoice;
+      return unpaidInvoices.find((invoice) => invoice.id === Number(id));
     },
     [unpaidInvoices]
   );
@@ -127,7 +123,9 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
   }
 
   const total = useMemo(() => {
-    const selectedInvoicesAmount = selectedInvoiceIds.map(getInvoiceById).map(getDiscountedAmount);
+    const selectedInvoicesAmount = selectedInvoiceIds
+      .map(getInvoiceById)
+      .map((invoice) => getDiscountedAmount(invoice?.amount, invoice?.discount));
     const additionalsAmounts = additionals.map((input) => input.value);
     const totalAmounts = [...selectedInvoicesAmount, ...additionalsAmounts];
 
