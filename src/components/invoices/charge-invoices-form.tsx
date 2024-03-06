@@ -8,14 +8,13 @@ import { useParams, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import React from 'react';
 import { useFormState } from 'react-dom';
-import { useForm } from 'react-hook-form';
+import { useFieldArray, useForm } from 'react-hook-form';
 import { v4 as uuid } from 'uuid';
 import { z } from 'zod';
 
 import { Button } from '@/components/ui/button';
 import { Form, FormField, FormItem, FormLabel } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { MultiSelect } from '@/components/ui/multi-select';
 import {
   Select,
   SelectContent,
@@ -30,8 +29,6 @@ import { getUnpaidInvoicesByStudent } from '@/lib/invoices';
 import { generateReceipt } from '@/lib/receipts';
 import { formatCurrency, getMonthName } from '@/lib/utils';
 import { getDiscountedAmount } from '@/lib/utils/invoices.utils';
-import { receiptFormSchema } from '@/lib/validations/form';
-import { Option } from '@/types';
 
 const initialState = {
   message: '',
@@ -49,16 +46,20 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
   const router = useRouter();
   const { toast } = useToast();
 
-  const [selectedInvoiceIds, setSelectedInvoiceIds] = useState<string[]>([]);
   const [additionals, setAdditionals] = useState<{ id: string; value: number }[]>([]);
   const [state, action] = useFormState(generateReceipt, initialState);
   const { id: studentId } = useParams<{ id: string }>();
 
-  const form = useForm<z.infer<typeof receiptFormSchema>>({
-    resolver: zodResolver(receiptFormSchema),
+  const form = useForm<any>({
+    // resolver: zodResolver(receiptFormSchema),
     defaultValues: {
       paymentMethod: ReceiptPaymentMethod.CASH
     }
+  });
+
+  const { fields, append, remove } = useFieldArray<any>({
+    control: form.control,
+    name: 'invoices'
   });
 
   useEffect(() => {
@@ -81,11 +82,6 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
   }, [form, router, state, toast]);
 
   const unpaidInvoices = React.use(unpaidInvoicesPromise);
-
-  const invoicesOptions: Option[] = unpaidInvoices.map(({ id, description, month, year, amount, discount }) => ({
-    value: String(id),
-    label: `${description} - ${getMonthName(month)} ${year} ${formatCurrency(getDiscountedAmount(amount, discount))}`
-  }));
 
   function addAditional() {
     setAdditionals((prev) => {
@@ -123,16 +119,33 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
   }
 
   const total = useMemo(() => {
-    const selectedInvoicesAmount = selectedInvoiceIds
-      .map(getInvoiceById)
-      .map((invoice) => getDiscountedAmount(invoice?.amount, invoice?.discount));
-    const additionalsAmounts = additionals.map((input) => input.value);
-    const totalAmounts = [...selectedInvoicesAmount, ...additionalsAmounts];
+    // const selectedInvoicesAmount = selectedInvoiceIds
+    //   .map(getInvoiceById)
+    //   .map((invoice) => getDiscountedAmount(invoice?.amount, invoice?.discount));
+    // const additionalsAmounts = additionals.map((input) => input.value);
+    // const totalAmounts = [...selectedInvoicesAmount, ...additionalsAmounts];
 
-    const total = totalAmounts.reduce((acc, current) => acc + current, 0);
+    // const total = totalAmounts.reduce((acc, current) => acc + current, 0);
 
-    return total;
-  }, [additionals, getInvoiceById, selectedInvoiceIds]);
+    // return total;
+
+    return 0;
+  }, []);
+
+  const availableOptions = useMemo(() => {
+    return unpaidInvoices.map(({ id, description, month, year }) => ({
+      value: String(id),
+      label: `${description} - ${getMonthName(month)} ${year}`
+    }));
+  }, [unpaidInvoices]);
+
+  const handleInvoiceSelect = (id: string, index: number) => {
+    const invoice = getInvoiceById(id);
+    const amount = getDiscountedAmount(invoice?.amount, invoice?.discount);
+    form.setValue(`invoices.${index}.amount`, amount);
+  };
+
+  console.log(form.getValues());
 
   return (
     <Form {...form}>
@@ -158,24 +171,66 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name='invoices'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Cuotas Impagas</FormLabel>
-              <MultiSelect
-                className='w-[462px]'
-                options={invoicesOptions}
-                selected={selectedInvoiceIds}
-                notFoundMessage='Cuota no encontrada'
-                {...field}
-                onChange={setSelectedInvoiceIds}
-                name='invoices'
-              />
-            </FormItem>
-          )}
-        />
+        {fields.map((item, index) => (
+          <div key={item.id} className='flex items-center gap-1'>
+            <FormField
+              control={form.control}
+              name={`invoices.${index}.invoiceId`}
+              render={({ field: { ref, ...fieldWithoutRef } }) => (
+                <FormItem className='flex-1'>
+                  <FormLabel>Cuota</FormLabel>
+                  <Select
+                    onValueChange={(value) => {
+                      fieldWithoutRef.onChange(value);
+                      handleInvoiceSelect(value, index);
+                    }}
+                    {...fieldWithoutRef}
+                  >
+                    <SelectTrigger className='w-full'>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectLabel>Cuotas</SelectLabel>
+                        {availableOptions.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name={`invoices.${index}.amount`}
+              defaultValue={0}
+              render={({ field: { ref, ...fieldWithoutRef } }) => (
+                <FormItem className='w-[min(100%,150px)]'>
+                  <FormLabel>Importe</FormLabel>
+                  <div className='flex items-center gap-1'>
+                    <Input type='number' autoComplete='off' {...fieldWithoutRef} />
+                    <Button variant='ghost' size='sm' onClick={() => remove(index)}>
+                      <X className='h-3 w-3 text-muted-foreground hover:text-foreground' />
+                    </Button>
+                  </div>
+                </FormItem>
+              )}
+            />
+          </div>
+        ))}
+        <Button
+          variant='secondary'
+          onClick={() => append({ id: '' })}
+          disabled={additionals.length === 10}
+          className='flex items-center gap-2'
+          type='button'
+        >
+          <PlusCircleIcon width={15} />
+          Agregar cuota
+        </Button>
         <input type='hidden' name='studentId' value={studentId} />
         <input type='hidden' name='receiptTotal' value={total} />
         {additionals.length > 0
