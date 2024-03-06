@@ -161,7 +161,7 @@ export const generateReceipt = async (_: unknown, paidItems: FormData) => {
           receiptId: receipt.id,
           invoiceId: id,
           description: `${description} - ${getMonthName(month)} ${year} ${discount ? `(${formatPercentage(discount)})` : ''}`,
-          amount: getDiscountedAmount({ amount, discount })
+          amount: getDiscountedAmount(amount, discount)
         }))
       });
 

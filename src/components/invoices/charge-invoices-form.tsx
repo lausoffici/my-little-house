@@ -87,9 +87,9 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
 
   const unpaidInvoices = React.use(unpaidInvoicesPromise);
 
-  const invoicesOptions: Option[] = unpaidInvoices.map((invoice) => ({
-    value: String(invoice.id),
-    label: `${invoice.description} - ${getMonthName(invoice.month)} ${invoice.year} ${formatCurrency(getDiscountedAmount(invoice))}`
+  const invoicesOptions: Option[] = unpaidInvoices.map(({ id, description, month, year, amount, discount }) => ({
+    value: String(id),
+    label: `${description} - ${getMonthName(month)} ${year} ${formatCurrency(getDiscountedAmount(amount, discount))}`
   }));
 
   function addAditional() {
@@ -128,7 +128,9 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
   }
 
   const total = useMemo(() => {
-    const selectedInvoicesAmount = selectedInvoiceIds.map(getInvoiceById).map(getDiscountedAmount);
+    const selectedInvoicesAmount = selectedInvoiceIds
+      .map(getInvoiceById)
+      .map((invoice) => getDiscountedAmount(invoice?.amount, invoice?.discount));
     const additionalsAmounts = additionals.map((input) => input.value);
     const totalAmounts = [...selectedInvoicesAmount, ...additionalsAmounts];
 
