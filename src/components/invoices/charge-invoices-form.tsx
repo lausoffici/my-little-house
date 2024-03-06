@@ -54,6 +54,13 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
   const [state, action] = useFormState(generateReceipt, initialState);
   const { id: studentId } = useParams<{ id: string }>();
 
+  const form = useForm<z.infer<typeof receiptFormSchema>>({
+    resolver: zodResolver(receiptFormSchema),
+    defaultValues: {
+      paymentMethod: ReceiptPaymentMethod.CASH
+    }
+  });
+
   useEffect(() => {
     if (state === undefined || state.message === '') return;
 
@@ -69,9 +76,14 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
         icon: <CheckIcon width='20px' height='20px' />,
         variant: 'success'
       });
-      router.push(`/receipts?receiptId=${state.receipt?.id}`);
+
+      router.refresh();
+
+      setTimeout(() => {
+        router.push(`/receipts?receiptId=${state.receipt?.id}`);
+      }, 500);
     }
-  }, [router, state, toast]);
+  }, [form, router, state, toast]);
 
   const unpaidInvoices = React.use(unpaidInvoicesPromise);
 
@@ -79,13 +91,6 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
     value: String(invoice.id),
     label: `${invoice.description} - ${getMonthName(invoice.month)} ${invoice.year} ${formatCurrency(getDiscountedAmount(invoice))}`
   }));
-
-  const form = useForm<z.infer<typeof receiptFormSchema>>({
-    resolver: zodResolver(receiptFormSchema),
-    defaultValues: {
-      paymentMethod: ReceiptPaymentMethod.CASH
-    }
-  });
 
   function addAditional() {
     setAdditionals((prev) => {
@@ -103,11 +108,7 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
 
   const getInvoiceById = useCallback(
     (id: string) => {
-      const invoice = unpaidInvoices.find((invoice) => invoice.id === Number(id));
-
-      if (!invoice) throw new Error('Invoice not found');
-
-      return invoice;
+      return unpaidInvoices.find((invoice) => invoice.id === Number(id));
     },
     [unpaidInvoices]
   );

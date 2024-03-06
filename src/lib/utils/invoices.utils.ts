@@ -1,3 +1,5 @@
+import { Invoice } from '@prisma/client';
+
 import { invoiceStateSchema } from '../validations/params';
 
 export const parseInvoiceStatesSearchParam = (statesParam: string | undefined) => {
@@ -12,6 +14,8 @@ export const parseInvoiceStatesSearchParam = (statesParam: string | undefined) =
   );
 };
 
-export const getDiscountedAmount = ({ amount, discount }: { amount: number; discount: number }) => {
+export const getDiscountedAmount = (invoice?: Invoice) => {
+  if (!invoice) return 0;
+  const { amount, discount } = invoice;
   return amount * (1 - (discount ?? 0));
 };

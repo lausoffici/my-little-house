@@ -80,3 +80,8 @@ export const deleteCourseEnrollmentSchema = z.object({
   studentId: z.string(),
   studentByCourseId: z.string()
 });
+
+export const editInvoiceFormSchema = z.object({
+  invoiceId: z.number(),
+  amount: z.string({ required_error: 'El importe es requerido' })
+});
