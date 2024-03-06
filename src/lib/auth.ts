@@ -5,7 +5,8 @@ const whitelist = [
   'lautarosoffici@gmail.com',
   'julietapontino@gmail.com',
   'gsoffici@gmail.com',
-  'secretariamlh@gmail.com'
+  'secretariamlh@gmail.com',
+  'fsoffici01@gmail.com'
 ];
 
 export const authOptions: NextAuthOptions = {
