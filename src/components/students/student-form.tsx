@@ -21,6 +21,7 @@ type StudentFormValues = {
   lastName: string;
   birthDate?: Date;
   dni?: string;
+  email?: string;
   address?: string;
   city?: string;
   phone?: string;
@@ -51,6 +52,7 @@ const emptyDefaultValues = {
   lastName: '',
   birthDate: undefined,
   dni: '',
+  email: '',
   address: '',
   city: '',
   phone: '',
@@ -150,7 +152,20 @@ export default function StudentForm({
             <FormItem>
               <FormLabel>DNI</FormLabel>
               <FormControl>
-                <Input type='number' autoComplete='off' {...field} />
+                <Input type='number' placeholder='40123123' autoComplete='off' {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name='email'
+          render={({ field }) => (
+            <FormItem className='grid col-span-2'>
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <Input type='email' placeholder='monica.geller@gmail.com' autoComplete='off' {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
