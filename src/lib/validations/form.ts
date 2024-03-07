@@ -42,12 +42,9 @@ export const studentFormSchema = z.object({
 
 export const receiptFormSchema = z.object({
   invoices: z.array(z.any()).optional(),
-  'invoices-description': z.array(z.string()).optional(),
-  'invoices-amount': z.array(z.string()).optional(),
+  additional: z.array(z.any()).optional(),
   studentId: z.string(),
   receiptTotal: z.string(),
-  additionalsDescription: z.array(z.string()),
-  additionalsAmount: z.array(z.string()),
   paymentMethod: z.nativeEnum(ReceiptPaymentMethod)
 });
 

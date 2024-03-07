@@ -99,26 +99,9 @@ function combineInvoices(ids: string[], amounts: string[]) {
 }
 
 export const generateReceipt = async (_: unknown, paidItems: FormData) => {
-  const selectedIds: string[] = [];
-  const selectedAmounts: string[] = [];
-  const MAX_INPUTS_ALLOWED = 10;
-
-  for (let i = 0; i <= MAX_INPUTS_ALLOWED; i++) {
-    const selectedId = paidItems.get(`invoices.${i}.selectedId`);
-    const selectedAmount = paidItems.get(`invoices.${i}.amount`);
-
-    if (selectedId) {
-      if (selectedIds.includes(selectedId.toString())) throw new Error('Error: Dos cuotas iguales seleccionadas');
-      selectedIds.push(selectedId.toString());
-    }
-    if (selectedAmount) selectedAmounts.push(selectedAmount.toString());
-  }
-
   const parsedData = receiptFormSchema.safeParse({
     studentId: paidItems.get('studentId'),
     receiptTotal: paidItems.get('receiptTotal'),
-    additionalsDescription: paidItems.getAll('additional-description'),
-    additionalsAmount: paidItems.getAll('additional-amount'),
     paymentMethod: paidItems.get('paymentMethod')
   });
 
@@ -130,9 +113,40 @@ export const generateReceipt = async (_: unknown, paidItems: FormData) => {
     };
   }
 
-  const { additionalsDescription, additionalsAmount, studentId, receiptTotal, paymentMethod } = parsedData.data;
+  const selectedIds: string[] = [];
+  const selectedAmounts: string[] = [];
+  const additionalDescriptions: string[] = [];
+  const additionalAmounts: string[] = [];
+  const MAX_INPUTS_ALLOWED = 10;
 
-  const additionals = combineAdditionals(additionalsDescription, additionalsAmount);
+  for (let i = 0; i <= MAX_INPUTS_ALLOWED; i++) {
+    const selectedId = paidItems.get(`invoices.${i}.selectedId`);
+    const additionalDescription = paidItems.get(`additional.${i}.description`);
+    const selectedAmount = paidItems.get(`invoices.${i}.amount`);
+    const additionalAmount = paidItems.get(`additional.${i}.amount`);
+
+    if (selectedId && selectedAmount) {
+      if (selectedIds.includes(selectedId.toString())) throw new Error('Error: Dos cuotas iguales seleccionadas');
+      selectedIds.push(selectedId.toString());
+      selectedAmounts.push(selectedAmount.toString());
+    }
+
+    if (additionalDescription && additionalAmount) {
+      if (
+        additionalDescriptions.includes(additionalDescription.toString()) &&
+        additionalAmounts.includes(additionalAmount.toString())
+      ) {
+        throw new Error('Error: dos adicionales son iguales');
+      }
+
+      additionalAmounts.push(additionalAmount.toString());
+      additionalDescriptions.push(additionalDescription.toString());
+    }
+  }
+
+  const { studentId, receiptTotal, paymentMethod } = parsedData.data;
+
+  const additionals = combineAdditionals(additionalDescriptions, additionalAmounts);
   const invoices = combineInvoices(selectedIds, selectedAmounts);
 
   if (additionals.length === 0 && invoices.length === 0) {

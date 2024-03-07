@@ -5,11 +5,10 @@ import { ReceiptPaymentMethod } from '@prisma/client';
 import { ExclamationTriangleIcon } from '@radix-ui/react-icons';
 import { CheckIcon, PlusCircleIcon, X } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect } from 'react';
 import React from 'react';
 import { useFormState } from 'react-dom';
 import { useFieldArray, useForm } from 'react-hook-form';
-import { v4 as uuid } from 'uuid';
 import { z } from 'zod';
 
 import { Button } from '@/components/ui/button';
@@ -48,7 +47,6 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
   const router = useRouter();
   const { toast } = useToast();
 
-  const [additionals, setAdditionals] = useState<{ id: string; value: number }[]>([]);
   const [state, action] = useFormState(generateReceipt, initialState);
   const { id: studentId } = useParams<{ id: string }>();
 
@@ -66,20 +64,30 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
     }
   });
 
-  const { fields, append, remove } = useFieldArray<any>({
+  const { fields, append, remove } = useFieldArray<z.infer<typeof receiptFormSchema>>({
     control: form.control,
     name: 'invoices'
   });
 
-  const formInvoices: { selectedId: string; amount: number }[] | undefined = form.getValues().invoices;
+  const {
+    fields: additionalFields,
+    append: appendAdditional,
+    remove: removeAdditional
+  } = useFieldArray<z.infer<typeof receiptFormSchema>>({
+    control: form.control,
+    name: 'additional'
+  });
 
+  const formInvoices: { selectedId: string; amount: number }[] | undefined = form.getValues().invoices;
   const formInvoicesAmount = formInvoices?.map((invoice) => Number(invoice.amount));
 
-  const total = useMemo(() => {
-    const additionalsAmounts = additionals.map((input) => input.value);
+  const formAdditionals: { description: string; amount: number }[] | undefined = form.getValues()?.additional;
+
+  const total = () => {
+    const additionalsAmounts = formAdditionals?.map((additional) => Number(additional.amount)) ?? [];
     const totalAmounts = formInvoicesAmount ? [...formInvoicesAmount, ...additionalsAmounts] : additionalsAmounts;
     return totalAmounts.reduce((acc, current) => acc + current, 0);
-  }, [additionals, formInvoicesAmount]);
+  };
 
   function getInvoicesOptions(invoiceId: string) {
     const selectedIds = formInvoices?.map(({ selectedId }) => Number(selectedId)) ?? [];
@@ -109,20 +117,6 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
     }
   }, [router, state, toast]);
 
-  function addAditional() {
-    setAdditionals((prev) => {
-      if (prev) {
-        return [...prev, { id: uuid(), value: 0, label: '' }];
-      } else {
-        return [{ id: uuid(), value: 0, label: '' }];
-      }
-    });
-  }
-
-  const deleteAditional = (aditionalId: string) => {
-    setAdditionals(additionals.filter((el) => el.id !== aditionalId));
-  };
-
   const getInvoiceById = useCallback(
     (id: string) => {
       const invoice = unpaidInvoices.find((invoice) => invoice.id === Number(id));
@@ -133,20 +127,6 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
     },
     [unpaidInvoices]
   );
-
-  function handleDescriptionChange(e: React.ChangeEvent<HTMLInputElement>, id: string) {
-    const { value } = e.target;
-    setAdditionals(additionals.map((aditional) => (aditional.id === id ? { ...aditional, label: value } : aditional)));
-  }
-
-  function handleInputChange(e: React.ChangeEvent<HTMLInputElement>, id: string) {
-    const { value } = e.target;
-    const numValue = Number(value);
-
-    setAdditionals(
-      additionals.map((aditional) => (aditional.id === id ? { ...aditional, value: numValue } : aditional))
-    );
-  }
 
   function handleSelect(index: number, id: string) {
     const invoice = getInvoiceById(id);
@@ -237,7 +217,7 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
         <Button
           variant='secondary'
           onClick={() => append({ selectedId: undefined, amount: 0 })}
-          disabled={fields.length === 10}
+          disabled={fields.length === 5}
           className='flex items-center gap-2 w-[172px]'
           type='button'
         >
@@ -245,49 +225,49 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
           Agregar cuota
         </Button>
         <input type='hidden' name='studentId' value={studentId} />
-        <input type='hidden' name='receiptTotal' value={total} />
-        {additionals.length > 0
-          ? additionals.map((aditional) => (
-              <div className='flex gap-2' key={aditional.id}>
-                <FormField
-                  name='additional-description'
-                  render={({ field: { ref, ...fieldWithoutRef } }) => (
-                    <FormItem className='w-11/12'>
-                      <Input
-                        placeholder='Descripción'
-                        autoComplete='off'
-                        required
-                        {...fieldWithoutRef}
-                        onChange={(e) => handleDescriptionChange(e, aditional.id)}
-                      />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  name='additional-amount'
-                  render={({ field: { ref, ...fieldWithoutRef } }) => (
-                    <FormItem>
-                      <Input
-                        type='number'
-                        placeholder='Importe'
-                        autoComplete='off'
-                        {...fieldWithoutRef}
-                        required
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange(e, aditional.id)}
-                      />
-                    </FormItem>
-                  )}
-                />
-                <Button variant='ghost' size='sm' onClick={() => deleteAditional(aditional.id)}>
-                  <X className='h-3 w-3 text-muted-foreground hover:text-foreground' />
-                </Button>
-              </div>
-            ))
-          : null}
+        <input type='hidden' name='receiptTotal' value={total()} />
+
+        {additionalFields.map((aditional, index) => (
+          <div className='flex gap-2' key={aditional.id}>
+            <FormField
+              name={`additional.${index}.description`}
+              render={({ field: { ref, ...fieldWithoutRef } }) => (
+                <FormItem className='w-11/12'>
+                  <Input
+                    placeholder='Descripción'
+                    autoComplete='off'
+                    required
+                    defaultValue={''}
+                    {...fieldWithoutRef}
+                    value={fieldWithoutRef.value}
+                  />
+                </FormItem>
+              )}
+            />
+            <FormField
+              name={`additional.${index}.amount`}
+              render={({ field: { ref, ...fieldWithoutRef } }) => (
+                <FormItem>
+                  <Input
+                    type='number'
+                    placeholder='Importe'
+                    autoComplete='off'
+                    defaultValue={0}
+                    required
+                    {...fieldWithoutRef}
+                  />
+                </FormItem>
+              )}
+            />
+            <Button variant='ghost' size='sm' onClick={() => removeAdditional(index)}>
+              <X className='h-3 w-3 text-muted-foreground hover:text-foreground' />
+            </Button>
+          </div>
+        ))}
         <Button
           variant='secondary'
-          onClick={addAditional}
-          disabled={additionals.length === 10}
+          onClick={appendAdditional}
+          disabled={additionalFields.length === 5}
           className='flex items-center gap-2'
           type='button'
         >
@@ -297,7 +277,7 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
       </form>
       <div className='flex justify-between font-semibold mb-3'>
         <span>Total: </span>
-        <span>{formatCurrency(total)}</span>
+        <span>{formatCurrency(total())}</span>
       </div>
     </Form>
   );
