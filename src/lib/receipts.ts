@@ -92,12 +92,29 @@ function combineAdditionals(descriptions: string[], amounts: string[]) {
 
   return descriptions.map((description, index) => ({ description, amount: amounts[index] }));
 }
+function combineInvoices(ids: string[], amounts: string[]) {
+  if (ids.length !== amounts.length) throw new Error('Arrays must have the same length');
+
+  return ids.map((id, index) => ({ id, amount: Number(amounts[index]) }));
+}
 
 export const generateReceipt = async (_: unknown, paidItems: FormData) => {
-  const validInvoice = paidItems.get('invoices')?.toString() !== '';
+  const selectedIds: string[] = [];
+  const selectedAmounts: string[] = [];
+  const MAX_INPUTS_ALLOWED = 10;
+
+  for (let i = 0; i <= MAX_INPUTS_ALLOWED; i++) {
+    const selectedId = paidItems.get(`invoices.${i}.selectedId`);
+    const selectedAmount = paidItems.get(`invoices.${i}.amount`);
+
+    if (selectedId) {
+      if (selectedIds.includes(selectedId.toString())) throw new Error('Error: Dos cuotas iguales seleccionadas');
+      selectedIds.push(selectedId.toString());
+    }
+    if (selectedAmount) selectedAmounts.push(selectedAmount.toString());
+  }
 
   const parsedData = receiptFormSchema.safeParse({
-    invoices: validInvoice ? paidItems.get('invoices')?.toString().split(',') : [],
     studentId: paidItems.get('studentId'),
     receiptTotal: paidItems.get('receiptTotal'),
     additionalsDescription: paidItems.getAll('additional-description'),
@@ -106,6 +123,7 @@ export const generateReceipt = async (_: unknown, paidItems: FormData) => {
   });
 
   if (!parsedData.success) {
+    console.log(parsedData.error.flatten().fieldErrors);
     return {
       error: true,
       message: 'Error al cobrar cuotas'
@@ -115,8 +133,9 @@ export const generateReceipt = async (_: unknown, paidItems: FormData) => {
   const { additionalsDescription, additionalsAmount, studentId, receiptTotal, paymentMethod } = parsedData.data;
 
   const additionals = combineAdditionals(additionalsDescription, additionalsAmount);
+  const invoices = combineInvoices(selectedIds, selectedAmounts);
 
-  if (additionals.length === 0 && parsedData.data.invoices.length === 0) {
+  if (additionals.length === 0 && invoices.length === 0) {
     return {
       error: true,
       message: 'Error: seleccione al menos una cuota'
@@ -125,19 +144,48 @@ export const generateReceipt = async (_: unknown, paidItems: FormData) => {
 
   try {
     const receipt = await prisma.$transaction(async (tx) => {
-      const invoices = await Promise.all(
-        parsedData.data.invoices.map((id) =>
-          tx.invoice.update({
+      const paidInvoices = await Promise.all(
+        invoices.map(async ({ id, amount }) => {
+          const currentInvoice = await tx.invoice.findUnique({
             where: {
-              studentId: Number(studentId),
               id: Number(id)
-            },
-            data: {
-              state: InvoiceState.P,
-              paymentDate: new Date()
             }
-          })
-        )
+          });
+
+          if (!currentInvoice) throw new Error();
+
+          const fullPrice =
+            currentInvoice.amount === amount || currentInvoice.amount - currentInvoice.balance === amount;
+
+          if (fullPrice) {
+            return tx.invoice.update({
+              where: {
+                studentId: Number(studentId),
+                id: Number(id)
+              },
+              data: {
+                state: fullPrice ? InvoiceState.P : InvoiceState.I,
+                paymentDate: new Date(),
+                balance: fullPrice ? currentInvoice.amount : amount
+              }
+            });
+          } else {
+            const discAmount = getDiscountedAmount(currentInvoice);
+            const fullDiscPrice = discAmount === amount || discAmount - currentInvoice.balance === amount;
+
+            return tx.invoice.update({
+              where: {
+                studentId: Number(studentId),
+                id: Number(id)
+              },
+              data: {
+                state: fullDiscPrice ? InvoiceState.P : InvoiceState.I,
+                paymentDate: new Date(),
+                balance: fullDiscPrice ? discAmount : amount
+              }
+            });
+          }
+        })
       );
 
       const receipt = await tx.receipt.create({
@@ -165,19 +213,20 @@ export const generateReceipt = async (_: unknown, paidItems: FormData) => {
       }));
 
       await tx.item.createMany({
-        data: invoices.map(({ id, description, month, year, amount, discount }) => ({
-          receiptId: receipt.id,
-          invoiceId: id,
-          description: `${description} - ${getMonthName(month)} ${year} ${discount ? `(${formatPercentage(discount)})` : ''}`,
-          amount: getDiscountedAmount({ amount, discount })
-        }))
+        data: paidInvoices.map(({ id, description, month, year, discount }) => {
+          const currentInvoice = invoices.find((invoice) => Number(invoice.id) === id);
+          if (!currentInvoice) throw new Error();
+          return {
+            receiptId: receipt.id,
+            invoiceId: id,
+            description: `${description} - ${getMonthName(month)} ${year} ${discount ? `(${formatPercentage(discount)})` : ''}`,
+            amount: currentInvoice.amount
+          };
+        })
       });
-
       await Promise.all(mappedAdditionals.map((additional) => tx.additional.create({ data: additional })));
-
       return receipt;
     });
-
     return {
       error: false,
       message: 'Recibo creado con éxito',
