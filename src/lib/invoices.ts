@@ -106,3 +106,30 @@ export const scholarshipInvoice = async (_: any, formData: FormData) => {
     };
   }
 };
+
+export const updateAmount = async (_: any, formData: FormData) => {
+  const invoiceId = Number(formData.get('invoiceId'));
+  const amount = Number(formData.get('amount'));
+
+  try {
+    await prisma.invoice.update({
+      data: {
+        amount
+      },
+      where: {
+        id: invoiceId
+      }
+    });
+
+    return {
+      error: false,
+      message: 'Monto actualizado con éxito'
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      error: true,
+      message: 'Error al actualizar el monto'
+    };
+  }
+};

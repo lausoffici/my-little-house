@@ -119,18 +119,15 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
 
   const getInvoiceById = useCallback(
     (id: string) => {
-      const invoice = unpaidInvoices.find((invoice) => invoice.id === Number(id));
-
-      if (!invoice) throw new Error('Invoice not found');
-
-      return invoice;
+      return unpaidInvoices.find((invoice) => invoice.id === Number(id));
     },
     [unpaidInvoices]
   );
 
   function handleSelect(index: number, id: string) {
     const invoice = getInvoiceById(id);
-    const amount = getDiscountedAmount(invoice);
+    if (!invoice) return;
+    const amount = getDiscountedAmount(invoice.amount, invoice.discount);
 
     form.setValue(`invoices.${index}.amount`, amount - invoice.balance);
   }
@@ -141,10 +138,10 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
         <FormField
           control={form.control}
           name='paymentMethod'
-          render={({ field }) => (
+          render={({ field: { ref, ...fieldWithoutRef } }) => (
             <FormItem>
               <FormLabel>Modo de pago</FormLabel>
-              <Select onValueChange={field.onChange} {...field}>
+              <Select onValueChange={fieldWithoutRef.onChange} {...fieldWithoutRef}>
                 <SelectTrigger className='w-[min(100%,180px)]'>
                   <SelectValue />
                 </SelectTrigger>

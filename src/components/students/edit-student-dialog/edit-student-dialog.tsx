@@ -30,6 +30,7 @@ export default function EditStudentDialog({ student }: EditStudentDialogProps) {
     lastName: student.lastName,
     birthDate: student.birthDate || undefined,
     dni: student.dni || undefined,
+    email: student.email || undefined,
     address: student.address || undefined,
     city: student.city || undefined,
     phone: student.phone || undefined,

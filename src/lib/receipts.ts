@@ -1,6 +1,7 @@
 'use server';
 
 import { InvoiceState, Prisma } from '@prisma/client';
+import { revalidatePath } from 'next/cache';
 
 import { SearchParams } from '@/types';
 
@@ -184,7 +185,7 @@ export const generateReceipt = async (_: unknown, paidItems: FormData) => {
               }
             });
           } else {
-            const discAmount = getDiscountedAmount(currentInvoice);
+            const discAmount = getDiscountedAmount(currentInvoice.amount, currentInvoice.discount);
             const fullDiscPrice = discAmount === amount || discAmount - currentInvoice.balance === amount;
 
             return tx.invoice.update({
@@ -241,6 +242,9 @@ export const generateReceipt = async (_: unknown, paidItems: FormData) => {
       await Promise.all(mappedAdditionals.map((additional) => tx.additional.create({ data: additional })));
       return receipt;
     });
+
+    revalidatePath(`/students/${studentId}`);
+
     return {
       error: false,
       message: 'Recibo creado con éxito',

@@ -12,6 +12,6 @@ export const parseInvoiceStatesSearchParam = (statesParam: string | undefined) =
   );
 };
 
-export const getDiscountedAmount = ({ amount, discount }: { amount: number; discount: number }) => {
+export const getDiscountedAmount = (amount: number = 0, discount: number = 0) => {
   return amount * (1 - (discount ?? 0));
 };

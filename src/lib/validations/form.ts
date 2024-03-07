@@ -29,6 +29,10 @@ export const studentFormSchema = z.object({
     .max(50),
   birthDate: z.optional(z.string()),
   dni: z.optional(z.string()),
+  email: z
+    .union([z.string().trim().min(0).max(0), z.string().email({ message: 'El email no es válido' })])
+    .optional()
+    .transform((e) => e || undefined),
   description: z.optional(z.string()),
   address: z.optional(z.string()),
   city: z.optional(z.string()),
@@ -78,4 +82,9 @@ export const deleteCourseEnrollmentSchema = z.object({
   courseId: z.string(),
   studentId: z.string(),
   studentByCourseId: z.string()
+});
+
+export const editInvoiceFormSchema = z.object({
+  invoiceId: z.number(),
+  amount: z.string({ required_error: 'El importe es requerido' })
 });
