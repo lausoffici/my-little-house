@@ -78,24 +78,26 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
     name: 'additional'
   });
 
-  const formInvoices: { selectedId: string; amount: number }[] | undefined = form.getValues().invoices;
-  const formInvoicesAmount = formInvoices?.map((invoice) => Number(invoice.amount));
-
-  const formAdditionals: { description: string; amount: number }[] | undefined = form.getValues()?.additional;
+  const formInvoices: { selectedId: string; amount: number }[] = form.getValues().invoices ?? [];
+  const formAdditionals: { description: string; amount: number }[] = form.getValues().additional ?? [];
 
   const total = () => {
-    const additionalsAmounts = formAdditionals?.map((additional) => Number(additional.amount)) ?? [];
+    const formInvoicesAmount = formInvoices?.map((invoice) => Number(invoice.amount));
+    const additionalsAmounts = formAdditionals?.map((additional) => Number(additional.amount));
     const totalAmounts = formInvoicesAmount ? [...formInvoicesAmount, ...additionalsAmounts] : additionalsAmounts;
+
     return totalAmounts.reduce((acc, current) => acc + current, 0);
   };
 
   function getInvoicesOptions(invoiceId: string) {
     const selectedIds = formInvoices?.map(({ selectedId }) => Number(selectedId)) ?? [];
 
-    return invoicesOptions.filter(
-      (option) =>
-        Number(option.value) !== selectedIds.find((id) => id === Number(option.value) && id !== Number(invoiceId))
-    );
+    return invoicesOptions.filter((option) => {
+      const invoiceOptionId = Number(option.value);
+      const currentOptionId = Number(invoiceId);
+      // returns all invoices options except the ones that are selected by others inputs
+      return invoiceOptionId !== selectedIds.find((id) => id === invoiceOptionId && id !== currentOptionId);
+    });
   }
 
   useEffect(() => {
@@ -263,7 +265,7 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
         ))}
         <Button
           variant='secondary'
-          onClick={appendAdditional}
+          onClick={() => appendAdditional({ description: '', amount: 0 })}
           disabled={additionalFields.length === 5}
           className='flex items-center gap-2'
           type='button'

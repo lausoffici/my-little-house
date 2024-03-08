@@ -99,7 +99,6 @@ export const scholarshipInvoice = async (_: any, formData: FormData) => {
       message: 'Cuota becada con éxito'
     };
   } catch (error) {
-    console.log(error);
     return {
       error: true,
       message: 'Error al becar'
@@ -126,7 +125,6 @@ export const updateAmount = async (_: any, formData: FormData) => {
       message: 'Monto actualizado con éxito'
     };
   } catch (error) {
-    console.log(error);
     return {
       error: true,
       message: 'Error al actualizar el monto'

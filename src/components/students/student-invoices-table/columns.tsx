@@ -52,7 +52,8 @@ export const columns: ColumnDef<Invoice>[] = [
     header: ({ column }) => <DataTableColumnHeader column={column} title='Pagó' />,
     cell: ({ row }) => {
       const balance = row.original.balance;
-      return <span className={balance !== 0 ? 'text-success' : 'text-black'}>{formatCurrency(balance)}</span>;
+      const number = row.original.state === 'P' ? '-' : formatCurrency(balance);
+      return <span className={balance !== 0 ? 'text-success' : 'text-black'}>{number}</span>;
     }
   },
   {
@@ -60,11 +61,8 @@ export const columns: ColumnDef<Invoice>[] = [
     header: ({ column }) => <DataTableColumnHeader column={column} title='Debe' />,
     cell: ({ row }) => {
       const discountBalance = getDiscountedAmount(row.original.amount, row.original.discount) - row.original.balance;
-      return (
-        <span className={discountBalance === 0 ? 'text-black' : 'text-destructive'}>
-          {formatCurrency(discountBalance)}
-        </span>
-      );
+      const number = row.original.state === 'P' ? '-' : formatCurrency(discountBalance);
+      return <span className={discountBalance === 0 ? 'text-black' : 'text-destructive'}>{number}</span>;
     }
   },
   {

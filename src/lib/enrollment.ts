@@ -46,7 +46,6 @@ export const addEnrollment = async (_: unknown, newEnrollment: FormData) => {
       error: false
     };
   } catch (error: any) {
-    console.log(error);
     return {
       message: error.message,
       error: true
