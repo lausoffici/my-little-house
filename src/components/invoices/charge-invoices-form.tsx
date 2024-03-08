@@ -82,23 +82,23 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
     name: 'additionals'
   });
 
-  const getForms = useMemo(() => {
+  const formData = useMemo(() => {
     const formInvoices: { selectedId: string; amount: number }[] = form.getValues().invoices ?? [];
     const formAdditionals: { description: string; amount: number }[] = form.getValues().additionals ?? [];
     return { formInvoices, formAdditionals };
   }, [form]);
 
   const total = useMemo(() => {
-    const { formInvoices, formAdditionals } = getForms;
+    const { formInvoices, formAdditionals } = formData;
     const formInvoicesAmount = formInvoices?.map((invoice) => Number(invoice.amount));
     const additionalsAmounts = formAdditionals?.map((additional) => Number(additional.amount));
     const totalAmounts = formInvoicesAmount ? [...formInvoicesAmount, ...additionalsAmounts] : additionalsAmounts;
 
     return totalAmounts.reduce((acc, current) => acc + current, 0);
-  }, [getForms]);
+  }, [formData]);
 
   function getInvoicesOptions(invoiceId: string) {
-    const { formInvoices } = getForms;
+    const { formInvoices } = formData;
     const selectedIds = formInvoices?.map(({ selectedId }) => Number(selectedId)) ?? [];
 
     return invoicesOptions.filter((option) => {
