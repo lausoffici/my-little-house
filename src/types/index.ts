@@ -59,3 +59,7 @@ export type InvoiceDataType = {
   courseId: number;
   discount: number;
 };
+
+export type ErrorWithMessage = {
+  message: string;
+};

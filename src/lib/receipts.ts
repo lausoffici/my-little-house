@@ -6,7 +6,7 @@ import { revalidatePath } from 'next/cache';
 import { SearchParams } from '@/types';
 
 import prisma from './prisma';
-import { formatPercentage, getMonthName, getPaginationClause } from './utils';
+import { formatPercentage, getErrorMessage, getMonthName, getPaginationClause } from './utils';
 import { getYearMonthDayFromSearchParams } from './utils/cash-register.utils';
 import { getDiscountedAmount } from './utils/invoices.utils';
 import { receiptFormSchema } from './validations/form';
@@ -241,7 +241,7 @@ export const generateReceipt = async (_: unknown, paidItems: FormData) => {
       await tx.item.createMany({
         data: paidInvoices.map(({ id, description, month, year, discount }) => {
           const currentInvoice = invoices.find((invoice) => Number(invoice.id) === id);
-          if (!currentInvoice) throw new Error('Error al cobrar cuota');
+          if (!currentInvoice) throw new Error('Error al cobrar las cuotas');
           return {
             receiptId: receipt.id,
             invoiceId: id,
@@ -261,10 +261,10 @@ export const generateReceipt = async (_: unknown, paidItems: FormData) => {
       message: 'Recibo creado con éxito',
       receipt
     };
-  } catch (e: any) {
+  } catch (e) {
     return {
       error: true,
-      message: e.message,
+      message: getErrorMessage(e),
       receipt: null
     };
   }

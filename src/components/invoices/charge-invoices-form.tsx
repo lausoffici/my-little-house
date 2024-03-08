@@ -5,7 +5,7 @@ import { ReceiptPaymentMethod } from '@prisma/client';
 import { ExclamationTriangleIcon } from '@radix-ui/react-icons';
 import { CheckIcon, PlusCircleIcon, X } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import React from 'react';
 import { useFormState } from 'react-dom';
 import { useFieldArray, useForm } from 'react-hook-form';
@@ -60,7 +60,11 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
   const form = useForm<z.infer<typeof receiptFormSchema>>({
     resolver: zodResolver(receiptFormSchema),
     defaultValues: {
-      paymentMethod: ReceiptPaymentMethod.CASH
+      paymentMethod: ReceiptPaymentMethod.CASH,
+      invoices: [],
+      additionals: [],
+      studentId: '',
+      receiptTotal: ''
     }
   });
 
@@ -75,21 +79,26 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
     remove: removeAdditional
   } = useFieldArray<z.infer<typeof receiptFormSchema>>({
     control: form.control,
-    name: 'additional'
+    name: 'additionals'
   });
 
-  const formInvoices: { selectedId: string; amount: number }[] = form.getValues().invoices ?? [];
-  const formAdditionals: { description: string; amount: number }[] = form.getValues().additional ?? [];
+  const getForms = useMemo(() => {
+    const formInvoices: { selectedId: string; amount: number }[] = form.getValues().invoices ?? [];
+    const formAdditionals: { description: string; amount: number }[] = form.getValues().additionals ?? [];
+    return { formInvoices, formAdditionals };
+  }, [form]);
 
-  const total = () => {
+  const total = useMemo(() => {
+    const { formInvoices, formAdditionals } = getForms;
     const formInvoicesAmount = formInvoices?.map((invoice) => Number(invoice.amount));
     const additionalsAmounts = formAdditionals?.map((additional) => Number(additional.amount));
     const totalAmounts = formInvoicesAmount ? [...formInvoicesAmount, ...additionalsAmounts] : additionalsAmounts;
 
     return totalAmounts.reduce((acc, current) => acc + current, 0);
-  };
+  }, [getForms]);
 
   function getInvoicesOptions(invoiceId: string) {
+    const { formInvoices } = getForms;
     const selectedIds = formInvoices?.map(({ selectedId }) => Number(selectedId)) ?? [];
 
     return invoicesOptions.filter((option) => {
@@ -195,14 +204,7 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
                 name={`invoices.${index}.amount`}
                 render={({ field: { ref, ...fieldWithoutRef } }) => (
                   <FormItem>
-                    <Input
-                      type='number'
-                      placeholder='Importe'
-                      defaultValue={0}
-                      autoComplete='off'
-                      {...fieldWithoutRef}
-                      required
-                    />
+                    <Input type='number' placeholder='Importe' autoComplete='off' {...fieldWithoutRef} required />
                   </FormItem>
                 )}
               />
@@ -215,7 +217,7 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
         })}
         <Button
           variant='secondary'
-          onClick={() => append({ selectedId: undefined, amount: 0 })}
+          onClick={() => append({ selectedId: '', amount: 0 })}
           disabled={fields.length === 5}
           className='flex items-center gap-2 w-[172px]'
           type='button'
@@ -224,37 +226,23 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
           Agregar cuota
         </Button>
         <input type='hidden' name='studentId' value={studentId} />
-        <input type='hidden' name='receiptTotal' value={total()} />
+        <input type='hidden' name='receiptTotal' value={total.toString()} />
 
-        {additionalFields.map((aditional, index) => (
-          <div className='flex gap-2' key={aditional.id}>
+        {additionalFields.map((additional, index) => (
+          <div className='flex gap-2' key={additional.id}>
             <FormField
-              name={`additional.${index}.description`}
+              name={`additionals.${index}.description`}
               render={({ field: { ref, ...fieldWithoutRef } }) => (
                 <FormItem className='w-11/12'>
-                  <Input
-                    placeholder='Descripción'
-                    autoComplete='off'
-                    required
-                    defaultValue={''}
-                    {...fieldWithoutRef}
-                    value={fieldWithoutRef.value}
-                  />
+                  <Input placeholder='Descripción' autoComplete='off' required {...fieldWithoutRef} />
                 </FormItem>
               )}
             />
             <FormField
-              name={`additional.${index}.amount`}
+              name={`additionals.${index}.amount`}
               render={({ field: { ref, ...fieldWithoutRef } }) => (
                 <FormItem>
-                  <Input
-                    type='number'
-                    placeholder='Importe'
-                    autoComplete='off'
-                    defaultValue={0}
-                    required
-                    {...fieldWithoutRef}
-                  />
+                  <Input type='number' placeholder='Importe' autoComplete='off' required {...fieldWithoutRef} />
                 </FormItem>
               )}
             />
@@ -276,7 +264,7 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
       </form>
       <div className='flex justify-between font-semibold mb-3'>
         <span>Total: </span>
-        <span>{formatCurrency(total())}</span>
+        <span>{formatCurrency(total)}</span>
       </div>
     </Form>
   );
