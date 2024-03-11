@@ -5,7 +5,7 @@ import { ReceiptPaymentMethod } from '@prisma/client';
 import { ExclamationTriangleIcon } from '@radix-ui/react-icons';
 import { CheckIcon, PlusCircleIcon, X } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import React from 'react';
 import { useFormState } from 'react-dom';
 import { useFieldArray, useForm } from 'react-hook-form';
@@ -68,7 +68,11 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
     }
   });
 
-  const { fields, append, remove } = useFieldArray<z.infer<typeof receiptFormSchema>>({
+  const {
+    fields: invoiceFields,
+    append: appendInvoice,
+    remove: removeInvoice
+  } = useFieldArray<z.infer<typeof receiptFormSchema>>({
     control: form.control,
     name: 'invoices'
   });
@@ -82,24 +86,31 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
     name: 'additionals'
   });
 
-  const formData = useMemo(() => {
-    const formInvoices: { selectedId: string; amount: number }[] = form.getValues().invoices ?? [];
-    const formAdditionals: { description: string; amount: number }[] = form.getValues().additionals ?? [];
-    return { formInvoices, formAdditionals };
-  }, [form]);
+  const watchInvoices = form.watch('invoices');
+  const watchAdditionals = form.watch('additionals');
+
+  const invoices = invoiceFields.map((field, index) => {
+    return {
+      ...field,
+      ...(watchInvoices ? watchInvoices[index] : {})
+    };
+  });
+
+  const additionals = additionalFields.map((field, index) => {
+    return {
+      ...field,
+      ...(watchAdditionals ? watchAdditionals[index] : {})
+    };
+  });
 
   const total = useMemo(() => {
-    const { formInvoices, formAdditionals } = formData;
-    const formInvoicesAmount = formInvoices?.map((invoice) => Number(invoice.amount));
-    const additionalsAmounts = formAdditionals?.map((additional) => Number(additional.amount));
-    const totalAmounts = formInvoicesAmount ? [...formInvoicesAmount, ...additionalsAmounts] : additionalsAmounts;
-
-    return totalAmounts.reduce((acc, current) => acc + current, 0);
-  }, [formData]);
+    const totalInvoicesAmount = invoices.reduce((acc, invoice) => acc + Number(invoice.amount), 0) ?? 0;
+    const totalAdditionalsAmount = additionals.reduce((acc, additional) => acc + Number(additional.amount), 0) ?? 0;
+    return totalInvoicesAmount + totalAdditionalsAmount;
+  }, [additionals, invoices]);
 
   function getInvoicesOptions(invoiceId: string) {
-    const { formInvoices } = formData;
-    const selectedIds = formInvoices?.map(({ selectedId }) => Number(selectedId)) ?? [];
+    const selectedIds = invoices.map(({ selectedId }) => Number(selectedId));
 
     return invoicesOptions.filter((option) => {
       const invoiceOptionId = Number(option.value);
@@ -128,24 +139,21 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
     }
   }, [router, state, toast]);
 
-  const getInvoiceById = useCallback(
-    (id: string) => {
-      return unpaidInvoices.find((invoice) => invoice.id === Number(id));
-    },
-    [unpaidInvoices]
-  );
+  // Fill amount field with the selected invoice discounted amount when select an invoice
+  function handleSelect(index: number, selectedId: string) {
+    const invoice = unpaidInvoices.find(({ id }) => id === Number(selectedId));
 
-  function handleSelect(index: number, id: string) {
-    const invoice = getInvoiceById(id);
     if (!invoice) return;
-    const amount = getDiscountedAmount(invoice.amount, invoice.discount);
 
-    form.setValue(`invoices.${index}.amount`, amount - invoice.balance);
+    const { amount, balance, discount } = invoice;
+    const discountedAmount = getDiscountedAmount(amount, discount);
+
+    form.setValue(`invoices.${index}.amount`, discountedAmount - balance);
   }
 
   return (
     <Form {...form}>
-      <form className='space-y-3 py-3' action={action} id={CHARGE_INVOICE_FORM_ID}>
+      <form className='space-y-2 py-3' action={action} id={CHARGE_INVOICE_FORM_ID}>
         <FormField
           control={form.control}
           name='paymentMethod'
@@ -167,7 +175,7 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
             </FormItem>
           )}
         />
-        {fields.map((invoice, index) => {
+        {invoiceFields.map((invoice, index) => {
           return (
             <div className='flex gap-2 items-center' key={invoice.id}>
               <FormField
@@ -175,6 +183,7 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
                 name={`invoices.${index}.selectedId`}
                 render={({ field: { ref, ...fieldWithoutRef } }) => (
                   <FormItem className='w-11/12'>
+                    <FormLabel>Cuota</FormLabel>
                     <Select
                       onValueChange={(value) => {
                         fieldWithoutRef.onChange(value);
@@ -204,22 +213,25 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
                 name={`invoices.${index}.amount`}
                 render={({ field: { ref, ...fieldWithoutRef } }) => (
                   <FormItem>
-                    <Input type='number' placeholder='Importe' autoComplete='off' {...fieldWithoutRef} required />
+                    <FormLabel>Importe</FormLabel>
+
+                    <div className='flex items-center gap-1'>
+                      <Input type='number' placeholder='Importe' autoComplete='off' {...fieldWithoutRef} required />
+                      <Button variant='ghost' size='sm' onClick={() => removeInvoice(index)}>
+                        <X className='h-3 w-3 text-muted-foreground hover:text-foreground' />
+                      </Button>
+                    </div>
                   </FormItem>
                 )}
               />
-
-              <Button variant='ghost' size='sm' onClick={() => remove(index)}>
-                <X className='h-3 w-3 text-muted-foreground hover:text-foreground' />
-              </Button>
             </div>
           );
         })}
         <Button
           variant='secondary'
-          onClick={() => append({ selectedId: '', amount: 0 })}
-          disabled={fields.length === 5}
-          className='flex items-center gap-2 w-[172px]'
+          onClick={() => appendInvoice({ selectedId: '', amount: 0 })}
+          disabled={invoiceFields.length === 5}
+          className='flex items-center gap-2'
           type='button'
         >
           <PlusCircleIcon width={15} />
@@ -229,11 +241,12 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
         <input type='hidden' name='receiptTotal' value={total.toString()} />
 
         {additionalFields.map((additional, index) => (
-          <div className='flex gap-2' key={additional.id}>
+          <div className='flex gap-2 items-center' key={additional.id}>
             <FormField
               name={`additionals.${index}.description`}
               render={({ field: { ref, ...fieldWithoutRef } }) => (
                 <FormItem className='w-11/12'>
+                  <FormLabel>Adicional</FormLabel>
                   <Input placeholder='Descripción' autoComplete='off' required {...fieldWithoutRef} />
                 </FormItem>
               )}
@@ -242,13 +255,16 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
               name={`additionals.${index}.amount`}
               render={({ field: { ref, ...fieldWithoutRef } }) => (
                 <FormItem>
-                  <Input type='number' placeholder='Importe' autoComplete='off' required {...fieldWithoutRef} />
+                  <FormLabel>Importe</FormLabel>
+                  <div className='flex items-center gap-1'>
+                    <Input type='number' placeholder='Importe' autoComplete='off' required {...fieldWithoutRef} />
+                    <Button variant='ghost' size='sm' onClick={() => removeAdditional(index)}>
+                      <X className='h-3 w-3 text-muted-foreground hover:text-foreground' />
+                    </Button>
+                  </div>
                 </FormItem>
               )}
             />
-            <Button variant='ghost' size='sm' onClick={() => removeAdditional(index)}>
-              <X className='h-3 w-3 text-muted-foreground hover:text-foreground' />
-            </Button>
           </div>
         ))}
         <Button

@@ -96,9 +96,9 @@ const processFormData = (formData: FormData, maxInputsAllowed: number) => {
 
   for (let i = 0; i <= maxInputsAllowed; i++) {
     const selectedId = formData.get(`invoices.${i}.selectedId`);
-    const additionalDescription = formData.get(`additional.${i}.description`);
+    const additionalDescription = formData.get(`additionals.${i}.description`);
     const selectedAmount = formData.get(`invoices.${i}.amount`);
-    const additionalAmount = formData.get(`additional.${i}.amount`);
+    const additionalAmount = formData.get(`additionals.${i}.amount`);
 
     const thereAreInvoices = selectedId && selectedAmount;
     const thereAreAdditionals = additionalDescription && additionalAmount;
