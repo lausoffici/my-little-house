@@ -19,7 +19,7 @@ type StudentsTableProps = {
 };
 
 export default function StudentsTable({ studentsPromise, courseOptions }: StudentsTableProps) {
-  const { data, totalPages, totalItems } = React.use(studentsPromise);
+  const { data, totalPages } = React.use(studentsPromise);
 
   const table = useURLManagedDataTable<StudentWithCourses>({
     data,
@@ -35,7 +35,7 @@ export default function StudentsTable({ studentsPromise, courseOptions }: Studen
         <StudentsTableFilters table={table} courseOptions={courseOptions} />
       </div>
 
-      <DataTable table={table} columns={columns} withRowSelection={false} totalItems={totalItems} />
+      <DataTable table={table} columns={columns} withRowSelection={false} />
     </>
   );
 }

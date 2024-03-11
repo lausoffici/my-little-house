@@ -10,15 +10,9 @@ interface DataTableProps<TData, TValue> {
   table: TanStackTable<TData>;
   columns: ColumnDef<TData, TValue>[];
   withRowSelection?: boolean;
-  totalItems?: number;
 }
 
-export default function DataTable<TData, TValue>({
-  table,
-  columns,
-  withRowSelection,
-  totalItems
-}: DataTableProps<TData, TValue>) {
+export default function DataTable<TData, TValue>({ table, columns, withRowSelection }: DataTableProps<TData, TValue>) {
   return (
     <>
       <div className='rounded-md border'>
@@ -55,7 +49,7 @@ export default function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-      <DataTablePagination table={table} withRowSelection={withRowSelection} totalItems={totalItems} />
+      <DataTablePagination table={table} withRowSelection={withRowSelection} />
     </>
   );
 }

@@ -27,7 +27,7 @@ export default function ReceiptsTable({ receiptListPromise, receiptDetailPromise
 
   return (
     <>
-      <DataTable table={table} columns={columns} withRowSelection={false} />
+      <DataTable table={table} columns={columns} />
       {receipt && <ReceiptDialog receipt={receipt} />}
     </>
   );

@@ -30,7 +30,7 @@ export default function InvoicesTable({ invoicesPromise }: InvoicesTableTablePro
         <h3 className='text-sm font-medium'>Deuda total: </h3>
         {totalExpiredAmount && <Badge variant='outline'>{formatCurrency(totalExpiredAmount)}</Badge>}
       </div>
-      <DataTable table={table} columns={columns} withRowSelection={false} />
+      <DataTable table={table} columns={columns} />
     </>
   );
 }

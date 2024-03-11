@@ -77,7 +77,7 @@ export const getStudentList = async (searchParams: SearchParams) => {
     ...pagination
   });
 
-  return { data: students, totalPages, totalItems: totalStudentsCount };
+  return { data: students, totalPages };
 };
 
 export const createStudent = async (_: unknown, createdStudent: FormData) => {

@@ -9,16 +9,9 @@ interface DataTablePaginationProps<TData> {
   table: Table<TData>;
   withRowSelection?: boolean;
   withPagination?: boolean;
-  totalItems?: number;
 }
 
-export function DataTablePagination<TData>({
-  table,
-  withRowSelection = true,
-  totalItems
-}: DataTablePaginationProps<TData>) {
-  const totalResults = totalItems !== undefined ? totalItems : table.getFilteredRowModel().rows.length;
-
+export function DataTablePagination<TData>({ table, withRowSelection = true }: DataTablePaginationProps<TData>) {
   return (
     <div className='flex items-center justify-between px-2 my-3'>
       <div className={cn('flex-1 text-sm text-muted-foreground', !withRowSelection && 'invisible')}>
@@ -26,9 +19,6 @@ export function DataTablePagination<TData>({
         seleccionada(s)
       </div>
       <div className='flex items-center space-x-6 lg:space-x-8'>
-        <div className='flex items-center space-x-2 text-sm font-medium'>
-          {totalResults} {totalResults === 1 ? 'resultado' : 'resultados'}
-        </div>
         <div className='flex items-center space-x-2'>
           <p className='text-sm font-medium'>Filas por página</p>
           <Select
