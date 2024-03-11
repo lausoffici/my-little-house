@@ -44,7 +44,6 @@ export const createCourse = async (_: unknown, newCourse: FormData) => {
   });
 
   if (!parsedData.success) {
-    console.log(parsedData.error.flatten().fieldErrors);
     return {
       error: true,
       message: 'Error al crear curso'
@@ -313,7 +312,6 @@ export const deleteCourseEnrollment = async (_: unknown, deletedCourse: FormData
       message: `Curso eliminado exitosamente`
     };
   } catch (error) {
-    console.log(error);
     return {
       error: false,
       message: 'Error'

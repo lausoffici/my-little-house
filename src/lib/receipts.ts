@@ -6,7 +6,7 @@ import { revalidatePath } from 'next/cache';
 import { SearchParams } from '@/types';
 
 import prisma from './prisma';
-import { formatPercentage, getMonthName, getPaginationClause } from './utils';
+import { formatPercentage, getErrorMessage, getMonthName, getPaginationClause } from './utils';
 import { getYearMonthDayFromSearchParams } from './utils/cash-register.utils';
 import { getDiscountedAmount } from './utils/invoices.utils';
 import { receiptFormSchema } from './validations/form';
@@ -88,57 +88,132 @@ export const getReceiptWithItemsById = (searchParams: SearchParams) => {
   });
 };
 
+const processFormData = (formData: FormData, maxInputsAllowed: number) => {
+  const selectedIds: string[] = [];
+  const selectedAmounts: string[] = [];
+  const additionalDescriptions: string[] = [];
+  const additionalAmounts: string[] = [];
+
+  for (let i = 0; i <= maxInputsAllowed; i++) {
+    const selectedId = formData.get(`invoices.${i}.selectedId`);
+    const additionalDescription = formData.get(`additionals.${i}.description`);
+    const selectedAmount = formData.get(`invoices.${i}.amount`);
+    const additionalAmount = formData.get(`additionals.${i}.amount`);
+
+    const thereAreInvoices = selectedId && selectedAmount;
+    const thereAreAdditionals = additionalDescription && additionalAmount;
+
+    if (thereAreInvoices) {
+      if (Number(selectedAmount) === 0) throw new Error('Complete los campos de la cuota');
+
+      selectedIds.push(selectedId.toString());
+      selectedAmounts.push(selectedAmount.toString());
+    }
+
+    if (thereAreAdditionals) {
+      const additionalsAreEquals =
+        additionalDescriptions.includes(additionalDescription.toString()) &&
+        additionalAmounts.includes(additionalAmount.toString());
+
+      if (additionalsAreEquals) {
+        throw new Error('Error: dos adicionales son iguales');
+      }
+
+      additionalAmounts.push(additionalAmount.toString());
+      additionalDescriptions.push(additionalDescription.toString());
+    }
+  }
+
+  return { selectedIds, selectedAmounts, additionalDescriptions, additionalAmounts };
+};
+
 function combineAdditionals(descriptions: string[], amounts: string[]) {
   if (descriptions.length !== amounts.length) throw new Error('Arrays must have the same length');
 
   return descriptions.map((description, index) => ({ description, amount: amounts[index] }));
 }
+function combineInvoices(ids: string[], amounts: string[]) {
+  if (ids.length !== amounts.length) throw new Error('Arrays must have the same length');
+
+  return ids.map((id, index) => ({ id, amount: Number(amounts[index]) }));
+}
 
 export const generateReceipt = async (_: unknown, paidItems: FormData) => {
-  const validInvoice = paidItems.get('invoices')?.toString() !== '';
-
-  const parsedData = receiptFormSchema.safeParse({
-    invoices: validInvoice ? paidItems.get('invoices')?.toString().split(',') : [],
-    studentId: paidItems.get('studentId'),
-    receiptTotal: paidItems.get('receiptTotal'),
-    additionalsDescription: paidItems.getAll('additional-description'),
-    additionalsAmount: paidItems.getAll('additional-amount'),
-    paymentMethod: paidItems.get('paymentMethod')
-  });
-
-  if (!parsedData.success) {
-    return {
-      error: true,
-      message: 'Error al cobrar cuotas'
-    };
-  }
-
-  const { additionalsDescription, additionalsAmount, studentId, receiptTotal, paymentMethod } = parsedData.data;
-
-  const additionals = combineAdditionals(additionalsDescription, additionalsAmount);
-
-  if (additionals.length === 0 && parsedData.data.invoices.length === 0) {
-    return {
-      error: true,
-      message: 'Error: seleccione al menos una cuota'
-    };
-  }
+  const MAX_INPUTS_ALLOWED = 5;
 
   try {
+    const parsedData = receiptFormSchema.safeParse({
+      studentId: paidItems.get('studentId'),
+      receiptTotal: paidItems.get('receiptTotal'),
+      paymentMethod: paidItems.get('paymentMethod')
+    });
+
+    if (!parsedData.success) {
+      return {
+        error: true,
+        message: 'Error al cobrar cuotas'
+      };
+    }
+
+    const { studentId, receiptTotal, paymentMethod } = parsedData.data;
+    const { selectedIds, selectedAmounts, additionalDescriptions, additionalAmounts } = processFormData(
+      paidItems,
+      MAX_INPUTS_ALLOWED
+    );
+
+    const additionals = combineAdditionals(additionalDescriptions, additionalAmounts);
+    const invoices = combineInvoices(selectedIds, selectedAmounts);
+
+    if (additionals.length === 0 && invoices.length === 0) {
+      return {
+        error: true,
+        message: 'Error: seleccione al menos una cuota'
+      };
+    }
+
     const receipt = await prisma.$transaction(async (tx) => {
-      const invoices = await Promise.all(
-        parsedData.data.invoices.map((id) =>
-          tx.invoice.update({
+      const paidInvoices = await Promise.all(
+        invoices.map(async ({ id, amount }) => {
+          const currentInvoice = await tx.invoice.findUnique({
             where: {
-              studentId: Number(studentId),
               id: Number(id)
-            },
-            data: {
-              state: InvoiceState.P,
-              paymentDate: new Date()
             }
-          })
-        )
+          });
+
+          if (!currentInvoice) throw new Error();
+
+          const fullPrice =
+            currentInvoice.amount === amount || currentInvoice.amount - currentInvoice.balance === amount;
+
+          if (fullPrice) {
+            return tx.invoice.update({
+              where: {
+                studentId: Number(studentId),
+                id: Number(id)
+              },
+              data: {
+                state: fullPrice ? InvoiceState.P : InvoiceState.I,
+                paymentDate: new Date(),
+                balance: fullPrice ? currentInvoice.amount : amount
+              }
+            });
+          } else {
+            const discAmount = getDiscountedAmount(currentInvoice.amount, currentInvoice.discount);
+            const fullDiscPrice = discAmount === amount || discAmount - currentInvoice.balance === amount;
+
+            return tx.invoice.update({
+              where: {
+                studentId: Number(studentId),
+                id: Number(id)
+              },
+              data: {
+                state: fullDiscPrice ? InvoiceState.P : InvoiceState.I,
+                paymentDate: new Date(),
+                balance: fullDiscPrice ? discAmount : amount
+              }
+            });
+          }
+        })
       );
 
       const receipt = await tx.receipt.create({
@@ -166,16 +241,18 @@ export const generateReceipt = async (_: unknown, paidItems: FormData) => {
       }));
 
       await tx.item.createMany({
-        data: invoices.map(({ id, description, month, year, amount, discount }) => ({
-          receiptId: receipt.id,
-          invoiceId: id,
-          description: `${description} - ${getMonthName(month)} ${year} ${discount ? `(${formatPercentage(discount)})` : ''}`,
-          amount: getDiscountedAmount(amount, discount)
-        }))
+        data: paidInvoices.map(({ id, description, month, year, discount }) => {
+          const currentInvoice = invoices.find((invoice) => Number(invoice.id) === id);
+          if (!currentInvoice) throw new Error('Error al cobrar las cuotas');
+          return {
+            receiptId: receipt.id,
+            invoiceId: id,
+            description: `${description} - ${getMonthName(month)} ${year} ${discount ? `(${formatPercentage(discount)})` : ''}`,
+            amount: currentInvoice.amount
+          };
+        })
       });
-
       await Promise.all(mappedAdditionals.map((additional) => tx.additional.create({ data: additional })));
-
       return receipt;
     });
 
@@ -187,10 +264,9 @@ export const generateReceipt = async (_: unknown, paidItems: FormData) => {
       receipt
     };
   } catch (e) {
-    console.log(e);
     return {
       error: true,
-      message: 'Error al cobrar cuotas',
+      message: getErrorMessage(e),
       receipt: null
     };
   }

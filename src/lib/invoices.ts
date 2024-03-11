@@ -6,7 +6,7 @@ import { cache } from 'react';
 import { SearchParams } from '@/types';
 
 import prisma from './prisma';
-import { getPaginationClause } from './utils';
+import { getErrorMessage, getPaginationClause } from './utils';
 import { scholarshipFormSchema } from './validations/form';
 import { expiredInvoiceListSearchParamsSchema } from './validations/params';
 
@@ -102,7 +102,7 @@ export const scholarshipInvoice = async (_: any, formData: FormData) => {
     console.log(error);
     return {
       error: true,
-      message: 'Error al becar'
+      message: getErrorMessage(error)
     };
   }
 };
@@ -126,7 +126,6 @@ export const updateAmount = async (_: any, formData: FormData) => {
       message: 'Monto actualizado con éxito'
     };
   } catch (error) {
-    console.log(error);
     return {
       error: true,
       message: 'Error al actualizar el monto'

@@ -5,17 +5,15 @@ import { ReceiptPaymentMethod } from '@prisma/client';
 import { ExclamationTriangleIcon } from '@radix-ui/react-icons';
 import { CheckIcon, PlusCircleIcon, X } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import React from 'react';
 import { useFormState } from 'react-dom';
-import { useForm } from 'react-hook-form';
-import { v4 as uuid } from 'uuid';
+import { useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import { Button } from '@/components/ui/button';
-import { Form, FormField, FormItem, FormLabel } from '@/components/ui/form';
+import { Form, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { MultiSelect } from '@/components/ui/multi-select';
 import {
   Select,
   SelectContent,
@@ -49,17 +47,78 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
   const router = useRouter();
   const { toast } = useToast();
 
-  const [selectedInvoiceIds, setSelectedInvoiceIds] = useState<string[]>([]);
-  const [additionals, setAdditionals] = useState<{ id: string; value: number }[]>([]);
   const [state, action] = useFormState(generateReceipt, initialState);
   const { id: studentId } = useParams<{ id: string }>();
+
+  const unpaidInvoices = React.use(unpaidInvoicesPromise);
+
+  const invoicesOptions: Option[] = unpaidInvoices.map((invoice) => ({
+    value: String(invoice.id),
+    label: `${invoice.description} - ${getMonthName(invoice.month)} ${invoice.year}`
+  }));
 
   const form = useForm<z.infer<typeof receiptFormSchema>>({
     resolver: zodResolver(receiptFormSchema),
     defaultValues: {
-      paymentMethod: ReceiptPaymentMethod.CASH
+      paymentMethod: ReceiptPaymentMethod.CASH,
+      invoices: [],
+      additionals: [],
+      studentId: '',
+      receiptTotal: ''
     }
   });
+
+  const {
+    fields: invoiceFields,
+    append: appendInvoice,
+    remove: removeInvoice
+  } = useFieldArray<z.infer<typeof receiptFormSchema>>({
+    control: form.control,
+    name: 'invoices'
+  });
+
+  const {
+    fields: additionalFields,
+    append: appendAdditional,
+    remove: removeAdditional
+  } = useFieldArray<z.infer<typeof receiptFormSchema>>({
+    control: form.control,
+    name: 'additionals'
+  });
+
+  const watchInvoices = form.watch('invoices');
+  const watchAdditionals = form.watch('additionals');
+
+  const invoices = invoiceFields.map((field, index) => {
+    return {
+      ...field,
+      ...(watchInvoices ? watchInvoices[index] : {})
+    };
+  });
+
+  const additionals = additionalFields.map((field, index) => {
+    return {
+      ...field,
+      ...(watchAdditionals ? watchAdditionals[index] : {})
+    };
+  });
+
+  const total = useMemo(() => {
+    const totalInvoicesAmount = invoices.reduce((acc, invoice) => acc + Number(invoice.amount), 0) ?? 0;
+    const totalAdditionalsAmount = additionals.reduce((acc, additional) => acc + Number(additional.amount), 0) ?? 0;
+    return totalInvoicesAmount + totalAdditionalsAmount;
+  }, [additionals, invoices]);
+
+  function getInvoicesOptions(invoiceId: string) {
+    const selectedIds = invoices.map(({ selectedId }) => Number(selectedId));
+
+    return invoicesOptions.filter((option) => {
+      const invoiceOptionId = Number(option.value);
+      const currentOptionId = Number(invoiceId);
+      // returns all invoices options except the ones that are selected by others inputs
+      return invoiceOptionId !== selectedIds.find((id) => id === invoiceOptionId && id !== currentOptionId);
+    });
+  }
 
   useEffect(() => {
     if (state === undefined || state.message === '') return;
@@ -78,65 +137,23 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
       });
       router.push(`/receipts?receiptId=${state.receipt?.id}`);
     }
-  }, [form, router, state, toast]);
+  }, [router, state, toast]);
 
-  const unpaidInvoices = React.use(unpaidInvoicesPromise);
+  // Fill amount field with the selected invoice discounted amount when select an invoice
+  function handleSelect(index: number, selectedId: string) {
+    const invoice = unpaidInvoices.find(({ id }) => id === Number(selectedId));
 
-  const invoicesOptions: Option[] = unpaidInvoices.map(({ id, description, month, year, amount, discount }) => ({
-    value: String(id),
-    label: `${description} - ${getMonthName(month)} ${year} ${formatCurrency(getDiscountedAmount(amount, discount))}`
-  }));
+    if (!invoice) return;
 
-  function addAditional() {
-    setAdditionals((prev) => {
-      if (prev) {
-        return [...prev, { id: uuid(), value: 0, label: '' }];
-      } else {
-        return [{ id: uuid(), value: 0, label: '' }];
-      }
-    });
+    const { amount, balance, discount } = invoice;
+    const discountedAmount = getDiscountedAmount(amount, discount);
+
+    form.setValue(`invoices.${index}.amount`, discountedAmount - balance);
   }
-
-  const deleteAditional = (aditional: string) => {
-    setAdditionals(additionals.filter((el) => el.id !== aditional));
-  };
-
-  const getInvoiceById = useCallback(
-    (id: string) => {
-      return unpaidInvoices.find((invoice) => invoice.id === Number(id));
-    },
-    [unpaidInvoices]
-  );
-
-  function handleDescriptionChange(e: React.ChangeEvent<HTMLInputElement>, id: string) {
-    const { value } = e.target;
-    setAdditionals(additionals.map((aditional) => (aditional.id === id ? { ...aditional, label: value } : aditional)));
-  }
-
-  function handleInputChange(e: React.ChangeEvent<HTMLInputElement>, id: string) {
-    const { value } = e.target;
-    const numValue = Number(value);
-
-    setAdditionals(
-      additionals.map((aditional) => (aditional.id === id ? { ...aditional, value: numValue } : aditional))
-    );
-  }
-
-  const total = useMemo(() => {
-    const selectedInvoicesAmount = selectedInvoiceIds
-      .map(getInvoiceById)
-      .map((invoice) => getDiscountedAmount(invoice?.amount, invoice?.discount));
-    const additionalsAmounts = additionals.map((input) => input.value);
-    const totalAmounts = [...selectedInvoicesAmount, ...additionalsAmounts];
-
-    const total = totalAmounts.reduce((acc, current) => acc + current, 0);
-
-    return total;
-  }, [additionals, getInvoiceById, selectedInvoiceIds]);
 
   return (
     <Form {...form}>
-      <form className='space-y-3 py-3' action={action} id={CHARGE_INVOICE_FORM_ID}>
+      <form className='space-y-2 py-3' action={action} id={CHARGE_INVOICE_FORM_ID}>
         <FormField
           control={form.control}
           name='paymentMethod'
@@ -158,68 +175,102 @@ export default function ChargeInvoicesForm({ unpaidInvoicesPromise }: ChargeInvo
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name='invoices'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Cuotas Impagas</FormLabel>
-              <MultiSelect
-                className='w-[462px]'
-                options={invoicesOptions}
-                selected={selectedInvoiceIds}
-                notFoundMessage='Cuota no encontrada'
-                {...field}
-                onChange={setSelectedInvoiceIds}
-                name='invoices'
+        {invoiceFields.map((invoice, index) => {
+          return (
+            <div className='flex gap-2 items-center' key={invoice.id}>
+              <FormField
+                control={form.control}
+                name={`invoices.${index}.selectedId`}
+                render={({ field: { ref, ...fieldWithoutRef } }) => (
+                  <FormItem className='w-11/12'>
+                    <FormLabel>Cuota</FormLabel>
+                    <Select
+                      onValueChange={(value) => {
+                        fieldWithoutRef.onChange(value);
+                        handleSelect(index, value);
+                      }}
+                      {...fieldWithoutRef}
+                    >
+                      <SelectTrigger>
+                        <SelectValue defaultValue={''} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectLabel>Cursos</SelectLabel>
+                          {getInvoicesOptions(fieldWithoutRef.value).map(({ value, label }) => (
+                            <SelectItem key={value} value={value.toString()}>
+                              {label}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </FormItem>
-          )}
-        />
-        <input type='hidden' name='studentId' value={studentId} />
-        <input type='hidden' name='receiptTotal' value={total} />
-        {additionals.length > 0
-          ? additionals.map((aditional) => (
-              <div className='flex gap-2' key={aditional.id}>
-                <FormField
-                  name={`additional-description`}
-                  render={({ field }) => (
-                    <FormItem className='w-11/12'>
-                      <Input
-                        placeholder='Descripción'
-                        autoComplete='off'
-                        required
-                        {...field}
-                        onChange={(e) => handleDescriptionChange(e, aditional.id)}
-                      />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  name='additional-amount'
-                  render={({ field }) => (
-                    <FormItem>
-                      <Input
-                        type='number'
-                        placeholder='Importe'
-                        autoComplete='off'
-                        {...field}
-                        required
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange(e, aditional.id)}
-                      />
-                    </FormItem>
-                  )}
-                />
-                <Button variant='ghost' size='sm' onClick={() => deleteAditional(aditional.id)}>
-                  <X className='h-3 w-3 text-muted-foreground hover:text-foreground' />
-                </Button>{' '}
-              </div>
-            ))
-          : null}
+              <FormField
+                name={`invoices.${index}.amount`}
+                render={({ field: { ref, ...fieldWithoutRef } }) => (
+                  <FormItem>
+                    <FormLabel>Importe</FormLabel>
+
+                    <div className='flex items-center gap-1'>
+                      <Input type='number' placeholder='Importe' autoComplete='off' {...fieldWithoutRef} required />
+                      <Button variant='ghost' size='sm' onClick={() => removeInvoice(index)}>
+                        <X className='h-3 w-3 text-muted-foreground hover:text-foreground' />
+                      </Button>
+                    </div>
+                  </FormItem>
+                )}
+              />
+            </div>
+          );
+        })}
         <Button
           variant='secondary'
-          onClick={addAditional}
-          disabled={additionals.length === 10}
+          onClick={() => appendInvoice({ selectedId: '', amount: 0 })}
+          disabled={invoiceFields.length === 5}
+          className='flex items-center gap-2'
+          type='button'
+        >
+          <PlusCircleIcon width={15} />
+          Agregar cuota
+        </Button>
+        <input type='hidden' name='studentId' value={studentId} />
+        <input type='hidden' name='receiptTotal' value={total.toString()} />
+
+        {additionalFields.map((additional, index) => (
+          <div className='flex gap-2 items-center' key={additional.id}>
+            <FormField
+              name={`additionals.${index}.description`}
+              render={({ field: { ref, ...fieldWithoutRef } }) => (
+                <FormItem className='w-11/12'>
+                  <FormLabel>Adicional</FormLabel>
+                  <Input placeholder='Descripción' autoComplete='off' required {...fieldWithoutRef} />
+                </FormItem>
+              )}
+            />
+            <FormField
+              name={`additionals.${index}.amount`}
+              render={({ field: { ref, ...fieldWithoutRef } }) => (
+                <FormItem>
+                  <FormLabel>Importe</FormLabel>
+                  <div className='flex items-center gap-1'>
+                    <Input type='number' placeholder='Importe' autoComplete='off' required {...fieldWithoutRef} />
+                    <Button variant='ghost' size='sm' onClick={() => removeAdditional(index)}>
+                      <X className='h-3 w-3 text-muted-foreground hover:text-foreground' />
+                    </Button>
+                  </div>
+                </FormItem>
+              )}
+            />
+          </div>
+        ))}
+        <Button
+          variant='secondary'
+          onClick={() => appendAdditional({ description: '', amount: 0 })}
+          disabled={additionalFields.length === 5}
           className='flex items-center gap-2'
           type='button'
         >
