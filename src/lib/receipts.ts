@@ -104,6 +104,8 @@ const processFormData = (formData: FormData, maxInputsAllowed: number) => {
     const thereAreAdditionals = additionalDescription && additionalAmount;
 
     if (thereAreInvoices) {
+      if (Number(selectedAmount) === 0) throw new Error('Complete los campos de la cuota');
+
       selectedIds.push(selectedId.toString());
       selectedAmounts.push(selectedAmount.toString());
     }
