@@ -63,3 +63,17 @@ export type InvoiceDataType = {
 export type ErrorWithMessage = {
   message: string;
 };
+
+export type ExpiredInvoicesExcelData = {
+  name: string;
+  description: string;
+  amount: number;
+  month: string;
+  year: number;
+  course: string | undefined;
+  phone: string | null;
+  mobilePhone: string | null;
+  momPhone: string | null;
+  dadPhone: string | null;
+  observations: string | null;
+};
