@@ -107,17 +107,7 @@ export function getErrorMessage(error: unknown) {
 
 export function convertToCSV(data: ExpiredInvoicesExcelData[], dataHeader: string[]) {
   const header = dataHeader + '\n';
-  const body = data
-    .map((item) => {
-      const values = Object.values(item).map((value) => {
-        if (typeof value === 'object' && value) {
-          return Object.values(value).join(' ');
-        }
-        return value;
-      });
-      return values.join(',');
-    })
-    .join('\n');
+  const body = data.map((item) => Object.values(item).join(',')).join('\n');
   return header + body;
 }
 
