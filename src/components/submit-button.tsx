@@ -15,8 +15,13 @@ export function SubmitButton({ formId, title }: SubmitButtonProps) {
 
   return (
     <Button type='submit' form={formId} disabled={pending}>
-      {pending ? <Loader2 className='animate-spin' height={16} /> : null}
-      {pending ? 'Cargando...' : title}
+      {pending ? (
+        <>
+          <Loader2 className='animate-spin' height={16} /> Cargando...
+        </>
+      ) : (
+        title
+      )}
     </Button>
   );
 }

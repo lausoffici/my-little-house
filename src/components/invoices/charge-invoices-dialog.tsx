@@ -67,8 +67,6 @@ export default function ChargeInvoicesDialog({ unpaidInvoicesPromise }: ChargeIn
     label: `${invoice.description} - ${getMonthName(invoice.month)} ${invoice.year}`
   }));
 
-  // const form = useFormContext<z.infer<typeof receiptFormSchema>>();
-
   const form = useForm<z.infer<typeof receiptFormSchema>>({
     resolver: zodResolver(receiptFormSchema),
     defaultValues: {
