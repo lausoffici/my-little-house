@@ -74,7 +74,9 @@ export default async function StudentPage({ params: { id }, searchParams }: Page
               <StudentInvoicesFilters />
               <div className='flex gap-2'>
                 {courses.length > 0 && <DiscountsFormDialog studentByCourse={student.studentByCourse} />}
-                <ChargeInvoicesDialog unpaidInvoicesPromise={unpaidInvoicesPromise} />
+                <React.Suspense fallback='Cargando...'>
+                  <ChargeInvoicesDialog unpaidInvoicesPromise={unpaidInvoicesPromise} />
+                </React.Suspense>
               </div>
             </div>
             <React.Suspense fallback='Cargando...'>
