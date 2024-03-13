@@ -50,7 +50,7 @@ export default function InvoicesTable({ invoicesPromise }: InvoicesTableTablePro
           </Button>
         </div>
       </div>
-      <DataTable table={table} columns={columns} />
+      <DataTable table={table} columns={columns} withRowSelection={false} />
     </>
   );
 }
