@@ -1,5 +1,5 @@
 export const header = [
-  'Nombre y Apellido',
+  'Estudiante',
   'Descripcion',
   'Precio',
   'Mes',

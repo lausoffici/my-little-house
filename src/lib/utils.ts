@@ -106,7 +106,7 @@ export function getErrorMessage(error: unknown) {
 }
 
 export function convertToCSV(data: ExpiredInvoicesExcelData[], dataHeader: string[]) {
-  const header = dataHeader ? dataHeader + '\n' : Object.keys(data[0]).join(',') + '\n';
+  const header = dataHeader + '\n';
   const body = data
     .map((item) => {
       const values = Object.values(item).map((value) => {
