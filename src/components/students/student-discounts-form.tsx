@@ -32,7 +32,7 @@ const initialState = {
 
 export const DICOUNTS_FORM_ID = 'invoice-form';
 
-export const DISCOUNTS = [0, 0.1, 0.15, 0.2, 0.3, 0.4, 0.5, 1];
+export const DISCOUNTS = [0, 0.1, 0.15, 0.2, 0.3, 0.4, 0.5, 0.7, 1];
 
 interface ChargeInvoicesFormProps {
   studentByCourse: NonNullable<Awaited<ReturnType<typeof getStudentById>>>['studentByCourse'];
