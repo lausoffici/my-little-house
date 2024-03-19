@@ -6,7 +6,8 @@ import { cache } from 'react';
 import { SearchParams } from '@/types';
 
 import prisma from './prisma';
-import { getErrorMessage, getPaginationClause } from './utils';
+import { convertToCSV, getErrorMessage, getMonthName, getPaginationClause } from './utils';
+import { header } from './utils/varaibles';
 import { scholarshipFormSchema } from './validations/form';
 import { expiredInvoiceListSearchParamsSchema } from './validations/params';
 
@@ -130,5 +131,58 @@ export const updateAmount = async (_: any, formData: FormData) => {
       error: true,
       message: 'Error al actualizar el monto'
     };
+  }
+};
+
+export const getExpiredInvoicesCSVData = async () => {
+  try {
+    const data = await prisma.invoice.findMany({
+      where: {
+        state: InvoiceState.I,
+        expiredAt: { lt: new Date() }
+      },
+      include: {
+        student: {
+          select: {
+            firstName: true,
+            lastName: true,
+            phone: true,
+            mobilePhone: true,
+            momPhone: true,
+            dadPhone: true,
+            observations: true
+          }
+        },
+        course: {
+          select: {
+            name: true
+          }
+        }
+      },
+      orderBy: {
+        year: 'desc'
+      }
+    });
+
+    const necessaryData = data.map((item) => ({
+      name: `${item.student.firstName} ${item.student.lastName}`,
+      description: item.description,
+      amount: item.amount,
+      month: getMonthName(item.month),
+      year: item.year,
+      course: item.course?.name,
+      phone: item.student.phone,
+      mobilePhone: item.student.mobilePhone,
+      momPhone: item.student.momPhone,
+      dadPhone: item.student.dadPhone,
+      observations: item.student.observations
+    }));
+
+    // // Convert the data into CSV format
+    const dataCSV = convertToCSV(necessaryData, header);
+
+    return dataCSV;
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
   }
 };

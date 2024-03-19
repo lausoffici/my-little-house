@@ -2,7 +2,7 @@ import { parseAbsolute, toCalendarDate } from '@internationalized/date';
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
-import { ErrorWithMessage } from '@/types';
+import { ErrorWithMessage, ExpiredInvoicesExcelData } from '@/types';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -104,3 +104,22 @@ function toErrorWithMessage(maybeError: unknown): ErrorWithMessage {
 export function getErrorMessage(error: unknown) {
   return toErrorWithMessage(error).message;
 }
+
+export function convertToCSV(data: ExpiredInvoicesExcelData[], dataHeader: string[]) {
+  const header = dataHeader + '\n';
+  const body = data.map((item) => Object.values(item).join(',')).join('\n');
+  return header + body;
+}
+
+export const downloadFile = ({ data, fileName, fileType }: { data: string; fileName: string; fileType: string }) => {
+  // Create a blob with the data we want to download as a file
+  const blob = new Blob([data], { type: fileType });
+
+  // Create an anchor element and dispatch a click event on it
+  // to trigger a download
+  const a = document.createElement('a');
+  a.download = fileName;
+  a.href = window.URL.createObjectURL(blob);
+  a.click();
+  a.remove();
+};
