@@ -44,7 +44,8 @@ export const getExpiredInvoiceList = async (searchParams: SearchParams) => {
       student: {
         select: {
           firstName: true,
-          lastName: true
+          lastName: true,
+          active: true
         }
       },
       course: {
@@ -59,7 +60,9 @@ export const getExpiredInvoiceList = async (searchParams: SearchParams) => {
     ...pagination
   });
 
-  return { data: invoices, totalPages, totalExpiredAmount: totalExpiredAmount[0].total };
+  const activeStudentsInvoices = invoices.filter((invoice) => invoice.student.active);
+
+  return { data: activeStudentsInvoices, totalPages, totalExpiredAmount: totalExpiredAmount[0].total };
 };
 
 export const getUnpaidInvoicesByStudent = cache(async (id: number) => {
