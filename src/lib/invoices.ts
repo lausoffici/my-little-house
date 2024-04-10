@@ -18,7 +18,10 @@ export const getExpiredInvoiceList = async (searchParams: SearchParams) => {
 
   const whereClause = {
     state: InvoiceState.I,
-    expiredAt: { lt: new Date() }
+    expiredAt: { lt: new Date() },
+    student: {
+      active: true
+    }
   };
 
   // Get the total count of expired invoices
@@ -43,8 +46,7 @@ export const getExpiredInvoiceList = async (searchParams: SearchParams) => {
       student: {
         select: {
           firstName: true,
-          lastName: true,
-          active: true
+          lastName: true
         }
       },
       course: {
@@ -59,9 +61,7 @@ export const getExpiredInvoiceList = async (searchParams: SearchParams) => {
     ...pagination
   });
 
-  const activeStudentsInvoices = invoices.filter((invoice) => invoice.student.active);
-
-  return { data: activeStudentsInvoices, totalPages, totalExpiredAmount: totalExpiredAmount[0].total };
+  return { data: invoices, totalPages, totalExpiredAmount: totalExpiredAmount[0].total };
 };
 
 export const getUnpaidInvoicesByStudent = cache(async (id: number) => {
@@ -141,7 +141,10 @@ export const getExpiredInvoicesData = async () => {
     const data = await prisma.invoice.findMany({
       where: {
         state: InvoiceState.I,
-        expiredAt: { lt: new Date() }
+        expiredAt: { lt: new Date() },
+        student: {
+          active: true
+        }
       },
       include: {
         student: {
@@ -152,8 +155,7 @@ export const getExpiredInvoicesData = async () => {
             mobilePhone: true,
             momPhone: true,
             dadPhone: true,
-            observations: true,
-            active: true
+            observations: true
           }
         },
         course: {
@@ -167,9 +169,7 @@ export const getExpiredInvoicesData = async () => {
       }
     });
 
-    const activeStudentsData = data.filter((studentData) => studentData.student.active);
-
-    const sheetData: ExpiredInvoicesExcelData[] = activeStudentsData.map((item) => ({
+    const sheetData: ExpiredInvoicesExcelData[] = data.map((item) => ({
       nombre: `${item.student.firstName} ${item.student.lastName}`,
       descripcion: item.description,
       precio: item.amount,
