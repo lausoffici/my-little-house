@@ -7,8 +7,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import DataTable from '@/components/ui/data-table';
 import { useURLManagedDataTable } from '@/hooks/use-url-managed-data-table';
-import { getExpiredInvoiceList, getExpiredInvoicesCSVData } from '@/lib/invoices';
-import { downloadFile, formatCurrency } from '@/lib/utils';
+import { getExpiredInvoiceList, getExpiredInvoicesData } from '@/lib/invoices';
+import { convertAndExportToXlsx, formatCurrency } from '@/lib/utils';
 import { InvoiceListItem } from '@/types';
 
 import { columns } from './columns';
@@ -21,13 +21,8 @@ export default function InvoicesTable({ invoicesPromise }: InvoicesTableTablePro
   const { data, totalPages, totalExpiredAmount } = React.use(invoicesPromise);
 
   async function handleDownload() {
-    const data = await getExpiredInvoicesCSVData();
-
-    downloadFile({
-      data: data,
-      fileName: 'vencimientos.csv',
-      fileType: 'csv'
-    });
+    const data = await getExpiredInvoicesData();
+    convertAndExportToXlsx(data);
   }
 
   const table = useURLManagedDataTable<InvoiceListItem>({

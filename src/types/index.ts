@@ -65,15 +65,15 @@ export type ErrorWithMessage = {
 };
 
 export type ExpiredInvoicesExcelData = {
-  name: string;
-  description: string;
-  amount: number;
-  month: string;
-  year: number;
-  course: string | undefined;
-  phone: string | null;
-  mobilePhone: string | null;
-  momPhone: string | null;
-  dadPhone: string | null;
-  observations: string | null;
+  nombre: string;
+  descripcion: string;
+  precio: number;
+  mes: string;
+  'ciclo lectivo': number;
+  curso: string | undefined;
+  telefono: string | null;
+  celular: string | null;
+  'celular madre': string | null;
+  'celular padre': string | null;
+  observaciones: string | null;
 };
