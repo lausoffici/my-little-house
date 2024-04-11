@@ -35,7 +35,7 @@ export const columns: ColumnDef<InvoiceListItem>[] = [
     cell: ({ row }) => <span>{formatPercentage(row.original.discount ?? 0)}</span>
   },
   {
-    accessorKey: 'amount',
+    accessorKey: 'total',
     header: ({ column }) => <DataTableColumnHeader column={column} title='Total' />,
     cell: ({ row }) => <span>{formatCurrency(getDiscountedAmount(row.original.amount, row.original.discount))}</span>
   },

@@ -107,9 +107,9 @@ export function getErrorMessage(error: unknown) {
 }
 
 export const convertAndExportToXlsx = (data: ExpiredInvoicesExcelData[]) => {
-  const date = data.find((el) => (el.mes, el['ciclo lectivo']));
+  const date = data.find(({ mes }) => ({ month: mes, year: ['ciclo lectivo'] }));
   const ws = XLSX.utils.json_to_sheet(data);
   const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, `Vencimientos ${date?.mes} ${date?.['ciclo lectivo']}`);
+  XLSX.utils.book_append_sheet(wb, ws, date ? `Vencimientos ${date?.mes} ${date?.['ciclo lectivo']}` : 'Vencimientos');
   XLSX.writeFile(wb, 'vencimientos.xlsx');
 };
