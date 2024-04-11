@@ -3,11 +3,10 @@
 import { InvoiceState } from '@prisma/client';
 import { cache } from 'react';
 
-import { SearchParams } from '@/types';
+import { ExpiredInvoicesExcelData, SearchParams } from '@/types';
 
 import prisma from './prisma';
-import { convertToCSV, getErrorMessage, getMonthName, getPaginationClause } from './utils';
-import { header } from './utils/varaibles';
+import { getErrorMessage, getMonthName, getPaginationClause } from './utils';
 import { scholarshipFormSchema } from './validations/form';
 import { expiredInvoiceListSearchParamsSchema } from './validations/params';
 
@@ -19,7 +18,10 @@ export const getExpiredInvoiceList = async (searchParams: SearchParams) => {
 
   const whereClause = {
     state: InvoiceState.I,
-    expiredAt: { lt: new Date() }
+    expiredAt: { lt: new Date() },
+    student: {
+      active: true
+    }
   };
 
   // Get the total count of expired invoices
@@ -134,12 +136,15 @@ export const updateAmount = async (_: any, formData: FormData) => {
   }
 };
 
-export const getExpiredInvoicesCSVData = async () => {
+export const getExpiredInvoicesData = async () => {
   try {
     const data = await prisma.invoice.findMany({
       where: {
         state: InvoiceState.I,
-        expiredAt: { lt: new Date() }
+        expiredAt: { lt: new Date() },
+        student: {
+          active: true
+        }
       },
       include: {
         student: {
@@ -164,24 +169,21 @@ export const getExpiredInvoicesCSVData = async () => {
       }
     });
 
-    const necessaryData = data.map((item) => ({
-      name: `${item.student.firstName} ${item.student.lastName}`,
-      description: item.description,
-      amount: item.amount,
-      month: getMonthName(item.month),
-      year: item.year,
-      course: item.course?.name,
-      phone: item.student.phone,
-      mobilePhone: item.student.mobilePhone,
-      momPhone: item.student.momPhone,
-      dadPhone: item.student.dadPhone,
-      observations: item.student.observations
+    const sheetData: ExpiredInvoicesExcelData[] = data.map((item) => ({
+      nombre: `${item.student.firstName} ${item.student.lastName}`,
+      descripcion: item.description,
+      precio: item.amount,
+      mes: getMonthName(item.month),
+      'ciclo lectivo': item.year,
+      curso: item.course?.name,
+      telefono: item.student.phone,
+      celular: item.student.mobilePhone,
+      'celular madre': item.student.momPhone,
+      'celular padre': item.student.dadPhone,
+      observaciones: item.student.observations
     }));
 
-    // // Convert the data into CSV format
-    const dataCSV = convertToCSV(necessaryData, header);
-
-    return dataCSV;
+    return sheetData;
   } catch (error) {
     throw new Error(getErrorMessage(error));
   }

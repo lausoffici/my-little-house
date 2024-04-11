@@ -212,13 +212,15 @@ export const getStudentNamesByTerm = async (term: string) => {
           firstName: {
             contains: term,
             mode: 'insensitive' as const
-          }
+          },
+          active: true
         },
         {
           lastName: {
             contains: term,
             mode: 'insensitive' as const
-          }
+          },
+          active: true
         }
       ]
     },
