@@ -28,7 +28,7 @@ export default function EnrollmentDialog({ createdEnrollmentsPromise }: Enrollme
   return (
     <Dialog open={openDialog} onOpenChange={setOpenDialog}>
       <DialogTrigger asChild>
-        <Button variant='secondary'>Crear Matrícula</Button>
+        <Button variant='secondary' >Crear Matrícula</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
