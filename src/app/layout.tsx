@@ -1,10 +1,12 @@
 import type { Metadata } from 'next';
+import { getServerSession } from 'next-auth';
 import { Inter } from 'next/font/google';
 
 import Sidebar from '@/components/common/sidebar/sidebar';
 import TopNavigationBar from '@/components/common/top-navigation-bar/top-navigation-bar';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
+import { authOptions } from '@/lib/auth';
 
 import Favicon from '../../public/assets/metadata/favicon.ico';
 import './globals.css';
@@ -22,7 +24,7 @@ type RootLayoutProps = {
 };
 
 export default async function RootLayout({ children }: RootLayoutProps) {
-  // const session = await getServerSession(authOptions);
+  const session = await getServerSession(authOptions);
 
   return (
     <html lang='en'>
@@ -31,7 +33,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
           <div className='flex h-screen w-full'>
             <Sidebar />
             <div className='flex-1 flex flex-col overflow-hidden'>
-              <TopNavigationBar user={{name: "guess"}} />
+              <TopNavigationBar user={session?.user} />
               <main className='p-6 overflow-auto'>{children}</main>
             </div>
           </div>
