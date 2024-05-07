@@ -46,7 +46,7 @@ const initialState = {
   error: false,
   receipt: null
 };
-export const CHARGE_INVOICE_FORM_ID = 'invoice-form';
+const CHARGE_INVOICE_FORM_ID = 'invoice-form';
 
 interface ChargeInvoicesDialogProps {
   unpaidInvoicesPromise: ReturnType<typeof getUnpaidInvoicesByStudent>;
@@ -172,7 +172,7 @@ export default function ChargeInvoicesDialog({ unpaidInvoicesPromise }: ChargeIn
           <DialogDescription>Seleccione el monto a cobrar</DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form className='space-y-2 py-3' action={action} id={CHARGE_INVOICE_FORM_ID}>
+          <form action={action} className='space-y-2 py-3' id={CHARGE_INVOICE_FORM_ID}>
             <FormField
               control={form.control}
               name='paymentMethod'
