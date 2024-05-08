@@ -66,7 +66,7 @@ export const columns: ColumnDef<StudentWithCourses>[] = [
     header: ({ column }) => <DataTableColumnHeader column={column} title='Precio' />,
     cell: ({ row }) => {
       const student = row.original;
-      const courses: Course[] = student.studentByCourse.map(({ course }) => course);
+      const courses = student.studentByCourse.map(({ course }) => course);
 
       return (
         <div className='flex space-x-2'>
