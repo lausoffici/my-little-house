@@ -28,6 +28,7 @@ interface CourseFormProps {
     error?: boolean;
     message: string;
   }>;
+  id?: number;
 }
 
 const initialState = {
@@ -37,7 +38,7 @@ const initialState = {
 
 export const FORM_ID = 'course-form';
 
-export default function CourseForm({ defaultValues, onOpenDialogChange, action: serverAction }: CourseFormProps) {
+export default function CourseForm({ defaultValues, onOpenDialogChange, action: serverAction, id }: CourseFormProps) {
   const { toast } = useToast();
   const router = useRouter();
   const [state, action] = useFormState(serverAction, initialState);
@@ -116,6 +117,7 @@ export default function CourseForm({ defaultValues, onOpenDialogChange, action: 
             </FormItem>
           )}
         />
+        <input type='hidden' className='hidden' name='id' value={id} />
       </form>
     </Form>
   );
