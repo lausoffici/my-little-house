@@ -42,7 +42,7 @@ export default async function StudentPage({ params: { id }, searchParams }: Page
             <div>
               {courses.length > 0 ? (
                 courses.map(({ id, name }) => (
-                  <Badge variant='secondary' key={id} className='py-1 px-2 text-sm mr-2'>
+                  <Badge variant='secondary' key={id} className='py-1 px-2 text-sm mr-2 '>
                     {name}
                   </Badge>
                 ))

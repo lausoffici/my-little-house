@@ -14,7 +14,7 @@ interface EditCourseDialogProps {
 }
 
 export default function EditCourseDialog({ course, onOpenChange }: EditCourseDialogProps) {
-  const { name, amount, observations } = course;
+  const { name, amount, observations, id } = course;
 
   const currentValue = {
     name,
@@ -28,7 +28,7 @@ export default function EditCourseDialog({ course, onOpenChange }: EditCourseDia
         <DialogTitle>Editar Curso</DialogTitle>
         <DialogDescription>Modifique el formulario para editar el curso</DialogDescription>
       </DialogHeader>
-      <CourseForm action={editCourse} defaultValues={currentValue} onOpenDialogChange={onOpenChange} />
+      <CourseForm action={editCourse} defaultValues={currentValue} onOpenDialogChange={onOpenChange} id={id} />
       <DialogFooter>
         <Button variant='outline' onClick={() => onOpenChange(false)}>
           Cancelar

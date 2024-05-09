@@ -11,7 +11,8 @@ export const courseFormSchema = z.object({
   amount: z.coerce
     .number({ required_error: 'El precio del curso es requerido' })
     .positive({ message: 'El precio debe ser mayor a 0' }),
-  observations: z.string().nullable()
+  observations: z.string().nullable(),
+  id: z.optional(z.number())
 });
 
 export const studentFormSchema = z.object({

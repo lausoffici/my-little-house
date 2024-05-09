@@ -67,11 +67,12 @@ export const createCourse = async (_: unknown, newCourse: FormData) => {
   }
 };
 
-export const editCourse = async (id: number, editedCourse: FormData) => {
+export const editCourse = async (_: unknown, editedCourse: FormData) => {
   const parsedData = courseFormSchema.safeParse({
     name: editedCourse.get('name'),
     amount: editedCourse.get('amount'),
-    observations: editedCourse.get('observations')
+    observations: editedCourse.get('observations'),
+    id: Number(editedCourse.get('id'))
   });
 
   if (!parsedData.success) {
@@ -90,7 +91,7 @@ export const editCourse = async (id: number, editedCourse: FormData) => {
       // Update all invoices for the course that are in the future and have not been paid
       await tx.invoice.updateMany({
         where: {
-          courseId: id,
+          courseId: parsedData.data.id,
           state: InvoiceState.I,
           month: {
             gte: nextMonth
@@ -107,7 +108,7 @@ export const editCourse = async (id: number, editedCourse: FormData) => {
 
       const updatedCourse = await tx.course.update({
         where: {
-          id
+          id: parsedData.data.id
         },
         data: parsedData.data
       });
@@ -120,6 +121,7 @@ export const editCourse = async (id: number, editedCourse: FormData) => {
       message: `${course.name} editado con éxito`
     };
   } catch (error) {
+    console.log(error);
     return {
       error: true,
       message: 'Error al editar curso'

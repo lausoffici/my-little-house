@@ -16,6 +16,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
+import { formatCurrency } from '@/lib/utils';
 import { StudentWithCourses } from '@/types';
 
 export const columns: ColumnDef<StudentWithCourses>[] = [
@@ -53,6 +54,25 @@ export const columns: ColumnDef<StudentWithCourses>[] = [
           {courses.map(({ id, name }) => (
             <Badge key={id} variant='secondary'>
               {name}
+            </Badge>
+          ))}
+        </div>
+      );
+    },
+    enableSorting: false
+  },
+  {
+    accessorKey: 'amount',
+    header: ({ column }) => <DataTableColumnHeader column={column} title='Precio' />,
+    cell: ({ row }) => {
+      const student = row.original;
+      const courses = student.studentByCourse.map(({ course }) => course);
+
+      return (
+        <div className='flex space-x-2'>
+          {courses.map(({ id, amount }) => (
+            <Badge key={id} variant='outline'>
+              {formatCurrency(amount)}
             </Badge>
           ))}
         </div>
