@@ -76,7 +76,6 @@ export const editCourse = async (_: unknown, editedCourse: FormData) => {
   });
 
   if (!parsedData.success) {
-    console.log(parsedData.error.flatten());
     return {
       error: true,
       message: 'Error al editar el curso'
