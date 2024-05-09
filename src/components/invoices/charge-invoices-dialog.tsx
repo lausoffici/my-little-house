@@ -46,7 +46,7 @@ const initialState = {
   error: false,
   receipt: null
 };
-export const CHARGE_INVOICE_FORM_ID = 'invoice-form';
+const CHARGE_INVOICE_FORM_ID = 'invoice-form';
 
 interface ChargeInvoicesDialogProps {
   unpaidInvoicesPromise: ReturnType<typeof getUnpaidInvoicesByStudent>;
