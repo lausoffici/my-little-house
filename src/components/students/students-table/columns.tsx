@@ -62,25 +62,6 @@ export const columns: ColumnDef<StudentWithCourses>[] = [
     enableSorting: false
   },
   {
-    accessorKey: 'amount',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Precio' />,
-    cell: ({ row }) => {
-      const student = row.original;
-      const courses = student.studentByCourse.map(({ course }) => course);
-
-      return (
-        <div className='flex space-x-2'>
-          {courses.map(({ id, amount }) => (
-            <Badge key={id} variant='outline'>
-              {formatCurrency(amount)}
-            </Badge>
-          ))}
-        </div>
-      );
-    },
-    enableSorting: false
-  },
-  {
     id: 'actions',
     cell: ({ row }) => {
       const student = row.original;
