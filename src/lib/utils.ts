@@ -41,10 +41,6 @@ export function capitalizeFirstLetter(string: string) {
 
 export function getMonthName(monthNumber: number) {
   switch (monthNumber) {
-    case 1:
-      return 'Enero';
-    case 2:
-      return 'Febrero';
     case 3:
       return 'Marzo';
     case 4:
