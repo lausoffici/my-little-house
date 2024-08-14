@@ -18,7 +18,7 @@ export const getExpiredInvoiceList = async (searchParams: SearchParams) => {
 
   const whereClause = {
     state: InvoiceState.I,
-    expiredAt: { lt: new Date() },
+    expiredAt: { lt: new Date().toISOString() },
     student: {
       active: true
     }
@@ -34,8 +34,8 @@ export const getExpiredInvoiceList = async (searchParams: SearchParams) => {
 
   const totalExpiredAmount = await prisma.$queryRaw<{ total: number }[]>`
     SELECT SUM(amount * (1 - discount)) AS total
-    FROM "Invoice" 
-    WHERE state = 'I' AND "expiredAt" < NOW()
+    FROM "Invoice" i INNER JOIN "Student" s ON i."studentId" = s.id AND s.active = true
+    WHERE state = 'I' AND "expiredAt" < current_timestamp
   `;
 
   const pagination = getPaginationClause(pageNumber, pageSize);
