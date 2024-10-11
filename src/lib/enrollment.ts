@@ -3,10 +3,10 @@
 import prisma from './prisma';
 import { enrollmentFormSchema } from './validations/form';
 
-export const getEnrollments = async () => {
+export const getEnrollments = async (sortOrder: 'asc' | 'desc' = 'asc') => {
   return prisma.enrollment.findMany({
     orderBy: {
-      year: 'asc'
+      year: sortOrder
     }
   });
 };

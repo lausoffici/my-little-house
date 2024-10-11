@@ -1,6 +1,7 @@
 import React from 'react';
 
 import DeleteCourseEnrollmentDialog from '@/components/courses/delete-course-enrollment/delete-course-enrollment-dialog';
+import { AddEnrollmentDialog } from '@/components/invoices/add-enrollment-dialog';
 import ChargeInvoicesDialog from '@/components/invoices/charge-invoices-dialog';
 import DeleteStudentDialog from '@/components/students/delete-student-dialog';
 import EditStudentDialog from '@/components/students/edit-student-dialog';
@@ -14,6 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { getCourseOptions } from '@/lib/courses';
+import { getEnrollments } from '@/lib/enrollment';
 import { getUnpaidInvoicesByStudent } from '@/lib/invoices';
 import { getStudentById, getStudentInvoices } from '@/lib/students';
 import { formatDate } from '@/lib/utils';
@@ -24,6 +26,7 @@ export default async function StudentPage({ params: { id }, searchParams }: Page
   const courseOptionsPromise = getCourseOptions();
   const invoicesPromise = getStudentInvoices(Number(id), searchParams);
   const unpaidInvoicesPromise = getUnpaidInvoicesByStudent(Number(id));
+  const enrollmentsPromise = getEnrollments('desc');
 
   if (!student) {
     return <div>Student not found</div>;
@@ -73,6 +76,9 @@ export default async function StudentPage({ params: { id }, searchParams }: Page
             <div className='flex justify-between w-full mb-4'>
               <StudentInvoicesFilters />
               <div className='flex gap-2'>
+                <React.Suspense fallback='Cargando...'>
+                  <AddEnrollmentDialog enrollmentsPromise={enrollmentsPromise} studentId={student.id.toString()} />
+                </React.Suspense>
                 {courses.length > 0 && <DiscountsFormDialog studentByCourse={student.studentByCourse} />}
                 <React.Suspense fallback='Cargando...'>
                   <ChargeInvoicesDialog unpaidInvoicesPromise={unpaidInvoicesPromise} />
