@@ -192,7 +192,7 @@ const generateEnrollment = async (tx: Prisma.TransactionClient, studentId: numbe
     data: {
       month: 1,
       year: currentYear,
-      description: 'Matrícula',
+      description: `Matrícula ${currentYear}`,
       amount: enrollment?.amount || 0,
       balance: 0,
       state: 'I',

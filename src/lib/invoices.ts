@@ -207,6 +207,13 @@ export async function addEnrollmentInvoice(_: unknown, formData: FormData) {
       };
     }
 
+    await prisma.studentEnrollment.create({
+      data: {
+        year: enrollment.year,
+        studentId: studentId
+      }
+    });
+
     await prisma.invoice.create({
       data: {
         month: 1,
