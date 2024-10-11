@@ -29,7 +29,6 @@ interface AddEnrollmentDialogProps {
 export function AddEnrollmentInvoiceToStudentDialog({ enrollmentsPromise, studentId }: AddEnrollmentDialogProps) {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedEnrollmentId, setSelectedEnrollmentId] = useState<string | null>(null);
 
   const enrollments = use(enrollmentsPromise);
 
@@ -49,7 +48,7 @@ export function AddEnrollmentInvoiceToStudentDialog({ enrollmentsPromise, studen
     const { pending } = useFormStatus();
 
     return (
-      <Button type='submit' disabled={!selectedEnrollmentId || pending}>
+      <Button type='submit' disabled={pending}>
         {pending ? 'Agregando...' : 'Confirmar'}
       </Button>
     );
@@ -71,7 +70,7 @@ export function AddEnrollmentInvoiceToStudentDialog({ enrollmentsPromise, studen
         </DialogHeader>
         <form action={action}>
           <input type='hidden' name='studentId' value={studentId} />
-          <Select onValueChange={setSelectedEnrollmentId} name='enrollmentId'>
+          <Select name='enrollmentId' required>
             <SelectTrigger className='mb-4'>
               <SelectValue placeholder='Selecciona una matrícula' />
             </SelectTrigger>
