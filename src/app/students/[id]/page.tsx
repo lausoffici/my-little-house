@@ -1,7 +1,7 @@
 import React from 'react';
 
 import DeleteCourseEnrollmentDialog from '@/components/courses/delete-course-enrollment/delete-course-enrollment-dialog';
-import AddEnrollmentInvoiceToStudentDialog from '@/components/invoices/add-enrollment-invoice-to-student-dialog';
+import { AddEnrollmentInvoiceToStudentDialog } from '@/components/invoices/add-enrollment-invoice-to-student-dialog';
 import ChargeInvoicesDialog from '@/components/invoices/charge-invoices-dialog';
 import DeleteStudentDialog from '@/components/students/delete-student-dialog';
 import EditStudentDialog from '@/components/students/edit-student-dialog';
