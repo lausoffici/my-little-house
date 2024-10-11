@@ -1,7 +1,7 @@
 import React from 'react';
 
 import DeleteCourseEnrollmentDialog from '@/components/courses/delete-course-enrollment/delete-course-enrollment-dialog';
-import { AddEnrollmentDialog } from '@/components/invoices/add-enrollment-dialog';
+import AddEnrollmentInvoiceToStudentDialog from '@/components/invoices/add-enrollment-invoice-to-student-dialog';
 import ChargeInvoicesDialog from '@/components/invoices/charge-invoices-dialog';
 import DeleteStudentDialog from '@/components/students/delete-student-dialog';
 import EditStudentDialog from '@/components/students/edit-student-dialog';
@@ -77,7 +77,10 @@ export default async function StudentPage({ params: { id }, searchParams }: Page
               <StudentInvoicesFilters />
               <div className='flex gap-2'>
                 <React.Suspense fallback='Cargando...'>
-                  <AddEnrollmentDialog enrollmentsPromise={enrollmentsPromise} studentId={student.id.toString()} />
+                  <AddEnrollmentInvoiceToStudentDialog
+                    enrollmentsPromise={enrollmentsPromise}
+                    studentId={student.id.toString()}
+                  />
                 </React.Suspense>
                 {courses.length > 0 && <DiscountsFormDialog studentByCourse={student.studentByCourse} />}
                 <React.Suspense fallback='Cargando...'>
