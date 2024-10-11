@@ -64,7 +64,10 @@ export default function ChargeInvoicesDialog({ unpaidInvoicesPromise }: ChargeIn
 
   const invoicesOptions: Option[] = unpaidInvoices.map((invoice) => ({
     value: String(invoice.id),
-    label: `${invoice.description} - ${getMonthName(invoice.month)} ${invoice.year}`
+    label:
+      invoice.month === 1
+        ? invoice.description
+        : `${invoice.description} - ${getMonthName(invoice.month)} ${invoice.year}`
   }));
 
   const form = useForm<z.infer<typeof receiptFormSchema>>({
@@ -215,7 +218,7 @@ export default function ChargeInvoicesDialog({ unpaidInvoicesPromise }: ChargeIn
                           </SelectTrigger>
                           <SelectContent>
                             <SelectGroup>
-                              <SelectLabel>Cursos</SelectLabel>
+                              <SelectLabel>Cuotas</SelectLabel>
                               {getInvoicesOptions(fieldWithoutRef.value).map(({ value, label }) => (
                                 <SelectItem key={value} value={value.toString()}>
                                   {label}

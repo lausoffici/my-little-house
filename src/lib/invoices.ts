@@ -188,3 +188,55 @@ export const getExpiredInvoicesData = async () => {
     throw new Error(getErrorMessage(error));
   }
 };
+
+export async function addEnrollmentInvoice(_: unknown, formData: FormData) {
+  try {
+    const studentId = Number(formData.get('studentId'));
+    const enrollmentId = Number(formData.get('enrollmentId'));
+
+    const enrollment = await prisma.enrollment.findUnique({
+      where: {
+        id: enrollmentId
+      }
+    });
+
+    if (!enrollment) {
+      return {
+        error: true,
+        message: 'Error al agregar la matrícula: la matrícula no existe'
+      };
+    }
+
+    await prisma.studentEnrollment.create({
+      data: {
+        year: enrollment.year,
+        studentId: studentId
+      }
+    });
+
+    await prisma.invoice.create({
+      data: {
+        month: 1,
+        year: enrollment.year,
+        description: `Matrícula ${enrollment.year}`,
+        amount: enrollment.amount,
+        balance: 0,
+        state: 'I',
+        expiredAt: new Date(),
+        courseId: null,
+        studentId
+      }
+    });
+
+    return {
+      error: false,
+      message: 'Matrícula agregada exitosamente'
+    };
+  } catch (error) {
+    console.error('Error al agregar la matrícula:', error);
+    return {
+      error: true,
+      message: 'Error al agregar la matrícula: ' + getErrorMessage(error)
+    };
+  }
+}
