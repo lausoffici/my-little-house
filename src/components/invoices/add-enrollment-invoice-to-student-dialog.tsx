@@ -3,7 +3,7 @@
 import { Enrollment } from '@prisma/client';
 import { useRouter } from 'next/navigation';
 import { use, useEffect, useState } from 'react';
-import { useFormState, useFormStatus } from 'react-dom';
+import { useFormState } from 'react-dom';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -19,11 +19,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { addEnrollmentInvoice } from '@/lib/invoices';
 import { formatCurrency } from '@/lib/utils';
 
+import { SubmitButton } from '../submit-button';
 import { toast } from '../ui/use-toast';
 
 interface AddEnrollmentDialogProps {
   enrollmentsPromise: Promise<Enrollment[]>;
-  studentId: string;
+  studentId: number;
 }
 
 export function AddEnrollmentInvoiceToStudentDialog({ enrollmentsPromise, studentId }: AddEnrollmentDialogProps) {
@@ -43,16 +44,6 @@ export function AddEnrollmentInvoiceToStudentDialog({ enrollmentsPromise, studen
     }
     setIsOpen(false);
   }, [state, router]);
-
-  function SubmitButton() {
-    const { pending } = useFormStatus();
-
-    return (
-      <Button type='submit' disabled={pending}>
-        {pending ? 'Agregando...' : 'Confirmar'}
-      </Button>
-    );
-  }
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -86,7 +77,7 @@ export function AddEnrollmentInvoiceToStudentDialog({ enrollmentsPromise, studen
             <Button variant='outline' onClick={() => setIsOpen(false)} type='button'>
               Cancelar
             </Button>
-            <SubmitButton />
+            <SubmitButton title='Confirmar' />
           </DialogFooter>
         </form>
       </DialogContent>

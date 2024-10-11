@@ -77,10 +77,7 @@ export default async function StudentPage({ params: { id }, searchParams }: Page
               <StudentInvoicesFilters />
               <div className='flex gap-2'>
                 <React.Suspense fallback='Cargando...'>
-                  <AddEnrollmentInvoiceToStudentDialog
-                    enrollmentsPromise={enrollmentsPromise}
-                    studentId={student.id.toString()}
-                  />
+                  <AddEnrollmentInvoiceToStudentDialog enrollmentsPromise={enrollmentsPromise} studentId={student.id} />
                 </React.Suspense>
                 {courses.length > 0 && <DiscountsFormDialog studentByCourse={student.studentByCourse} />}
                 <React.Suspense fallback='Cargando...'>
