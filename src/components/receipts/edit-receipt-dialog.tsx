@@ -1,6 +1,7 @@
 'use client';
 
 import { ReceiptPaymentMethod } from '@prisma/client';
+import { useRouter } from 'next/navigation';
 import React from 'react';
 import { useFormState } from 'react-dom';
 
@@ -11,6 +12,7 @@ import { updateReceipt } from '@/lib/receipts';
 import { ReceiptWithStudent } from '@/types';
 
 import { SubmitButton } from '../submit-button';
+import { Label } from '../ui/label';
 import { toast } from '../ui/use-toast';
 
 interface EditReceiptDialogProps {
@@ -25,6 +27,7 @@ const initialState = {
 };
 
 export default function EditReceiptDialog({ receipt, onClose }: EditReceiptDialogProps) {
+  const router = useRouter();
   const [paymentMethod, setPaymentMethod] = React.useState(receipt.paymentMethod);
 
   const [state, action] = useFormState(updateReceipt, initialState);
@@ -44,9 +47,10 @@ export default function EditReceiptDialog({ receipt, onClose }: EditReceiptDialo
         description: state?.message,
         variant: 'success'
       });
+      router.refresh();
     }
     onClose();
-  }, [onClose, state]);
+  }, [onClose, router, state]);
 
   return (
     <Dialog open={true} onOpenChange={onClose}>
@@ -56,10 +60,8 @@ export default function EditReceiptDialog({ receipt, onClose }: EditReceiptDialo
         </DialogHeader>
         <form action={action}>
           <input type='hidden' name='id' value={receipt.id} />
-          <div className='py-4'>
-            <label htmlFor='paymentMethod' className='block text-sm font-medium text-gray-700'>
-              Método de Pago
-            </label>
+          <div className='py-4 mb-2'>
+            <Label htmlFor='paymentMethod'>Método de Pago</Label>
             <Select
               name='paymentMethod'
               value={paymentMethod}

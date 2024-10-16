@@ -285,8 +285,6 @@ export const updateReceipt = async (_: unknown, formData: FormData) => {
       data: { paymentMethod }
     });
 
-    revalidatePath(`/students/${updatedReceipt.studentId}`);
-
     return { error: false, message: 'Recibo actualizado con éxito', receipt: updatedReceipt };
   } catch (e) {
     return {
