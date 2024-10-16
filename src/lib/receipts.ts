@@ -1,6 +1,6 @@
 'use server';
 
-import { InvoiceState, Prisma } from '@prisma/client';
+import { InvoiceState, Prisma, ReceiptPaymentMethod } from '@prisma/client';
 import { revalidatePath } from 'next/cache';
 
 import { SearchParams } from '@/types';
@@ -266,6 +266,28 @@ export const generateReceipt = async (_: unknown, paidItems: FormData) => {
       message: 'Recibo creado con éxito',
       receipt
     };
+  } catch (e) {
+    return {
+      error: true,
+      message: getErrorMessage(e),
+      receipt: null
+    };
+  }
+};
+
+export const updateReceipt = async (_: unknown, formData: FormData) => {
+  const id = formData.get('id') as string;
+  const paymentMethod = formData.get('paymentMethod') as ReceiptPaymentMethod;
+
+  try {
+    const updatedReceipt = await prisma.receipt.update({
+      where: { id: Number(id) },
+      data: { paymentMethod }
+    });
+
+    revalidatePath(`/students/${updatedReceipt.studentId}`);
+
+    return { error: false, message: 'Recibo actualizado con éxito', receipt: updatedReceipt };
   } catch (e) {
     return {
       error: true,
