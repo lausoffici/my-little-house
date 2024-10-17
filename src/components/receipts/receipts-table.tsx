@@ -17,7 +17,7 @@ import { getReceiptWithItemsById, getReceiptsByDate } from '@/lib/receipts';
 import { ReceiptWithStudent } from '@/types';
 
 import { columns } from './columns';
-import EditReceiptDialog from './edit-receipt-dialog';
+import { EditReceiptDialog } from './edit-receipt-dialog';
 import ReceiptDialog from './receipt-dialog';
 
 interface ReceiptsTableProps {

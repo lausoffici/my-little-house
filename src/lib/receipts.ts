@@ -1,6 +1,6 @@
 'use server';
 
-import { InvoiceState, Prisma, ReceiptPaymentMethod } from '@prisma/client';
+import { InvoiceState, Prisma } from '@prisma/client';
 import { revalidatePath } from 'next/cache';
 
 import { SearchParams } from '@/types';
@@ -9,7 +9,7 @@ import prisma from './prisma';
 import { formatPercentage, getErrorMessage, getMonthName, getPaginationClause } from './utils';
 import { getYearMonthDayFromSearchParams } from './utils/cash-register.utils';
 import { getDiscountedAmount } from './utils/invoices.utils';
-import { receiptFormSchema } from './validations/form';
+import { editReceiptFormSchema, receiptFormSchema } from './validations/form';
 import { receiptsByDateSchema } from './validations/params';
 
 export const getReceiptsByDate = async (searchParams: SearchParams) => {
@@ -276,8 +276,20 @@ export const generateReceipt = async (_: unknown, paidItems: FormData) => {
 };
 
 export const updateReceipt = async (_: unknown, formData: FormData) => {
-  const id = formData.get('id') as string;
-  const paymentMethod = formData.get('paymentMethod') as ReceiptPaymentMethod;
+  const parsedData = editReceiptFormSchema.safeParse({
+    id: formData.get('id'),
+    paymentMethod: formData.get('paymentMethod')
+  });
+
+  if (!parsedData.success) {
+    return {
+      error: true,
+      message: 'Error al actualizar el recibo',
+      receipt: null
+    };
+  }
+
+  const { id, paymentMethod } = parsedData.data;
 
   try {
     const updatedReceipt = await prisma.receipt.update({
