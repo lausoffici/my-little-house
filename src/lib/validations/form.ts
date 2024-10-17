@@ -89,3 +89,8 @@ export const editInvoiceFormSchema = z.object({
   invoiceId: z.number(),
   amount: z.string({ required_error: 'El importe es requerido' })
 });
+
+export const editReceiptFormSchema = z.object({
+  id: z.string(),
+  paymentMethod: z.nativeEnum(ReceiptPaymentMethod)
+});

@@ -9,7 +9,7 @@ import prisma from './prisma';
 import { formatPercentage, getErrorMessage, getMonthName, getPaginationClause } from './utils';
 import { getYearMonthDayFromSearchParams } from './utils/cash-register.utils';
 import { getDiscountedAmount } from './utils/invoices.utils';
-import { receiptFormSchema } from './validations/form';
+import { editReceiptFormSchema, receiptFormSchema } from './validations/form';
 import { receiptsByDateSchema } from './validations/params';
 
 export const getReceiptsByDate = async (searchParams: SearchParams) => {
@@ -266,6 +266,38 @@ export const generateReceipt = async (_: unknown, paidItems: FormData) => {
       message: 'Recibo creado con éxito',
       receipt
     };
+  } catch (e) {
+    return {
+      error: true,
+      message: getErrorMessage(e),
+      receipt: null
+    };
+  }
+};
+
+export const updateReceipt = async (_: unknown, formData: FormData) => {
+  const parsedData = editReceiptFormSchema.safeParse({
+    id: formData.get('id'),
+    paymentMethod: formData.get('paymentMethod')
+  });
+
+  if (!parsedData.success) {
+    return {
+      error: true,
+      message: 'Error al actualizar el recibo',
+      receipt: null
+    };
+  }
+
+  const { id, paymentMethod } = parsedData.data;
+
+  try {
+    const updatedReceipt = await prisma.receipt.update({
+      where: { id: Number(id) },
+      data: { paymentMethod }
+    });
+
+    return { error: false, message: 'Recibo actualizado con éxito', receipt: updatedReceipt };
   } catch (e) {
     return {
       error: true,
