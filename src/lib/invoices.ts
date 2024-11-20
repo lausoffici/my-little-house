@@ -33,7 +33,7 @@ export const getExpiredInvoiceList = async (searchParams: SearchParams) => {
   const totalPages = Math.ceil(totalInvoicesCount / pageSize);
 
   const totalExpiredAmount = await prisma.$queryRaw<{ total: number }[]>`
-    SELECT SUM(amount * (1 - discount)) AS total
+    SELECT SUM(amount * (1 - discount) - balance) AS total
     FROM "Invoice" i INNER JOIN "Student" s ON i."studentId" = s.id AND s.active = true
     WHERE state = 'I' AND "expiredAt" < current_timestamp
   `;
