@@ -70,7 +70,6 @@ export type ExpiredInvoicesExcelData = {
   precio: number;
   mes: string;
   'ciclo lectivo': number;
-  curso: string | undefined;
   telefono: string | null;
   celular: string | null;
   'celular madre': string | null;

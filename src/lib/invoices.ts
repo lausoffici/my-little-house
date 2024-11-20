@@ -170,12 +170,11 @@ export const getExpiredInvoicesData = async () => {
     });
 
     const sheetData: ExpiredInvoicesExcelData[] = data.map((item) => ({
-      nombre: `${item.student.firstName} ${item.student.lastName}`,
-      descripcion: item.description,
+      nombre: `${item.student.lastName} ${item.student.firstName} `,
       precio: item.amount,
+      descripcion: item.description,
       mes: getMonthName(item.month),
       'ciclo lectivo': item.year,
-      curso: item.course?.name,
       telefono: item.student.phone,
       celular: item.student.mobilePhone,
       'celular madre': item.student.momPhone,
@@ -183,7 +182,7 @@ export const getExpiredInvoicesData = async () => {
       observaciones: item.student.observations
     }));
 
-    return sheetData;
+    return sheetData.sort((a, b) => a.nombre.localeCompare(b.nombre));
   } catch (error) {
     throw new Error(getErrorMessage(error));
   }
