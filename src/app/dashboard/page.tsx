@@ -3,12 +3,12 @@ import React from 'react';
 import DashboardKpis from '@/components/dashboard/dashboard-kpis';
 import DatePickerWithURLParams from '@/components/ui/date-picker/date-picker-with-url-params';
 import { getDashboard } from '@/lib/dashboards';
-import { getAllCurrentYearReceipts } from '@/lib/receipts';
+import { getReceiptsBalancePerYear } from '@/lib/receipts';
 import { PageProps } from '@/types';
 
 export default function Dashboard({ searchParams }: PageProps) {
   const dashboardPromise = getDashboard(searchParams);
-  const receiptsPromise = getAllCurrentYearReceipts(searchParams);
+  const receiptsPromise = getReceiptsBalancePerYear(searchParams);
 
   return (
     <section>

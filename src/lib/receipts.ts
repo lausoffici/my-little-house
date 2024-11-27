@@ -308,7 +308,7 @@ export const updateReceipt = async (_: unknown, formData: FormData) => {
   }
 };
 
-export const getAllCurrentYearReceipts = async (searchParams: SearchParams) => {
+export const getReceiptsBalancePerYear = async (searchParams: SearchParams) => {
   const params = balanceSearchParamsSchema.parse(searchParams);
   const selectedYear = Number(params.balance_year ?? currentYear);
 

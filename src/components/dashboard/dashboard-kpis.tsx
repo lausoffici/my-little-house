@@ -4,7 +4,7 @@ import { TfiReceipt } from 'react-icons/tfi';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getDashboard } from '@/lib/dashboards';
-import { getAllCurrentYearReceipts } from '@/lib/receipts';
+import { getReceiptsBalancePerYear } from '@/lib/receipts';
 import { formatCurrency } from '@/lib/utils';
 
 import ReceiptsBarChart from './receipts-bar-chart';
@@ -12,7 +12,7 @@ import YearSelect from './year-select';
 
 type Props = {
   dashboardPromise: ReturnType<typeof getDashboard>;
-  receiptsPromise: ReturnType<typeof getAllCurrentYearReceipts>;
+  receiptsPromise: ReturnType<typeof getReceiptsBalancePerYear>;
 };
 
 export default function DashboardKpis({ dashboardPromise, receiptsPromise }: Props) {
