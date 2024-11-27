@@ -77,3 +77,9 @@ export type ExpiredInvoicesExcelData = {
   'celular padre': string | null;
   observaciones: string | null;
 };
+
+export interface MonthlyReceipts {
+  month: string;
+  cash: number;
+  transfer: number;
+}
