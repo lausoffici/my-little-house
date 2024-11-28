@@ -61,3 +61,7 @@ export const dashboardSearchParamsSchema = z.object({
   month: z.string().optional(),
   year: z.string().optional()
 });
+
+export const balanceSearchParamsSchema = z.object({
+  balance_year: z.string().optional()
+});

@@ -3,14 +3,15 @@
 import { InvoiceState, Prisma } from '@prisma/client';
 import { revalidatePath } from 'next/cache';
 
-import { SearchParams } from '@/types';
+import { MonthlyReceipts, SearchParams } from '@/types';
 
+import { currentYear, monthsName } from './constants';
 import prisma from './prisma';
 import { formatPercentage, getErrorMessage, getMonthName, getPaginationClause } from './utils';
 import { getYearMonthDayFromSearchParams } from './utils/cash-register.utils';
 import { getDiscountedAmount } from './utils/invoices.utils';
 import { editReceiptFormSchema, receiptFormSchema } from './validations/form';
-import { receiptsByDateSchema } from './validations/params';
+import { balanceSearchParamsSchema, receiptsByDateSchema } from './validations/params';
 
 export const getReceiptsByDate = async (searchParams: SearchParams) => {
   const params = receiptsByDateSchema.parse(searchParams);
@@ -59,7 +60,7 @@ export const getReceiptsByDate = async (searchParams: SearchParams) => {
   return { data: receipts, totalPages };
 };
 
-export const getReceiptWithItemsById = (searchParams: SearchParams) => {
+export const getReceiptWithItemsById = async (searchParams: SearchParams) => {
   const receiptId = Number(searchParams.receiptId);
 
   if (!receiptId) return Promise.resolve(null);
@@ -305,4 +306,54 @@ export const updateReceipt = async (_: unknown, formData: FormData) => {
       receipt: null
     };
   }
+};
+
+export const getReceiptsBalancePerYear = async (searchParams: SearchParams) => {
+  const params = balanceSearchParamsSchema.parse(searchParams);
+  const selectedYear = Number(params.balance_year ?? currentYear);
+
+  const receipts = await prisma.receipt.findMany({});
+
+  const monthlyReceipts = await prisma.receipt.findMany({
+    where: {
+      createdAt: {
+        gte: new Date(selectedYear, 0, 1),
+        lt: new Date(selectedYear + 1, 0, 1)
+      }
+    },
+    select: {
+      total: true,
+      paymentMethod: true,
+      createdAt: true
+    }
+  });
+
+  const receiptsByMonth = monthlyReceipts.reduce<Record<string, MonthlyReceipts>>((acc, receipt) => {
+    const monthIndex = receipt.createdAt.getMonth();
+
+    const monthName = monthsName[monthIndex];
+
+    if (!acc[monthName]) {
+      acc[monthName] = {
+        month: monthName,
+        cash: 0,
+        transfer: 0
+      };
+    }
+
+    if (receipt.paymentMethod === 'CASH') {
+      acc[monthName].cash += receipt.total;
+    } else if (receipt.paymentMethod === 'TRANSFER') {
+      acc[monthName].transfer += receipt.total;
+    }
+
+    return acc;
+  }, {});
+
+  const receiptYears = Array.from(new Set(receipts.map((receipt) => String(receipt.createdAt.getFullYear()))));
+
+  return {
+    receipts: Object.values(receiptsByMonth).sort((a, b) => monthsName.indexOf(a.month) - monthsName.indexOf(b.month)),
+    receiptYears
+  };
 };

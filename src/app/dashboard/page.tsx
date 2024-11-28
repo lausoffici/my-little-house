@@ -3,10 +3,12 @@ import React from 'react';
 import DashboardKpis from '@/components/dashboard/dashboard-kpis';
 import DatePickerWithURLParams from '@/components/ui/date-picker/date-picker-with-url-params';
 import { getDashboard } from '@/lib/dashboards';
+import { getReceiptsBalancePerYear } from '@/lib/receipts';
 import { PageProps } from '@/types';
 
 export default function Dashboard({ searchParams }: PageProps) {
   const dashboardPromise = getDashboard(searchParams);
+  const receiptsPromise = getReceiptsBalancePerYear(searchParams);
 
   return (
     <section>
@@ -17,7 +19,7 @@ export default function Dashboard({ searchParams }: PageProps) {
         </div>
       </div>
       <React.Suspense fallback='Cargando...'>
-        <DashboardKpis dashboardPromise={dashboardPromise} />
+        <DashboardKpis dashboardPromise={dashboardPromise} receiptsPromise={receiptsPromise} />
       </React.Suspense>
     </section>
   );
