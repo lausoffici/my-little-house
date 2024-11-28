@@ -6,7 +6,7 @@ This is a backroom web app for an English Language Institute called "My Little H
 - controlling the incomes, outcomes, etc.
 
 ### Technologies
-  - Next JS
+  - NextJS
   - Tailwind CSS / Shadcn UI
   - Prisma
   - PostgreSQL
