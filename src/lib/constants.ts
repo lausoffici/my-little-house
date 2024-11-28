@@ -1,16 +1,5 @@
-export const monthsName = [
-  'Enero',
-  'Febrero',
-  'Marzo',
-  'Abril',
-  'Mayo',
-  'Junio',
-  'Julio',
-  'Agosto',
-  'Septiembre',
-  'Octubre',
-  'Noviembre',
-  'Diciembre'
-];
+export const monthsName = Array.from({ length: 12 }, (_, i) =>
+  new Date(0, i).toLocaleString('es-ES', { month: 'long' }).replace(/^./, (char) => char.toUpperCase())
+);
 
 export const currentYear = new Date().getFullYear();
