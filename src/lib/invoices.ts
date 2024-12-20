@@ -199,7 +199,8 @@ export const updateAmount = async (_: any, formData: FormData) => {
   }
 };
 
-export const getExpiredInvoicesData = async () => {
+export const getExpiredInvoicesData = async (searchParams: SearchParams) => {
+  const { sortOrder } = expiredInvoiceListSearchParamsSchema.parse(searchParams);
   try {
     const data = await prisma.invoice.findMany({
       where: {
@@ -228,24 +229,24 @@ export const getExpiredInvoicesData = async () => {
         }
       },
       orderBy: {
-        year: 'desc'
+        student: {
+          firstName: sortOrder as Prisma.SortOrder
+        }
       }
     });
 
-    const sheetData: ExpiredInvoicesExcelData[] = data.map((item) => ({
-      nombre: `${item.student.lastName} ${item.student.firstName} `,
-      debe: formatCurrency(getDiscountedAmount(item.amount, item.discount) - item.balance),
-      descripcion: item.description,
-      mes: getMonthName(item.month),
-      'ciclo lectivo': item.year,
-      telefono: item.student.phone,
-      celular: item.student.mobilePhone,
-      'celular madre': item.student.momPhone,
-      'celular padre': item.student.dadPhone,
-      observaciones: item.student.observations
+    return data.map((item) => ({
+      Nombre: `${item.student?.firstName} ${item.student?.lastName} `,
+      Debe: formatCurrency(getDiscountedAmount(item.amount, item.discount) - item.balance),
+      Descripcion: item.description,
+      Mes: getMonthName(item.month),
+      'Ciclo lectivo': item.year,
+      Telefono: item.student?.phone,
+      Celular: item.student?.mobilePhone,
+      'Celular madre': item.student?.momPhone,
+      'Celular padre': item.student?.dadPhone,
+      Observaciones: item.student?.observations
     }));
-
-    return sheetData.sort((a, b) => a.nombre.localeCompare(b.nombre));
   } catch (error) {
     throw new Error(getErrorMessage(error));
   }

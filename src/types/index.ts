@@ -65,16 +65,16 @@ export type ErrorWithMessage = {
 };
 
 export type ExpiredInvoicesExcelData = {
-  nombre: string;
-  descripcion: string;
-  debe: string;
-  mes: string;
-  'ciclo lectivo': number;
-  telefono: string | null;
-  celular: string | null;
-  'celular madre': string | null;
-  'celular padre': string | null;
-  observaciones: string | null;
+  Nombre: string;
+  Descripcion: string;
+  Debe: string;
+  Mes: string;
+  'Ciclo lectivo': number;
+  Telefono: string | null;
+  Celular: string | null;
+  'Celular madre': string | null;
+  'Celular padre': string | null;
+  Observaciones: string | null;
 };
 
 export interface MonthlyReceipts {
