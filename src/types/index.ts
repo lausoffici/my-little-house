@@ -67,7 +67,7 @@ export type ErrorWithMessage = {
 export type ExpiredInvoicesExcelData = {
   nombre: string;
   descripcion: string;
-  precio: number;
+  debe: string;
   mes: string;
   'ciclo lectivo': number;
   telefono: string | null;

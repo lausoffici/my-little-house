@@ -15,10 +15,10 @@ export const columns: ColumnDef<InvoiceListItem>[] = [
     header: ({ column }) => <DataTableColumnHeader column={column} title='Estudiante' />,
     cell: ({ row }) => (
       <div>
-        {row.original.student.firstName} {row.original.student.lastName}
+        {row.original.student?.firstName ?? row.original.firstName}{' '}
+        {row.original.student?.lastName ?? row.original.lastName}
       </div>
-    ),
-    enableSorting: false
+    )
   },
   {
     accessorKey: 'description',

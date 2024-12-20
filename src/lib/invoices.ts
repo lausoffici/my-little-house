@@ -1,12 +1,13 @@
 'use server';
 
-import { InvoiceState } from '@prisma/client';
+import { InvoiceState, Prisma } from '@prisma/client';
 import { cache } from 'react';
 
 import { ExpiredInvoicesExcelData, SearchParams } from '@/types';
 
 import prisma from './prisma';
-import { getErrorMessage, getMonthName, getPaginationClause } from './utils';
+import { formatCurrency, getErrorMessage, getMonthName, getPaginationClause } from './utils';
+import { getDiscountedAmount } from './utils/invoices.utils';
 import { scholarshipFormSchema } from './validations/form';
 import { expiredInvoiceListSearchParamsSchema } from './validations/params';
 
@@ -40,6 +41,70 @@ export const getExpiredInvoiceList = async (searchParams: SearchParams) => {
 
   const pagination = getPaginationClause(pageNumber, pageSize);
 
+  // Handle special sorting cases
+  let orderByClause: Prisma.InvoiceOrderByWithRelationInput;
+
+  switch (sortBy) {
+    case 'student':
+      orderByClause = {
+        student: {
+          firstName: sortOrder as Prisma.SortOrder
+        }
+      };
+      break;
+    case 'total':
+      const invoicesWithTotal = await prisma.$queryRaw<any[]>`
+          SELECT 
+            i.*,
+            s."firstName",
+            s."lastName",
+            c.name as "courseName",
+            (i.amount * (1 - i.discount)) as computed_total
+          FROM "Invoice" i
+          INNER JOIN "Student" s ON i."studentId" = s.id
+          INNER JOIN "Course" c ON i."courseId" = c.id
+          WHERE i.state = 'I' 
+          AND i."expiredAt" < current_timestamp
+          AND s.active = true
+          ORDER BY computed_total ${Prisma.raw(sortOrder === 'asc' ? 'ASC' : 'DESC')}
+          LIMIT ${Prisma.raw(String(pageSize))}
+          OFFSET ${Prisma.raw(String((pageNumber - 1) * pageSize))}
+        `;
+      return {
+        data: invoicesWithTotal,
+        totalPages,
+        totalExpiredAmount: totalExpiredAmount[0].total
+      };
+    case 'rest':
+      const invoicesWithRest = await prisma.$queryRaw<any[]>`
+          SELECT 
+            i.*,
+            s."firstName",
+            s."lastName",
+            c.name as "courseName",
+            (i.amount * (1 - i.discount) - i.balance) as rest
+          FROM "Invoice" i
+          INNER JOIN "Student" s ON i."studentId" = s.id
+          INNER JOIN "Course" c ON i."courseId" = c.id
+          WHERE i.state = 'I' 
+          AND i."expiredAt" < current_timestamp
+          AND s.active = true
+          ORDER BY rest ${Prisma.raw(sortOrder === 'asc' ? 'ASC' : 'DESC')}
+          LIMIT ${Prisma.raw(String(pageSize))}
+          OFFSET ${Prisma.raw(String((pageNumber - 1) * pageSize))}
+        `;
+      return {
+        data: invoicesWithRest,
+        totalPages,
+        totalExpiredAmount: totalExpiredAmount[0].total
+      };
+    default:
+      orderByClause = {
+        [sortBy]: sortOrder as Prisma.SortOrder
+      };
+  }
+
+  // Default query for standard sorting fields
   const invoices = await prisma.invoice.findMany({
     where: whereClause,
     include: {
@@ -55,9 +120,7 @@ export const getExpiredInvoiceList = async (searchParams: SearchParams) => {
         }
       }
     },
-    orderBy: {
-      [sortBy]: sortOrder
-    },
+    orderBy: orderByClause,
     ...pagination
   });
 
@@ -171,7 +234,7 @@ export const getExpiredInvoicesData = async () => {
 
     const sheetData: ExpiredInvoicesExcelData[] = data.map((item) => ({
       nombre: `${item.student.lastName} ${item.student.firstName} `,
-      precio: item.amount,
+      debe: formatCurrency(getDiscountedAmount(item.amount, item.discount) - item.balance),
       descripcion: item.description,
       mes: getMonthName(item.month),
       'ciclo lectivo': item.year,
