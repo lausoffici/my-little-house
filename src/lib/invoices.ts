@@ -3,7 +3,7 @@
 import { InvoiceState, Prisma } from '@prisma/client';
 import { cache } from 'react';
 
-import { ExpiredInvoicesExcelData, SearchParams } from '@/types';
+import { SearchParams } from '@/types';
 
 import prisma from './prisma';
 import { formatCurrency, getErrorMessage, getMonthName, getPaginationClause } from './utils';
@@ -241,11 +241,11 @@ export const getExpiredInvoicesData = async (searchParams: SearchParams) => {
       Descripcion: item.description,
       Mes: getMonthName(item.month),
       'Ciclo lectivo': item.year,
-      Telefono: item.student?.phone,
-      Celular: item.student?.mobilePhone,
-      'Celular madre': item.student?.momPhone,
-      'Celular padre': item.student?.dadPhone,
-      Observaciones: item.student?.observations
+      Telefono: item.student.phone,
+      Celular: item.student.mobilePhone,
+      'Celular madre': item.student.momPhone,
+      'Celular padre': item.student.dadPhone,
+      Observaciones: item.student.observations
     }));
   } catch (error) {
     throw new Error(getErrorMessage(error));
