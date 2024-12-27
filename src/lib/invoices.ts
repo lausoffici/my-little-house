@@ -41,71 +41,7 @@ export const getExpiredInvoiceList = async (searchParams: SearchParams) => {
 
   const pagination = getPaginationClause(pageNumber, pageSize);
 
-  // Handle special sorting cases
-  let orderByClause: Prisma.InvoiceOrderByWithRelationInput;
-
-  switch (sortBy) {
-    case 'student':
-      orderByClause = {
-        student: {
-          firstName: sortOrder as Prisma.SortOrder
-        }
-      };
-      break;
-    case 'total':
-      const invoicesWithTotal = await prisma.$queryRaw<any[]>`
-          SELECT 
-            i.*,
-            s."firstName",
-            s."lastName",
-            c.name as "courseName",
-            (i.amount * (1 - i.discount)) as computed_total
-          FROM "Invoice" i
-          INNER JOIN "Student" s ON i."studentId" = s.id
-          INNER JOIN "Course" c ON i."courseId" = c.id
-          WHERE i.state = 'I' 
-          AND i."expiredAt" < current_timestamp
-          AND s.active = true
-          ORDER BY computed_total ${Prisma.raw(sortOrder === 'asc' ? 'ASC' : 'DESC')}
-          LIMIT ${Prisma.raw(String(pageSize))}
-          OFFSET ${Prisma.raw(String((pageNumber - 1) * pageSize))}
-        `;
-      return {
-        data: invoicesWithTotal,
-        totalPages,
-        totalExpiredAmount: totalExpiredAmount[0].total
-      };
-    case 'rest':
-      const invoicesWithRest = await prisma.$queryRaw<any[]>`
-          SELECT 
-            i.*,
-            s."firstName",
-            s."lastName",
-            c.name as "courseName",
-            (i.amount * (1 - i.discount) - i.balance) as rest
-          FROM "Invoice" i
-          INNER JOIN "Student" s ON i."studentId" = s.id
-          INNER JOIN "Course" c ON i."courseId" = c.id
-          WHERE i.state = 'I' 
-          AND i."expiredAt" < current_timestamp
-          AND s.active = true
-          ORDER BY rest ${Prisma.raw(sortOrder === 'asc' ? 'ASC' : 'DESC')}
-          LIMIT ${Prisma.raw(String(pageSize))}
-          OFFSET ${Prisma.raw(String((pageNumber - 1) * pageSize))}
-        `;
-      return {
-        data: invoicesWithRest,
-        totalPages,
-        totalExpiredAmount: totalExpiredAmount[0].total
-      };
-    default:
-      orderByClause = {
-        [sortBy]: sortOrder as Prisma.SortOrder
-      };
-  }
-
-  // Default query for standard sorting fields
-  const invoices = await prisma.invoice.findMany({
+  const baseQueryOptions = {
     where: whereClause,
     include: {
       student: {
@@ -120,11 +56,66 @@ export const getExpiredInvoiceList = async (searchParams: SearchParams) => {
         }
       }
     },
-    orderBy: orderByClause,
     ...pagination
-  });
+  };
 
-  return { data: invoices, totalPages, totalExpiredAmount: totalExpiredAmount[0].total };
+  switch (sortBy) {
+    case 'student':
+      const invoicesOrderedByStudent = await prisma.invoice.findMany({
+        ...baseQueryOptions,
+        orderBy: {
+          student: {
+            firstName: sortOrder as Prisma.SortOrder
+          }
+        }
+      });
+      return {
+        data: invoicesOrderedByStudent,
+        totalPages,
+        totalExpiredAmount: totalExpiredAmount[0].total
+      };
+
+    case 'total':
+    case 'rest':
+      // For total and rest, we need to fetch all matching records and sort in memory
+      // since Prisma doesn't support ordering by computed fields
+      const invoices = await prisma.invoice.findMany({
+        ...baseQueryOptions,
+        orderBy: undefined
+      });
+
+      const sortedInvoices = invoices.sort((a, b) => {
+        const getComputedValue = (invoice: any) => {
+          if (sortBy === 'total') return invoice.amount * (1 - invoice.discount);
+          else return invoice.amount * (1 - invoice.discount) - invoice.balance;
+        };
+
+        const aValue = getComputedValue(a);
+        const bValue = getComputedValue(b);
+
+        return sortOrder === 'asc' ? aValue - bValue : bValue - aValue;
+      });
+
+      return {
+        data: sortedInvoices,
+        totalPages,
+        totalExpiredAmount: totalExpiredAmount[0].total
+      };
+
+    default:
+      const regularInvoices = await prisma.invoice.findMany({
+        ...baseQueryOptions,
+        orderBy: {
+          [sortBy]: sortOrder as Prisma.SortOrder
+        }
+      });
+
+      return {
+        data: regularInvoices,
+        totalPages,
+        totalExpiredAmount: totalExpiredAmount[0].total
+      };
+  }
 };
 
 export const getUnpaidInvoicesByStudent = cache(async (id: number) => {
