@@ -1,11 +1,12 @@
 import React from 'react';
 
 import InvoicesTable from '@/components/invoices/invoices-table/invoices-table';
-import { getExpiredInvoiceList } from '@/lib/invoices';
+import { getExpiredInvoiceList, getExpiredInvoicesData } from '@/lib/invoices';
 import { PageProps } from '@/types';
 
 export default async function ExpirationsPage({ searchParams }: PageProps) {
   const expiredInvoicesPromise = getExpiredInvoiceList(searchParams);
+  const expiredInvoicesDataPromise = getExpiredInvoicesData(searchParams);
 
   return (
     <div>
@@ -16,7 +17,10 @@ export default async function ExpirationsPage({ searchParams }: PageProps) {
         </div>
       </div>
       <React.Suspense fallback='Cargando...'>
-        <InvoicesTable invoicesPromise={expiredInvoicesPromise} />
+        <InvoicesTable
+          invoicesPromise={expiredInvoicesPromise}
+          expiredInvoicesDataPromise={expiredInvoicesDataPromise}
+        />
       </React.Suspense>
     </div>
   );

@@ -17,8 +17,7 @@ export const columns: ColumnDef<InvoiceListItem>[] = [
       <div>
         {row.original.student.firstName} {row.original.student.lastName}
       </div>
-    ),
-    enableSorting: false
+    )
   },
   {
     accessorKey: 'description',
