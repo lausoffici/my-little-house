@@ -7,7 +7,8 @@ export const studentListSearchParamsSchema = z.object({
   sortBy: z.string().default('lastName'),
   sortOrder: z.string().default('asc'),
   studentByCourse: z.string().optional(),
-  lastName: z.string().optional()
+  lastName: z.string().optional(),
+  withInactiveStudents: z.string().optional()
 });
 
 export const incomingListSearchParamsSchema = z.object({

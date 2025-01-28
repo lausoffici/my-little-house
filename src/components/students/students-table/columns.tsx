@@ -16,7 +16,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { formatCurrency } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 import { StudentWithCourses } from '@/types';
 
 export const columns: ColumnDef<StudentWithCourses>[] = [
@@ -62,6 +62,20 @@ export const columns: ColumnDef<StudentWithCourses>[] = [
     enableSorting: false
   },
   {
+    accessorKey: 'status',
+    header: ({ column }) => <DataTableColumnHeader column={column} title='Estado' />,
+    cell: ({ row }) => (
+      <Badge
+        className={cn(
+          row.original.active ? 'bg-green-600 hover:bg-green-600' : 'bg-gray-500 hover:bg-gray-500',
+          'border-transparent'
+        )}
+      >
+        {row.original.active ? 'Activo' : 'Inactivo'}
+      </Badge>
+    )
+  },
+  {
     id: 'actions',
     cell: ({ row }) => {
       const student = row.original;
@@ -78,7 +92,13 @@ export const columns: ColumnDef<StudentWithCourses>[] = [
           <DropdownMenuContent align='end'>
             <DropdownMenuLabel>Acciones</DropdownMenuLabel>
             <DropdownMenuItem>
-              <Link href={`/students/${id}`}>Ver detalles</Link>
+              {row.original.active ? (
+                <Link href={`/students/${id}`}>Ver detalles</Link>
+              ) : (
+                <Button variant='ghost' className='p-0 w-full h-fit'>
+                  Activar
+                </Button>
+              )}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

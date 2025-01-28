@@ -2,12 +2,17 @@
 
 import { Cross2Icon } from '@radix-ui/react-icons';
 import { Table } from '@tanstack/react-table';
+import { useRouter } from 'next/navigation';
 import React from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 
 import { Button } from '@/components/ui/button';
 import { DataTableFacetedFilter, DataTableViewOptions } from '@/components/ui/data-table';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { useSearchParams } from '@/hooks/use-search-params';
+import { createQueryString } from '@/lib/utils';
 import { Option, StudentWithCourses } from '@/types';
 
 interface StudentsTableFilters {
@@ -24,6 +29,10 @@ const columnNamesMap = {
 };
 
 export default function StudentsTableFilters({ table, courseOptions }: StudentsTableFilters) {
+  const router = useRouter();
+
+  const { searchParams } = useSearchParams();
+
   const isFiltered = table.getState().columnFilters.length > 0;
 
   const [inputValue, setInputValue] = React.useState(
@@ -44,6 +53,11 @@ export default function StudentsTableFilters({ table, courseOptions }: StudentsT
     setInputValue('');
   }
 
+  function handleSwitchChange(checked: boolean) {
+    const newQueryString = createQueryString('withInactiveStudents', checked ? 'true' : null, searchParams);
+    router.push(`${window.location.pathname}?${newQueryString}`);
+  }
+
   return (
     <div className='flex items-center justify-between gap-2 w-full'>
       <div className='flex flex-1 items-center space-x-2'>
@@ -60,6 +74,12 @@ export default function StudentsTableFilters({ table, courseOptions }: StudentsT
             <Cross2Icon className='ml-2 h-4 w-4' />
           </Button>
         )}
+        <Switch
+          id='students-state'
+          checked={searchParams.get('withInactiveStudents') === 'true'}
+          onCheckedChange={handleSwitchChange}
+        />
+        <Label htmlFor='students-state'>Incluir Inactivos</Label>
       </div>
       <DataTableViewOptions table={table} columnNamesMap={columnNamesMap} />
     </div>

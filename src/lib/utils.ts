@@ -1,5 +1,6 @@
 import { parseAbsolute, toCalendarDate } from '@internationalized/date';
 import { type ClassValue, clsx } from 'clsx';
+import { ReadonlyURLSearchParams } from 'next/navigation';
 import { twMerge } from 'tailwind-merge';
 import * as XLSX from 'xlsx';
 
@@ -130,3 +131,11 @@ export const convertAndExportToXlsx = (data: ExpiredInvoicesExcelData[]) => {
   XLSX.utils.book_append_sheet(wb, ws, 'Vencimientos');
   XLSX.writeFile(wb, 'vencimientos.xlsx');
 };
+
+export function createQueryString(name: string, value: string | null, searchParams: ReadonlyURLSearchParams) {
+  const params = new URLSearchParams(searchParams.toString());
+  if (value === null) params.delete(name);
+  else params.set(name, value);
+
+  return params.toString();
+}
