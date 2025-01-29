@@ -19,6 +19,9 @@ import {
 import { cn } from '@/lib/utils';
 import { StudentWithCourses } from '@/types';
 
+import ActivateStudentDialog from '../active-student-dialog';
+import DeleteStudentDialog from '../delete-student-dialog';
+
 export const columns: ColumnDef<StudentWithCourses>[] = [
   {
     accessorKey: 'id',
@@ -91,15 +94,27 @@ export const columns: ColumnDef<StudentWithCourses>[] = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align='end'>
             <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-            <DropdownMenuItem>
-              {row.original.active ? (
+            {row.original.active ? (
+              <DropdownMenuItem>
                 <Link href={`/students/${id}`}>Ver detalles</Link>
-              ) : (
-                <Button variant='ghost' className='p-0 w-full h-fit'>
-                  Activar
-                </Button>
-              )}
-            </DropdownMenuItem>
+              </DropdownMenuItem>
+            ) : (
+              <>
+                <DropdownMenuItem asChild>
+                  <ActivateStudentDialog studentWithCourses={student} />
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <DeleteStudentDialog
+                    studentWithCourses={student}
+                    ButtonTrigger={
+                      <Button variant='ghost' className='p-0 w-full'>
+                        Eliminar
+                      </Button>
+                    }
+                  />
+                </DropdownMenuItem>
+              </>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       );

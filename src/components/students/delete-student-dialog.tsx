@@ -4,19 +4,26 @@ import { DialogTrigger } from '@radix-ui/react-dialog';
 import { ExclamationTriangleIcon, TrashIcon } from '@radix-ui/react-icons';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { FiMoon } from 'react-icons/fi';
 
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useToast } from '@/components/ui/use-toast';
-import { deleteStudent } from '@/lib/students';
+import { deactivateStudent, deleteStudent } from '@/lib/students';
 import { StudentWithCourses } from '@/types';
 
 interface DeleteCourseDialogProps {
   studentWithCourses: StudentWithCourses;
+  isDeactivate?: boolean;
+  ButtonTrigger: JSX.Element;
 }
 
-export default function DeleteStudentDialog({ studentWithCourses }: DeleteCourseDialogProps) {
-  const [openDeleteStudentDialog, setopenDeleteStudentDialog] = useState(false);
+export default function DeleteStudentDialog({
+  studentWithCourses,
+  isDeactivate = false,
+  ButtonTrigger
+}: DeleteCourseDialogProps) {
+  const [openDeleteStudentDialog, setOpenDeleteStudentDialog] = useState(false);
   const { toast } = useToast();
   const { firstName, lastName, id } = studentWithCourses;
   const router = useRouter();
@@ -25,15 +32,16 @@ export default function DeleteStudentDialog({ studentWithCourses }: DeleteCourse
 
   async function handleDelete() {
     try {
-      await deleteStudent(id);
+      if (isDeactivate) await deactivateStudent(id);
+      else await deleteStudent(id);
 
       toast({
-        description: `Estudiante eliminado: ${fullName} `,
-        icon: <TrashIcon width='20px' height='20px' />,
-        variant: 'destructive'
+        description: `Estudiante ${isDeactivate ? 'inactivo' : 'eliminado'}: ${fullName} `,
+        icon: isDeactivate ? <FiMoon width='20px' height='20px' /> : <TrashIcon width='20px' height='20px' />,
+        variant: isDeactivate ? 'default' : 'destructive'
       });
 
-      setopenDeleteStudentDialog(false);
+      setOpenDeleteStudentDialog(false);
       router.replace('/students');
     } catch (err) {
       toast({
@@ -46,25 +54,22 @@ export default function DeleteStudentDialog({ studentWithCourses }: DeleteCourse
   }
 
   return (
-    <Dialog open={openDeleteStudentDialog} onOpenChange={setopenDeleteStudentDialog}>
-      <DialogTrigger asChild>
-        <Button variant='outline' size='sm' className='w-full'>
-          Eliminar Estudiante
-        </Button>
-      </DialogTrigger>
+    <Dialog open={openDeleteStudentDialog} onOpenChange={setOpenDeleteStudentDialog}>
+      <DialogTrigger asChild>{ButtonTrigger}</DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Confirmar Eliminación</DialogTitle>
+          <DialogTitle>Confirmar {isDeactivate ? 'Inactivación' : 'Eliminación'}</DialogTitle>
         </DialogHeader>
         <div className='my-3'>
-          ¿Desea eliminar a <span className='font-semibold'>{fullName}</span> definitivamente?
+          ¿Desea {isDeactivate ? 'Inactivar' : 'Eliminar permanentemente'} a{' '}
+          <span className='font-semibold'>{fullName}</span> ?
         </div>
         <DialogFooter>
-          <Button variant='outline' onClick={() => setopenDeleteStudentDialog(false)}>
+          <Button variant='outline' onClick={() => setOpenDeleteStudentDialog(false)}>
             Cancelar
           </Button>
           <Button variant='destructive' type='button' onClick={handleDelete}>
-            Eliminar
+            {isDeactivate ? 'Inactivar' : 'Eliminar'}
           </Button>
         </DialogFooter>
       </DialogContent>

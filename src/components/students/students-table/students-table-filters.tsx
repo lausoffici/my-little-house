@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { useSearchParams } from '@/hooks/use-search-params';
-import { createQueryString } from '@/lib/utils';
+import { updateSearchParams } from '@/lib/utils';
 import { Option, StudentWithCourses } from '@/types';
 
 interface StudentsTableFilters {
@@ -54,7 +54,14 @@ export default function StudentsTableFilters({ table, courseOptions }: StudentsT
   }
 
   function handleSwitchChange(checked: boolean) {
-    const newQueryString = createQueryString('withInactiveStudents', checked ? 'true' : null, searchParams);
+    const currentParams = new URLSearchParams(searchParams.toString());
+
+    const updates = {
+      withInactiveStudents: checked ? 'true' : null,
+      page: '1'
+    };
+
+    const newQueryString = updateSearchParams(currentParams, updates);
     router.push(`${window.location.pathname}?${newQueryString}`);
   }
 

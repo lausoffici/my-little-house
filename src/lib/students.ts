@@ -236,12 +236,31 @@ export const getStudentNamesByTerm = async (term: string) => {
 };
 
 export const deleteStudent = async (id: number) => {
+  return await prisma.student.delete({
+    where: {
+      id
+    }
+  });
+};
+
+export const deactivateStudent = async (id: number) => {
   return await prisma.student.update({
     where: {
       id
     },
     data: {
       active: false
+    }
+  });
+};
+
+export const activateStudent = async (id: number) => {
+  return await prisma.student.update({
+    where: {
+      id
+    },
+    data: {
+      active: true
     }
   });
 };
