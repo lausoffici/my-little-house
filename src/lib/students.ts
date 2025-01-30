@@ -29,7 +29,7 @@ export const getStudentById = async (id: number) => {
 };
 
 export const getStudentList = async (searchParams: SearchParams) => {
-  const { page, size, sortBy, sortOrder, studentByCourse, lastName } =
+  const { page, size, sortBy, sortOrder, studentByCourse, lastName, withInactiveStudents } =
     studentListSearchParamsSchema.parse(searchParams);
 
   const pageNumber = Number(page);
@@ -39,7 +39,7 @@ export const getStudentList = async (searchParams: SearchParams) => {
   const courseIds = studentByCourse?.split('.').map(Number) ?? [];
 
   const whereClause = {
-    active: true,
+    active: withInactiveStudents ? undefined : true,
     studentByCourse: courseIds.length > 0 ? { some: { courseId: { in: courseIds } } } : undefined,
     firstName: {
       not: ''
@@ -236,12 +236,31 @@ export const getStudentNamesByTerm = async (term: string) => {
 };
 
 export const deleteStudent = async (id: number) => {
+  return await prisma.student.delete({
+    where: {
+      id
+    }
+  });
+};
+
+export const inactivateStudent = async (id: number) => {
   return await prisma.student.update({
     where: {
       id
     },
     data: {
       active: false
+    }
+  });
+};
+
+export const activateStudent = async (id: number) => {
+  return await prisma.student.update({
+    where: {
+      id
+    },
+    data: {
+      active: true
     }
   });
 };

@@ -130,3 +130,14 @@ export const convertAndExportToXlsx = (data: ExpiredInvoicesExcelData[]) => {
   XLSX.utils.book_append_sheet(wb, ws, 'Vencimientos');
   XLSX.writeFile(wb, 'vencimientos.xlsx');
 };
+
+export function updateSearchParams(currentParams: URLSearchParams, updates: Record<string, string | null>): string {
+  const newParams = new URLSearchParams(currentParams);
+
+  Object.entries(updates).forEach(([key, value]) => {
+    if (value === null) newParams.delete(key);
+    else newParams.set(key, value);
+  });
+
+  return newParams.toString();
+}
