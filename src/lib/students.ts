@@ -39,7 +39,7 @@ export const getStudentList = async (searchParams: SearchParams) => {
   const courseIds = studentByCourse?.split('.').map(Number) ?? [];
 
   const whereClause = {
-    active: !!withInactiveStudents ? undefined : true,
+    active: withInactiveStudents ? undefined : true,
     studentByCourse: courseIds.length > 0 ? { some: { courseId: { in: courseIds } } } : undefined,
     firstName: {
       not: ''
@@ -243,7 +243,7 @@ export const deleteStudent = async (id: number) => {
   });
 };
 
-export const deactivateStudent = async (id: number) => {
+export const inactivateStudent = async (id: number) => {
   return await prisma.student.update({
     where: {
       id

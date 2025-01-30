@@ -9,19 +9,19 @@ import { FiMoon } from 'react-icons/fi';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useToast } from '@/components/ui/use-toast';
-import { deactivateStudent, deleteStudent } from '@/lib/students';
+import { deleteStudent, inactivateStudent } from '@/lib/students';
 import { StudentWithCourses } from '@/types';
 
 interface DeleteCourseDialogProps {
   studentWithCourses: StudentWithCourses;
-  isDeactivate?: boolean;
-  ButtonTrigger: JSX.Element;
+  isInactivation?: boolean;
+  buttonTrigger: JSX.Element;
 }
 
 export default function DeleteStudentDialog({
   studentWithCourses,
-  isDeactivate = false,
-  ButtonTrigger
+  isInactivation = false,
+  buttonTrigger
 }: DeleteCourseDialogProps) {
   const [openDeleteStudentDialog, setOpenDeleteStudentDialog] = useState(false);
   const { toast } = useToast();
@@ -32,13 +32,13 @@ export default function DeleteStudentDialog({
 
   async function handleDelete() {
     try {
-      if (isDeactivate) await deactivateStudent(id);
+      if (isInactivation) await inactivateStudent(id);
       else await deleteStudent(id);
 
       toast({
-        description: `Estudiante ${isDeactivate ? 'inactivo' : 'eliminado'}: ${fullName} `,
-        icon: isDeactivate ? <FiMoon width='20px' height='20px' /> : <TrashIcon width='20px' height='20px' />,
-        variant: isDeactivate ? 'default' : 'destructive'
+        description: `Estudiante ${isInactivation ? 'inactivo' : 'eliminado'}: ${fullName} `,
+        icon: isInactivation ? <FiMoon width='20px' height='20px' /> : <TrashIcon width='20px' height='20px' />,
+        variant: isInactivation ? 'default' : 'destructive'
       });
 
       setOpenDeleteStudentDialog(false);
@@ -55,21 +55,21 @@ export default function DeleteStudentDialog({
 
   return (
     <Dialog open={openDeleteStudentDialog} onOpenChange={setOpenDeleteStudentDialog}>
-      <DialogTrigger asChild>{ButtonTrigger}</DialogTrigger>
+      <DialogTrigger asChild>{buttonTrigger}</DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Confirmar {isDeactivate ? 'Inactivación' : 'Eliminación'}</DialogTitle>
+          <DialogTitle>Confirmar {isInactivation ? 'Inactivación' : 'Eliminación'}</DialogTitle>
         </DialogHeader>
         <div className='my-3'>
-          ¿Desea {isDeactivate ? 'Inactivar' : 'Eliminar permanentemente'} a{' '}
-          <span className='font-semibold'>{fullName}</span> ?
+          ¿Desea {isInactivation ? 'Inactivar' : 'Eliminar permanentemente'} a{' '}
+          <b className='font-semibold'>{fullName}</b> ?
         </div>
         <DialogFooter>
           <Button variant='outline' onClick={() => setOpenDeleteStudentDialog(false)}>
             Cancelar
           </Button>
           <Button variant='destructive' type='button' onClick={handleDelete}>
-            {isDeactivate ? 'Inactivar' : 'Eliminar'}
+            {isInactivation ? 'Inactivar' : 'Eliminar'}
           </Button>
         </DialogFooter>
       </DialogContent>

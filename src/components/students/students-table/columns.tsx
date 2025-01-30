@@ -106,7 +106,7 @@ export const columns: ColumnDef<StudentWithCourses>[] = [
                 <DropdownMenuItem asChild>
                   <DeleteStudentDialog
                     studentWithCourses={student}
-                    ButtonTrigger={
+                    buttonTrigger={
                       <Button variant='ghost' className='p-0 w-full'>
                         Eliminar
                       </Button>

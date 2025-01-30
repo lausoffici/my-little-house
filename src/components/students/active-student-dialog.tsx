@@ -1,3 +1,5 @@
+'use client';
+
 import { CheckIcon, ExclamationTriangleIcon } from '@radix-ui/react-icons';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -55,7 +57,7 @@ export default function ActivateStudentDialog({ studentWithCourses }: ActivateSt
           <DialogTitle>Confirmar Activación</DialogTitle>
         </DialogHeader>
         <div className='my-3'>
-          ¿Desea Activar a <span className='font-semibold'>{fullName}</span> ?
+          ¿Desea Activar a <b className='font-semibold'>{fullName}</b> ?
         </div>
         <DialogFooter>
           <Button variant='outline' onClick={() => setOpenActivateStudentDialog(false)}>

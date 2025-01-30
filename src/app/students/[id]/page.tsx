@@ -60,8 +60,8 @@ export default async function StudentPage({ params: { id }, searchParams }: Page
         <div className='flex flex-col gap-1 justify-end'>
           <DeleteStudentDialog
             studentWithCourses={student}
-            isDeactivate
-            ButtonTrigger={
+            isInactivation
+            buttonTrigger={
               <Button variant='outline' size='sm' className='w-full'>
                 Inactivar Estudiante
               </Button>
@@ -69,7 +69,7 @@ export default async function StudentPage({ params: { id }, searchParams }: Page
           />
           <DeleteStudentDialog
             studentWithCourses={student}
-            ButtonTrigger={
+            buttonTrigger={
               <Button variant='outline' size='sm' className='w-full'>
                 Eliminar Estudiante
               </Button>
