@@ -59,8 +59,6 @@ export const editEnrollment = async (_: unknown, editedEnrollment: FormData) => 
     id: Number(editedEnrollment.get('id'))
   });
 
-  console.log({ parsedData: parsedData.error });
-
   if (!parsedData?.success) {
     return {
       error: true,
