@@ -58,8 +58,9 @@ export const scholarshipFormSchema = z.object({
 });
 
 export const enrollmentFormSchema = z.object({
-  year: z.string(),
-  amount: z.string()
+  year: z.optional(z.string()),
+  amount: z.string(),
+  id: z.optional(z.number())
 });
 
 export const discountsFormSchema = z.object({

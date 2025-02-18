@@ -52,3 +52,41 @@ export const addEnrollment = async (_: unknown, newEnrollment: FormData) => {
     };
   }
 };
+
+export const editEnrollment = async (_: unknown, editedEnrollment: FormData) => {
+  const parsedData = enrollmentFormSchema.safeParse({
+    amount: editedEnrollment.get('amount'),
+    id: Number(editedEnrollment.get('id'))
+  });
+
+  console.log({ parsedData: parsedData.error });
+
+  if (!parsedData?.success) {
+    return {
+      error: true,
+      message: 'Error al editar la matrícula'
+    };
+  }
+
+  try {
+    const updatedEnrollment = await prisma.enrollment.update({
+      where: {
+        id: parsedData.data.id
+      },
+      data: {
+        amount: Number(parsedData.data.amount)
+      }
+    });
+
+    return {
+      error: false,
+      message: `Matrícula ${updatedEnrollment.year} actualizada con éxito`
+    };
+  } catch (error) {
+    console.error(error);
+    return {
+      error: true,
+      message: 'Error al actualizar la matrícula'
+    };
+  }
+};

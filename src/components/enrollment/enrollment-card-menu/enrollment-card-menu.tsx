@@ -1,13 +1,10 @@
 'use client';
 
-import { Course } from '@prisma/client';
-import { DotsVerticalIcon } from '@radix-ui/react-icons';
-import { Pencil2Icon } from '@radix-ui/react-icons';
-import { TrashIcon } from '@radix-ui/react-icons';
+import { Enrollment } from '@prisma/client';
+import { DotsVerticalIcon, Pencil2Icon } from '@radix-ui/react-icons';
 import { useState } from 'react';
 
-import DeleteCourseDialog from '@/components/courses/delete-course-dialog';
-import EditCourseDialog from '@/components/courses/edit-course-dialog';
+import EditEnrollmentDialog from '@/components/enrollment/edit-enrollment-dialog';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogTrigger } from '@/components/ui/dialog';
 import {
@@ -18,9 +15,8 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 
-export default function CourseCardMenu({ course }: { course: Course }) {
+export default function EnrollmentCardMenu({ enrollment }: { enrollment: Enrollment }) {
   const [openEditDialog, setOpenEditDialog] = useState(false);
-  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
   return (
     <DropdownMenu>
@@ -39,19 +35,7 @@ export default function CourseCardMenu({ course }: { course: Course }) {
               </DropdownMenuShortcut>
             </DropdownMenuItem>
           </DialogTrigger>
-          <EditCourseDialog course={course} onOpenChange={setOpenEditDialog} />
-        </Dialog>
-
-        <Dialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>
-          <DialogTrigger className='w-full'>
-            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-              Eliminar
-              <DropdownMenuShortcut>
-                <TrashIcon />
-              </DropdownMenuShortcut>
-            </DropdownMenuItem>
-          </DialogTrigger>
-          <DeleteCourseDialog course={course} onOpenChange={setOpenDeleteDialog} />
+          <EditEnrollmentDialog enrollment={enrollment} onOpenChange={setOpenEditDialog} />
         </Dialog>
       </DropdownMenuContent>
     </DropdownMenu>
