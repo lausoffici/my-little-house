@@ -16,9 +16,7 @@ export default async function Enrollments() {
           <EnrollmentDialog />
         </div>
       </div>
-      <div
-        className={`grid auto-rows-[fit-content(1em)] grid-cols-[repeat(auto-fit,minmax(250px,_1fr))] gap-4 overflow-scroll no-scrollbar`}
-      >
+      <div className='grid auto-rows-[fit-content(1em)] grid-cols-[repeat(auto-fit,minmax(250px,_1fr))] gap-4 overflow-scroll no-scrollbar'>
         {enrollments.map((enrollment) => (
           <Card key={enrollment.id} className='shadow-sm'>
             <CardHeader className='flex-row items-center justify-between relative'>
