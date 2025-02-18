@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React from 'react';
-import { FiDollarSign, FiLock, FiMonitor, FiSmile, FiTrendingUp } from 'react-icons/fi';
+import { FiClipboard, FiDollarSign, FiLock, FiMonitor, FiSmile, FiTrendingUp } from 'react-icons/fi';
 import { TfiReceipt } from 'react-icons/tfi';
 
 import { cn } from '@/lib/utils';
@@ -17,7 +17,8 @@ const LinkItems = [
   { name: 'Resumen', icon: <FiTrendingUp />, href: '/dashboard' },
   { name: 'Caja', icon: <FiLock />, href: '/cash-register' },
   { name: 'Comprobantes', icon: <TfiReceipt />, href: '/receipts' },
-  { name: 'Vencimientos', icon: <FiDollarSign />, href: '/expirations?sortBy=expiredAt&sortOrder=asc' }
+  { name: 'Vencimientos', icon: <FiDollarSign />, href: '/expirations?sortBy=expiredAt&sortOrder=asc' },
+  { name: 'Matriculas', icon: <FiClipboard />, href: '/enrollments' }
 ];
 
 interface NavItemProps {
