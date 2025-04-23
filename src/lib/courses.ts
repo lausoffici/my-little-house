@@ -172,7 +172,6 @@ const generateInvoices = async (tx: Prisma.TransactionClient, course: Course, st
 
 const generateEnrollment = async (tx: Prisma.TransactionClient, studentId: number) => {
   const todaysData = getTodaysData();
-  let currentMonth = todaysData.currentMonth;
   const currentYear = todaysData.currentYear;
 
   const enrollment = await tx.enrollment.findFirst({
@@ -196,7 +195,7 @@ const generateEnrollment = async (tx: Prisma.TransactionClient, studentId: numbe
       amount: enrollment?.amount || 0,
       balance: 0,
       state: 'I',
-      expiredAt: new Date(`${currentMonth}-15-${currentYear + 1}`),
+      expiredAt: new Date(),
       courseId: null,
       studentId: studentId
     }
