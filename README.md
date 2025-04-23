@@ -1,6 +1,7 @@
 ## My Little House
 This is a backroom web app for an English Language Institute called "My Little House". Some functionalities include:
 - adding courses and students
+- adding enrollements
 - charging invoices
 - seeing statistics
 - controlling the incomes, outcomes, etc.
