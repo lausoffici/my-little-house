@@ -415,25 +415,15 @@ export const getStudentSheetData = async () => {
     }
   });
 
-  const expiredInvoices = await prisma.invoice.findMany({
-    where: {
-      state: InvoiceState.I,
-      expiredAt: { lt: new Date() },
-      student: {
-        active: true
-      }
-    }
-  });
-
-  return students.map((item) => {
-    const courses = item.studentByCourse.map((c) => c.course);
-    const currentDebt = expiredInvoices.filter((i) => i.studentId === item.id);
+  return students.map((student) => {
+    const courses = student.studentByCourse.map((c) => c.course);
+    const expiredInvoices = student.invoices.filter((i) => i.state === InvoiceState.I && i.expiredAt < new Date());
 
     return {
-      Alumno: `${item.lastName} ${item.firstName}`,
+      Alumno: `${student.lastName} ${student.firstName}`,
       Curso: courses.map((c) => c.name).join(', '),
       Cuota: courses.map((c) => formatCurrency(c.amount)).join(', '),
-      Deuda: currentDebt
+      Adeuda: expiredInvoices
         .map(
           (i) => `${getMonthName(i.month)}: ${formatCurrency(getDiscountedAmount(i.amount, i.discount) - i.balance)}`
         )

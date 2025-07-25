@@ -23,7 +23,7 @@ export default function InvoicesTable({ invoicesPromise, expiredInvoicesDataProm
   const sheetData = React.use(expiredInvoicesDataPromise);
 
   function handleDownload() {
-    convertAndExportToXlsx(sheetData);
+    convertAndExportToXlsx(sheetData, 'Vencimientos');
   }
 
   const table = useURLManagedDataTable<InvoiceListItem>({

@@ -3,7 +3,7 @@ import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import * as XLSX from 'xlsx';
 
-import { ErrorWithMessage, ExpiredInvoicesExcelData } from '@/types';
+import { ErrorWithMessage } from '@/types';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -124,21 +124,11 @@ export function getErrorMessage(error: unknown) {
   return toErrorWithMessage(error).message;
 }
 
-export const convertAndExportToXlsx = (
-  data:
-    | ExpiredInvoicesExcelData[]
-    | {
-        Alumno: string;
-        Curso: string;
-        Cuota: string;
-        Deuda: string;
-      }[],
-  isStudentsDataSheet: boolean
-) => {
+export const convertAndExportToXlsx = <T>(data: T[], fileName: string) => {
   const ws = XLSX.utils.json_to_sheet(data);
   const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, isStudentsDataSheet ? 'Estudiantes' : 'Vencimientos');
-  XLSX.writeFile(wb, isStudentsDataSheet ? 'Estudiantes.xlsx' : 'vencimientos.xlsx');
+  XLSX.utils.book_append_sheet(wb, ws, fileName);
+  XLSX.writeFile(wb, `${fileName}.xlsx`);
 };
 
 export function updateSearchParams(currentParams: URLSearchParams, updates: Record<string, string | null>): string {

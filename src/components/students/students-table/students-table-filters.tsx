@@ -70,7 +70,7 @@ export default function StudentsTableFilters({ table, courseOptions, studentShee
   }
 
   function handleDownload() {
-    convertAndExportToXlsx(studentSheetData, true);
+    convertAndExportToXlsx(studentSheetData, 'Estudiantes');
   }
 
   return (
