@@ -10,7 +10,9 @@ const MINIMUM_CHARACTERS = 4;
 export const SearchBar = () => {
   const [inputValue, setInputValue] = useState('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [studentNames, setStudentNames] = useState<{ id: string; firstName: string; lastName: string }[]>([]);
+  const [studentNames, setStudentNames] = useState<
+    { id: string; firstName: string; lastName: string; active: boolean }[]
+  >([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -84,7 +86,7 @@ export const SearchBar = () => {
 };
 
 type DropdownContentProps = {
-  studentNames: { id: string; firstName: string; lastName: string }[];
+  studentNames: { id: string; firstName: string; lastName: string; active: boolean }[];
   inputValue: string;
   isLoading: boolean;
   error: string;
@@ -100,14 +102,21 @@ function DropdownContent({ studentNames, inputValue, isLoading, error }: Dropdow
   }
 
   if (studentNames.length > 0) {
-    return studentNames.map(({ id, firstName, lastName }) => (
+    return studentNames.map(({ id, firstName, lastName, active }) => (
       <Link
         key={id}
         href={`/students/${id}`}
         className='flex justify-between items-center text-sm font-medium bg-white hover:bg-gray-200 p-2 last:border-b-0 border-b'
       >
-        <div>
-          {firstName} {lastName}
+        <div className='flex items-center gap-2'>
+          <span>
+            {firstName} {lastName}
+          </span>
+          {!active && (
+            <span className='inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'>
+              Inactivo
+            </span>
+          )}
         </div>
         <ArrowRightIcon />
       </Link>
