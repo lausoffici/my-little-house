@@ -62,7 +62,7 @@ export function getMonthName(monthNumber: number) {
     case 12:
       return 'Diciembre';
     default:
-      return '--';
+      return 'Matrícula';
   }
 }
 
@@ -124,11 +124,21 @@ export function getErrorMessage(error: unknown) {
   return toErrorWithMessage(error).message;
 }
 
-export const convertAndExportToXlsx = (data: ExpiredInvoicesExcelData[]) => {
+export const convertAndExportToXlsx = (
+  data:
+    | ExpiredInvoicesExcelData[]
+    | {
+        Alumno: string;
+        Curso: string;
+        Cuota: string;
+        Deuda: string;
+      }[],
+  isStudentsDataSheet: boolean
+) => {
   const ws = XLSX.utils.json_to_sheet(data);
   const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'Vencimientos');
-  XLSX.writeFile(wb, 'vencimientos.xlsx');
+  XLSX.utils.book_append_sheet(wb, ws, isStudentsDataSheet ? 'Estudiantes' : 'Vencimientos');
+  XLSX.writeFile(wb, isStudentsDataSheet ? 'Estudiantes.xlsx' : 'vencimientos.xlsx');
 };
 
 export function updateSearchParams(currentParams: URLSearchParams, updates: Record<string, string | null>): string {
