@@ -206,29 +206,59 @@ export const editStudent = async (_: unknown, editedStudent: FormData) => {
 };
 
 export const getStudentNamesByTerm = async (term: string) => {
+  // Split the search term into words
+  const searchTerms = term
+    .trim()
+    .split(/\s+/)
+    .filter((word) => word.length > 0);
+
   const students = await prisma.student.findMany({
     where: {
       OR: [
+        // Search in firstName only
         {
           firstName: {
             contains: term,
             mode: 'insensitive' as const
-          },
-          active: true
+          }
         },
+        // Search in lastName only
         {
           lastName: {
             contains: term,
             mode: 'insensitive' as const
-          },
-          active: true
-        }
+          }
+        },
+        // Multi-word search: each word must be found in either firstName or lastName
+        ...(searchTerms.length > 1
+          ? [
+              {
+                AND: searchTerms.map((word) => ({
+                  OR: [
+                    {
+                      firstName: {
+                        contains: word,
+                        mode: 'insensitive' as const
+                      }
+                    },
+                    {
+                      lastName: {
+                        contains: word,
+                        mode: 'insensitive' as const
+                      }
+                    }
+                  ]
+                }))
+              }
+            ]
+          : [])
       ]
     },
     select: {
       id: true,
       firstName: true,
-      lastName: true
+      lastName: true,
+      active: true
     },
     take: 10
   });
