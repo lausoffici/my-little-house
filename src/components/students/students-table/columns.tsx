@@ -65,7 +65,7 @@ export const columns: ColumnDef<StudentWithCourses>[] = [
     enableSorting: false
   },
   {
-    accessorKey: 'status',
+    accessorKey: 'active',
     header: ({ column }) => <DataTableColumnHeader column={column} title='Estado' />,
     cell: ({ row }) => (
       <Badge
