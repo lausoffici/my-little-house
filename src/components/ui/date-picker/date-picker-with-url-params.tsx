@@ -15,7 +15,9 @@ export default function DatePickerWithURLParams() {
   const appliedDate = getAppliedDateFromSearchParams(searchParams);
   const defaultValue = getDatePickerFormattedDate(appliedDate);
 
-  function handleChange(value: DateValue) {
+  function handleChange(value: DateValue | null) {
+    if (!value) return;
+
     const currentParams = new URLSearchParams(searchParams.toString());
 
     currentParams.set('day', value.day.toString());
