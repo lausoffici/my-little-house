@@ -252,13 +252,13 @@ export const getStudentNamesByTerm = async (term: string) => {
               }
             ]
           : [])
-      ]
+      ],
+      active: true
     },
     select: {
       id: true,
       firstName: true,
-      lastName: true,
-      active: true
+      lastName: true
     },
     take: 10
   });

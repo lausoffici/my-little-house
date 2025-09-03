@@ -125,12 +125,14 @@ export default function ChargeInvoicesDialog({ unpaidInvoicesPromise }: ChargeIn
   function getInvoicesOptions(invoiceId: string) {
     const selectedIds = invoices.map(({ selectedId }) => Number(selectedId));
 
-    return invoicesOptions.filter((option) => {
-      const invoiceOptionId = Number(option.value);
-      const currentOptionId = Number(invoiceId);
-      // returns all invoices options except the ones that are selected by others inputs
-      return invoiceOptionId !== selectedIds.find((id) => id === invoiceOptionId && id !== currentOptionId);
-    });
+    return invoicesOptions
+      .filter((option) => {
+        const invoiceOptionId = Number(option.value);
+        const currentOptionId = Number(invoiceId);
+        // returns all invoices options except the ones that are selected by others inputs
+        return invoiceOptionId !== selectedIds.find((id) => id === invoiceOptionId && id !== currentOptionId);
+      })
+      .sort((a, b) => +a.value - +b.value);
   }
 
   useEffect(() => {
