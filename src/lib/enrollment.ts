@@ -88,3 +88,97 @@ export const editEnrollment = async (_: unknown, editedEnrollment: FormData) => 
     };
   }
 };
+
+export const getAllActiveStudentsWithEnrollmentStatus = async () => {
+  return await prisma.$transaction(async (tx) => {
+    const latestEnrollment = await tx.enrollment.findFirst({
+      orderBy: { year: 'desc' }
+    });
+
+    if (!latestEnrollment) {
+      return [];
+    }
+
+    const year = latestEnrollment.year;
+
+    // Get ALL active students
+    const allStudents = await tx.student.findMany({
+      where: { active: true },
+      include: {
+        studentEnrollments: {
+          where: { year }
+        },
+        invoices: {
+          where: {
+            year: year,
+            description: {
+              contains: 'Matrícula',
+              mode: 'insensitive'
+            }
+          },
+          include: {
+            items: true
+          }
+        }
+      }
+    });
+
+    // Map all students with their enrollment status
+    const results = allStudents.map((student) => {
+      const isEnrolled = student.studentEnrollments.length > 0;
+      const invoice = student.invoices[0];
+
+      if (!invoice) {
+        return {
+          id: student.id,
+          firstName: student.firstName,
+          lastName: student.lastName,
+          email: student.email,
+          phone: student.phone,
+          mobilePhone: student.mobilePhone,
+          enrollmentYear: year,
+          enrollmentAmount: latestEnrollment.amount,
+          totalPaid: 0,
+          balance: latestEnrollment.amount,
+          invoiceState: null,
+          paymentStatus: isEnrolled ? ('SIN FACTURA' as const) : ('NO INSCRIPTO' as const),
+          invoiceId: null,
+          paymentDate: null
+        };
+      }
+
+      const totalPaid = invoice.items.reduce((sum, item) => sum + item.amount, 0);
+
+      let paymentStatus: 'PAGO COMPLETO' | 'PAGO PARCIAL' | 'NO PAGO' | 'BECADO' | 'SIN FACTURA';
+
+      if (invoice.state === 'B') {
+        paymentStatus = 'BECADO';
+      } else if (invoice.state === 'P') {
+        paymentStatus = 'PAGO COMPLETO';
+      } else if (invoice.state === 'I' && invoice.balance < invoice.amount) {
+        paymentStatus = 'PAGO PARCIAL';
+      } else {
+        paymentStatus = 'NO PAGO';
+      }
+
+      return {
+        id: student.id,
+        firstName: student.firstName,
+        lastName: student.lastName,
+        email: student.email,
+        phone: student.phone,
+        mobilePhone: student.mobilePhone,
+        enrollmentYear: year,
+        enrollmentAmount: invoice.amount,
+        totalPaid: totalPaid,
+        balance: invoice.balance,
+        invoiceState: invoice.state,
+        paymentStatus,
+        invoiceId: invoice.id,
+        paymentDate: invoice.paymentDate
+      };
+    });
+
+    return results;
+  });
+};

@@ -1,18 +1,21 @@
 import EnrollmentCardMenu from '@/components/enrollment/enrollment-card-menu';
 import EnrollmentDialog from '@/components/enrollment/enrollment-dialog';
+import { ExportEnrollmentsButton } from '@/components/enrollment/export-enrollments-btn';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { getEnrollments } from '@/lib/enrollment';
+import { getAllActiveStudentsWithEnrollmentStatus, getEnrollments } from '@/lib/enrollment';
 import { formatCurrency } from '@/lib/utils';
 
 export default async function Enrollments() {
   const enrollments = await getEnrollments();
+  const studentsEnrollmentStatusPromise = getAllActiveStudentsWithEnrollmentStatus();
 
   return (
     <section>
       <div className='flex justify-between items-center mb-6'>
         <h1 className='text-3xl font-bold text-foreground'>Matrículas</h1>
         <div className='flex gap-2'>
+          <ExportEnrollmentsButton studentsEnrollmentStatusPromise={studentsEnrollmentStatusPromise} />
           <EnrollmentDialog />
         </div>
       </div>
