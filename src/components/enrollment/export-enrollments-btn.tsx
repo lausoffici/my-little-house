@@ -18,13 +18,21 @@ export function ExportEnrollmentsButton({
   function handleExport() {
     // Preparar los datos para Excel
     const excelData = studentsEnrollmentStatus
-      .sort((a, b) => a.lastName.localeCompare(b.lastName))
+      .sort((a, b) => {
+        const courseCompare = a.courseName.localeCompare(b.courseName);
+        if (courseCompare !== 0) {
+          return courseCompare;
+        }
+
+        return a.lastName.localeCompare(b.lastName);
+      })
       .map((status) => ({
         'Apellido y Nombre': `${status.lastName}, ${status.firstName}`,
-        'Año de Matrícula': status.enrollmentYear,
+        Curso: status.courseName,
         'Estado de Pago': status.paymentStatus,
         Debe: status.enrollmentAmount === status.balance ? formatCurrency(0) : formatCurrency(status.balance),
-        Precio: formatCurrency(status.enrollmentAmount)
+        Precio: formatCurrency(status.enrollmentAmount),
+        'Año de Matrícula': status.enrollmentYear
       }));
 
     convertAndExportToXlsx(excelData, 'Estado_de_Matriculas.xlsx');

@@ -117,7 +117,18 @@ export const getAllActiveStudentsWithEnrollmentStatus = async () => {
             }
           },
           include: {
-            items: true
+            items: true,
+            course: true
+          }
+        },
+        studentByCourse: {
+          where: {
+            course: {
+              active: true
+            }
+          },
+          include: {
+            course: true
           }
         }
       }
@@ -127,6 +138,8 @@ export const getAllActiveStudentsWithEnrollmentStatus = async () => {
     const results = allStudents.map((student) => {
       const isEnrolled = student.studentEnrollments.length > 0;
       const invoice = student.invoices[0];
+
+      const courseNames = student.studentByCourse.map((sbc) => sbc.course.name).join(', ') || 'Sin curso asignado';
 
       if (!invoice) {
         return {
@@ -143,7 +156,8 @@ export const getAllActiveStudentsWithEnrollmentStatus = async () => {
           invoiceState: null,
           paymentStatus: isEnrolled ? ('SIN FACTURA' as const) : ('NO INSCRIPTO' as const),
           invoiceId: null,
-          paymentDate: null
+          paymentDate: null,
+          courseName: courseNames
         };
       }
 
@@ -175,7 +189,8 @@ export const getAllActiveStudentsWithEnrollmentStatus = async () => {
         invoiceState: invoice.state,
         paymentStatus,
         invoiceId: invoice.id,
-        paymentDate: invoice.paymentDate
+        paymentDate: invoice.paymentDate,
+        courseName: courseNames
       };
     });
 
