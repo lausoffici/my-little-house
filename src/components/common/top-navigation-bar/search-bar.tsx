@@ -10,7 +10,7 @@ const MINIMUM_CHARACTERS = 4;
 export const SearchBar = () => {
   const [inputValue, setInputValue] = useState('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [studentNames, setStudentNames] = useState<{ id: string; firstName: string; lastName: string }[]>([]);
+  const [studentNames, setStudentNames] = useState<{ id: number; firstName: string; lastName: string }[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -28,9 +28,10 @@ export const SearchBar = () => {
       const response = await fetch(`/api/students?query=${searchTerm}`);
       if (!response.ok) throw new Error('Network response was not ok');
       const data = await response.json();
-      setStudentNames(data.studentNames);
+      const names = Array.isArray(data.studentNames) ? data.studentNames : [];
+      setStudentNames(names);
 
-      if (data.studentNames.length === 0) {
+      if (names.length === 0) {
         setError('No se encontraron estudiantes');
       }
     } catch (error) {
@@ -84,7 +85,7 @@ export const SearchBar = () => {
 };
 
 type DropdownContentProps = {
-  studentNames: { id: string; firstName: string; lastName: string }[];
+  studentNames: { id: number; firstName: string; lastName: string }[];
   inputValue: string;
   isLoading: boolean;
   error: string;

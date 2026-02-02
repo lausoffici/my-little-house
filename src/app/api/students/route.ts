@@ -8,9 +8,8 @@ export async function GET(req: NextRequest) {
 
   const searchTerm = searchParams.get('query');
 
-  const query = studentNamesListQueryParamsSchema.parse(searchTerm);
-
   try {
+    const query = studentNamesListQueryParamsSchema.parse(searchTerm);
     const studentNames = await getStudentNamesByTerm(query);
 
     return Response.json({ studentNames });
@@ -18,7 +17,8 @@ export async function GET(req: NextRequest) {
     console.error('Failed to fetch student names:', error);
     return Response.json(
       {
-        error: 'Failed to fetch student names'
+        error: 'Failed to fetch student names',
+        studentNames: []
       },
       {
         status: 500
