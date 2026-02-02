@@ -127,7 +127,7 @@ function DropdownContent({ students, inputValue, isLoading, error }: DropdownCon
 
   if (students.length > 0) {
     return (
-      <>
+      <div className='flex flex-col'>
         {students.map(({ id, firstName, lastName }) => (
           <Link
             key={id}
@@ -140,7 +140,7 @@ function DropdownContent({ students, inputValue, isLoading, error }: DropdownCon
             <ArrowRightIcon />
           </Link>
         ))}
-      </>
+      </div>
     );
   }
 
