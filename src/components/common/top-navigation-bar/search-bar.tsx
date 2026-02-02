@@ -103,18 +103,22 @@ function DropdownContent({ studentNames, inputValue, isLoading, error }: Dropdow
   }
 
   if (studentNames.length > 0) {
-    return studentNames.map(({ id, firstName, lastName }) => (
-      <Link
-        key={id}
-        href={`/students/${id}`}
-        className='flex justify-between items-center text-sm font-medium bg-white hover:bg-gray-200 p-2 last:border-b-0 border-b'
-      >
-        <span>
-          {firstName} {lastName}
-        </span>
-        <ArrowRightIcon />
-      </Link>
-    ));
+    return (
+      <>
+        {studentNames.map(({ id, firstName, lastName }) => (
+          <Link
+            key={id}
+            href={`/students/${id}`}
+            className='flex justify-between items-center text-sm font-medium bg-white hover:bg-gray-200 p-2 last:border-b-0 border-b'
+          >
+            <span>
+              {firstName} {lastName}
+            </span>
+            <ArrowRightIcon />
+          </Link>
+        ))}
+      </>
+    );
   }
 
   if (inputValue.length >= MINIMUM_CHARACTERS) {
