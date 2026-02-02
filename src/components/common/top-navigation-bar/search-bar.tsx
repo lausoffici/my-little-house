@@ -1,25 +1,32 @@
+'use client';
+
 import { ArrowRightIcon, MagnifyingGlassIcon } from '@radix-ui/react-icons';
 import Link from 'next/link';
-import React, { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 
 import { Input } from '@/components/ui/input';
 
 const MINIMUM_CHARACTERS = 4;
 
-export const SearchBar = () => {
+type Student = {
+  id: number;
+  firstName: string;
+  lastName: string;
+};
+
+export function SearchBar() {
   const [inputValue, setInputValue] = useState('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [studentNames, setStudentNames] = useState<
-    { id: string; firstName: string; lastName: string; active: boolean }[]
-  >([]);
+  const [students, setStudents] = useState<Student[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const debouncedFetchStudentNames = useDebouncedCallback(async (searchTerm: string) => {
+  const debouncedFetchStudents = useDebouncedCallback(async (searchTerm: string) => {
     if (searchTerm.length < MINIMUM_CHARACTERS) {
-      setStudentNames([]);
+      setStudents([]);
       setError('');
+      setIsLoading(false);
       return;
     }
 
@@ -27,73 +34,89 @@ export const SearchBar = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch(`/api/students?query=${searchTerm}`);
-      if (!response.ok) throw new Error('Network response was not ok');
+      const response = await fetch(`/api/students?query=${encodeURIComponent(searchTerm)}`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const data = await response.json();
-      const names = Array.isArray(data.studentNames) ? data.studentNames : [];
-      setStudentNames(names);
+      const studentNames = Array.isArray(data.studentNames) ? data.studentNames : [];
+      
+      setStudents(studentNames);
 
-      if (names.length === 0) {
+      if (studentNames.length === 0) {
         setError('No se encontraron estudiantes');
       }
     } catch (error) {
       console.error('Failed to fetch student names:', error);
       setError('Error al buscar estudiantes');
-      setStudentNames([]);
+      setStudents([]);
     } finally {
       setIsLoading(false);
     }
   }, 500);
 
-  function handleSearch(searchTerm: string) {
+  const handleSearch = useCallback((searchTerm: string) => {
     setInputValue(searchTerm);
+    
     if (searchTerm.length >= MINIMUM_CHARACTERS) {
       setIsLoading(true);
-      debouncedFetchStudentNames(searchTerm);
+      debouncedFetchStudents(searchTerm);
     } else {
-      setStudentNames([]);
+      setStudents([]);
       setError('');
+      setIsLoading(false);
     }
-  }
+  }, [debouncedFetchStudents]);
+
+  const handleBlur = useCallback((e: React.FocusEvent<HTMLDivElement>) => {
+    if (e.currentTarget.contains(e.relatedTarget)) {
+      return;
+    }
+    setIsDropdownOpen(false);
+  }, []);
+
+  const handleFocus = useCallback(() => {
+    setIsDropdownOpen(true);
+  }, []);
 
   return (
     <div className='relative md:w-2/3 lg:w-1/3'>
       <MagnifyingGlassIcon className='absolute left-2.5 top-2.5 h-4 w-4 text-gray-500 dark:text-gray-400' />
-      <div
-        onBlur={(e) => {
-          if (e.currentTarget.contains(e.relatedTarget)) {
-            return;
-          }
-          setIsDropdownOpen(false);
-        }}
-      >
+      <div onBlur={handleBlur}>
         <Input
           className='w-full bg-white shadow-none appearance-none pl-8 dark:bg-gray-950'
           placeholder='Buscar estudiante...'
           onChange={(e) => handleSearch(e.target.value)}
-          onFocus={() => setIsDropdownOpen(true)}
+          onFocus={handleFocus}
           value={inputValue}
           type='search'
         />
 
         {isDropdownOpen && (
           <div className='absolute top-10 left-0 flex flex-col bg-white border rounded text-foreground w-full z-10'>
-            <DropdownContent studentNames={studentNames} inputValue={inputValue} isLoading={isLoading} error={error} />
+            <DropdownContent 
+              students={students} 
+              inputValue={inputValue} 
+              isLoading={isLoading} 
+              error={error} 
+            />
           </div>
         )}
       </div>
     </div>
   );
-};
+}
 
 type DropdownContentProps = {
-  studentNames: { id: string; firstName: string; lastName: string; active: boolean }[];
+  students: Student[];
   inputValue: string;
   isLoading: boolean;
   error: string;
 };
 
-function DropdownContent({ studentNames, inputValue, isLoading, error }: DropdownContentProps) {
+function DropdownContent({ students, inputValue, isLoading, error }: DropdownContentProps) {
   if (isLoading) {
     return <div className='p-2 text-center font-medium text-xs text-gray-600'>Cargando...</div>;
   }
@@ -102,10 +125,10 @@ function DropdownContent({ studentNames, inputValue, isLoading, error }: Dropdow
     return <div className='p-2 text-center font-medium text-xs text-gray-600'>{error}</div>;
   }
 
-  if (studentNames.length > 0) {
+  if (students.length > 0) {
     return (
       <>
-        {studentNames.map(({ id, firstName, lastName }) => (
+        {students.map(({ id, firstName, lastName }) => (
           <Link
             key={id}
             href={`/students/${id}`}

@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
   const searchTerm = searchParams.get('query');
 
   try {
-    const query = studentNamesListQueryParamsSchema.parse(searchTerm);
+    const query = studentNamesListQueryParamsSchema.parse(searchTerm ?? '');
     const studentNames = await getStudentNamesByTerm(query);
 
     return Response.json({ studentNames });
