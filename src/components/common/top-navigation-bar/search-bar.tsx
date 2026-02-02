@@ -1,30 +1,32 @@
-'use client';
-
 import { ArrowRightIcon, MagnifyingGlassIcon } from '@radix-ui/react-icons';
 import Link from 'next/link';
-import { useCallback, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 
 import { Input } from '@/components/ui/input';
 
 const MINIMUM_CHARACTERS = 4;
 
-type Student = {
-  id: number;
-  firstName: string;
-  lastName: string;
-};
-
-export function SearchBar() {
+export const SearchBar = () => {
   const [inputValue, setInputValue] = useState('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [students, setStudents] = useState<Student[]>([]);
+  const [studentNames, setStudentNames] = useState<
+    {
+      id: string;
+      firstName: string;
+      lastName: string;
+      active: boolean;
+    }[]
+  >([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const debouncedFetchStudents = useDebouncedCallback(async (searchTerm: string) => {
+  // Ref para evitar actualizaciones después del desmontaje
+  const isMountedRef = useRef(true);
+
+  const debouncedFetchStudentNames = useDebouncedCallback(async (searchTerm: string) => {
     if (searchTerm.length < MINIMUM_CHARACTERS) {
-      setStudents([]);
+      setStudentNames([]);
       setError('');
       setIsLoading(false);
       return;
@@ -35,88 +37,90 @@ export function SearchBar() {
 
     try {
       const response = await fetch(`/api/students?query=${encodeURIComponent(searchTerm)}`);
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
+      if (!response.ok) throw new Error('Network response was not ok');
       const data = await response.json();
-      const studentNames = Array.isArray(data.studentNames) ? data.studentNames : [];
-      
-      setStudents(studentNames);
 
-      if (studentNames.length === 0) {
-        setError('No se encontraron estudiantes');
+      // Solo actualiza si el componente sigue montado
+      if (isMountedRef.current) {
+        setStudentNames(data.studentNames);
+
+        if (data.studentNames.length === 0) {
+          setError('No se encontraron estudiantes');
+        }
       }
     } catch (error) {
       console.error('Failed to fetch student names:', error);
-      setError('Error al buscar estudiantes');
-      setStudents([]);
+      if (isMountedRef.current) {
+        setError('Error al buscar estudiantes');
+        setStudentNames([]);
+      }
     } finally {
-      setIsLoading(false);
+      if (isMountedRef.current) {
+        setIsLoading(false);
+      }
     }
   }, 500);
 
-  const handleSearch = useCallback((searchTerm: string) => {
+  function handleSearch(searchTerm: string) {
     setInputValue(searchTerm);
-    
+
     if (searchTerm.length >= MINIMUM_CHARACTERS) {
       setIsLoading(true);
-      debouncedFetchStudents(searchTerm);
+      debouncedFetchStudentNames(searchTerm);
     } else {
-      setStudents([]);
+      debouncedFetchStudentNames.cancel();
+      setStudentNames([]);
       setError('');
       setIsLoading(false);
     }
-  }, [debouncedFetchStudents]);
+  }
 
-  const handleBlur = useCallback((e: React.FocusEvent<HTMLDivElement>) => {
-    if (e.currentTarget.contains(e.relatedTarget)) {
-      return;
-    }
-    setIsDropdownOpen(false);
-  }, []);
-
-  const handleFocus = useCallback(() => {
-    setIsDropdownOpen(true);
-  }, []);
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+      debouncedFetchStudentNames.cancel();
+    };
+  }, [debouncedFetchStudentNames]);
 
   return (
     <div className='relative md:w-2/3 lg:w-1/3'>
       <MagnifyingGlassIcon className='absolute left-2.5 top-2.5 h-4 w-4 text-gray-500 dark:text-gray-400' />
-      <div onBlur={handleBlur}>
+      <div
+        tabIndex={-1} // Añadido para que onBlur funcione correctamente
+        onBlur={(e) => {
+          if (e.currentTarget.contains(e.relatedTarget)) {
+            return;
+          }
+          setIsDropdownOpen(false);
+        }}
+      >
         <Input
           className='w-full bg-white shadow-none appearance-none pl-8 dark:bg-gray-950'
           placeholder='Buscar estudiante...'
           onChange={(e) => handleSearch(e.target.value)}
-          onFocus={handleFocus}
+          onFocus={() => setIsDropdownOpen(true)}
           value={inputValue}
           type='search'
         />
 
         {isDropdownOpen && (
           <div className='absolute top-10 left-0 flex flex-col bg-white border rounded text-foreground w-full z-10'>
-            <DropdownContent 
-              students={students} 
-              inputValue={inputValue} 
-              isLoading={isLoading} 
-              error={error} 
-            />
+            <DropdownContent studentNames={studentNames} inputValue={inputValue} isLoading={isLoading} error={error} />
           </div>
         )}
       </div>
     </div>
   );
-}
+};
 
 type DropdownContentProps = {
-  students: Student[];
+  studentNames: { id: string; firstName: string; lastName: string; active: boolean }[];
   inputValue: string;
   isLoading: boolean;
   error: string;
 };
 
-function DropdownContent({ students, inputValue, isLoading, error }: DropdownContentProps) {
+function DropdownContent({ studentNames, inputValue, isLoading, error }: DropdownContentProps) {
   if (isLoading) {
     return <div className='p-2 text-center font-medium text-xs text-gray-600'>Cargando...</div>;
   }
@@ -125,10 +129,10 @@ function DropdownContent({ students, inputValue, isLoading, error }: DropdownCon
     return <div className='p-2 text-center font-medium text-xs text-gray-600'>{error}</div>;
   }
 
-  if (students.length > 0) {
+  if (studentNames.length > 0) {
     return (
-      <div className='flex flex-col'>
-        {students.map(({ id, firstName, lastName }) => (
+      <>
+        {studentNames.map(({ id, firstName, lastName }) => (
           <Link
             key={id}
             href={`/students/${id}`}
@@ -140,7 +144,7 @@ function DropdownContent({ students, inputValue, isLoading, error }: DropdownCon
             <ArrowRightIcon />
           </Link>
         ))}
-      </div>
+      </>
     );
   }
 
