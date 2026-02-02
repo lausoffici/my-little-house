@@ -1,5 +1,6 @@
 'use client';
 
+import { PlusCircledIcon } from '@radix-ui/react-icons';
 import { useState } from 'react';
 import React from 'react';
 
@@ -13,30 +14,26 @@ import {
   DialogTitle,
   DialogTrigger
 } from '@/components/ui/dialog';
-import { getEnrollments } from '@/lib/enrollment';
+import { addEnrollment } from '@/lib/enrollment';
 
 import EnrollmentForm, { ENROLLMENT_FORM_ID } from './enrollment-form';
-import EnrollmentTable from './enrollment-table';
 
-interface EnrollmentDialogProps {
-  createdEnrollmentsPromise: ReturnType<typeof getEnrollments>;
-}
-
-export default function EnrollmentDialog({ createdEnrollmentsPromise }: EnrollmentDialogProps) {
+export default function EnrollmentDialog() {
   const [openDialog, setOpenDialog] = useState(false);
 
   return (
     <Dialog open={openDialog} onOpenChange={setOpenDialog}>
       <DialogTrigger asChild>
-        <Button variant='secondary' >Crear Matrícula</Button>
+        <Button>
+          <PlusCircledIcon /> <span className='ml-2'>Crear Matrícula</span>
+        </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Crear nueva matrícula</DialogTitle>
           <DialogDescription>Complete el formulario para crear una nueva matrícula</DialogDescription>
         </DialogHeader>
-        <EnrollmentTable createdEnrollmentsPromise={createdEnrollmentsPromise} />
-        <EnrollmentForm onOpenDialogChange={setOpenDialog} />
+        <EnrollmentForm onOpenDialogChange={setOpenDialog} action={addEnrollment} />
         <DialogFooter>
           <Button variant='outline' onClick={() => setOpenDialog(false)}>
             Cancelar

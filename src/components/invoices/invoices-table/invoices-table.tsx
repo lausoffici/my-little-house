@@ -15,14 +15,15 @@ import { columns } from './columns';
 
 type InvoicesTableTableProps = {
   invoicesPromise: ReturnType<typeof getExpiredInvoiceList>;
+  expiredInvoicesDataPromise: ReturnType<typeof getExpiredInvoicesData>;
 };
 
-export default function InvoicesTable({ invoicesPromise }: InvoicesTableTableProps) {
+export default function InvoicesTable({ invoicesPromise, expiredInvoicesDataPromise }: InvoicesTableTableProps) {
   const { data, totalPages, totalExpiredAmount } = React.use(invoicesPromise);
+  const sheetData = React.use(expiredInvoicesDataPromise);
 
-  async function handleDownload() {
-    const data = await getExpiredInvoicesData();
-    convertAndExportToXlsx(data);
+  function handleDownload() {
+    convertAndExportToXlsx(sheetData, 'Vencimientos');
   }
 
   const table = useURLManagedDataTable<InvoiceListItem>({

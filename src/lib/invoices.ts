@@ -1,12 +1,13 @@
 'use server';
 
-import { InvoiceState } from '@prisma/client';
+import { InvoiceState, Prisma } from '@prisma/client';
 import { cache } from 'react';
 
-import { ExpiredInvoicesExcelData, SearchParams } from '@/types';
+import { SearchParams } from '@/types';
 
 import prisma from './prisma';
-import { getErrorMessage, getMonthName, getPaginationClause } from './utils';
+import { formatCurrency, getErrorMessage, getMonthName, getPaginationClause } from './utils';
+import { getDiscountedAmount } from './utils/invoices.utils';
 import { scholarshipFormSchema } from './validations/form';
 import { expiredInvoiceListSearchParamsSchema } from './validations/params';
 
@@ -33,14 +34,14 @@ export const getExpiredInvoiceList = async (searchParams: SearchParams) => {
   const totalPages = Math.ceil(totalInvoicesCount / pageSize);
 
   const totalExpiredAmount = await prisma.$queryRaw<{ total: number }[]>`
-    SELECT SUM(amount * (1 - discount)) AS total
+    SELECT SUM(amount * (1 - discount) - balance) AS total
     FROM "Invoice" i INNER JOIN "Student" s ON i."studentId" = s.id AND s.active = true
     WHERE state = 'I' AND "expiredAt" < current_timestamp
   `;
 
   const pagination = getPaginationClause(pageNumber, pageSize);
 
-  const invoices = await prisma.invoice.findMany({
+  const baseQueryOptions = {
     where: whereClause,
     include: {
       student: {
@@ -55,13 +56,66 @@ export const getExpiredInvoiceList = async (searchParams: SearchParams) => {
         }
       }
     },
-    orderBy: {
-      [sortBy]: sortOrder
-    },
     ...pagination
-  });
+  };
 
-  return { data: invoices, totalPages, totalExpiredAmount: totalExpiredAmount[0].total };
+  switch (sortBy) {
+    case 'student':
+      const invoicesOrderedByStudent = await prisma.invoice.findMany({
+        ...baseQueryOptions,
+        orderBy: {
+          student: {
+            firstName: sortOrder as Prisma.SortOrder
+          }
+        }
+      });
+      return {
+        data: invoicesOrderedByStudent,
+        totalPages,
+        totalExpiredAmount: totalExpiredAmount[0].total
+      };
+
+    case 'total':
+    case 'rest':
+      // For total and rest, we need to fetch all matching records and sort in memory
+      // since Prisma doesn't support ordering by computed fields
+      const invoices = await prisma.invoice.findMany({
+        ...baseQueryOptions,
+        orderBy: undefined
+      });
+
+      const sortedInvoices = invoices.sort((a, b) => {
+        const getComputedValue = (invoice: any) => {
+          if (sortBy === 'total') return invoice.amount * (1 - invoice.discount);
+          else return invoice.amount * (1 - invoice.discount) - invoice.balance;
+        };
+
+        const aValue = getComputedValue(a);
+        const bValue = getComputedValue(b);
+
+        return sortOrder === 'asc' ? aValue - bValue : bValue - aValue;
+      });
+
+      return {
+        data: sortedInvoices,
+        totalPages,
+        totalExpiredAmount: totalExpiredAmount[0].total
+      };
+
+    default:
+      const regularInvoices = await prisma.invoice.findMany({
+        ...baseQueryOptions,
+        orderBy: {
+          [sortBy]: sortOrder as Prisma.SortOrder
+        }
+      });
+
+      return {
+        data: regularInvoices,
+        totalPages,
+        totalExpiredAmount: totalExpiredAmount[0].total
+      };
+  }
 };
 
 export const getUnpaidInvoicesByStudent = cache(async (id: number) => {
@@ -136,7 +190,8 @@ export const updateAmount = async (_: any, formData: FormData) => {
   }
 };
 
-export const getExpiredInvoicesData = async () => {
+export const getExpiredInvoicesData = async (searchParams: SearchParams) => {
+  const { sortOrder } = expiredInvoiceListSearchParamsSchema.parse(searchParams);
   try {
     const data = await prisma.invoice.findMany({
       where: {
@@ -165,25 +220,24 @@ export const getExpiredInvoicesData = async () => {
         }
       },
       orderBy: {
-        year: 'desc'
+        student: {
+          firstName: sortOrder as Prisma.SortOrder
+        }
       }
     });
 
-    const sheetData: ExpiredInvoicesExcelData[] = data.map((item) => ({
-      nombre: `${item.student.firstName} ${item.student.lastName}`,
-      descripcion: item.description,
-      precio: item.amount,
-      mes: getMonthName(item.month),
-      'ciclo lectivo': item.year,
-      curso: item.course?.name,
-      telefono: item.student.phone,
-      celular: item.student.mobilePhone,
-      'celular madre': item.student.momPhone,
-      'celular padre': item.student.dadPhone,
-      observaciones: item.student.observations
+    return data.map((item) => ({
+      Nombre: `${item.student?.firstName} ${item.student?.lastName} `,
+      Debe: formatCurrency(getDiscountedAmount(item.amount, item.discount) - item.balance),
+      Descripcion: item.description,
+      Mes: getMonthName(item.month),
+      'Ciclo lectivo': item.year,
+      Telefono: item.student.phone,
+      Celular: item.student.mobilePhone,
+      'Celular madre': item.student.momPhone,
+      'Celular padre': item.student.dadPhone,
+      Observaciones: item.student.observations
     }));
-
-    return sheetData;
   } catch (error) {
     throw new Error(getErrorMessage(error));
   }

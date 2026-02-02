@@ -6,7 +6,7 @@ export const useSearchParams = () => {
   const searchParams = useNextSearchParams();
 
   const setSearchParam = (key: string, value: string) => {
-    const currentURLParams = new URLSearchParams(searchParams);
+    const currentURLParams = new URLSearchParams(searchParams.toString());
 
     const newValue = value.trim();
 
@@ -20,7 +20,7 @@ export const useSearchParams = () => {
   };
 
   const setSearchParams = (params: Record<string, string>) => {
-    const currentURLParams = new URLSearchParams(searchParams);
+    const currentURLParams = new URLSearchParams(searchParams.toString());
 
     Object.entries(params).forEach(([key, value]) => {
       const newValue = value.trim();

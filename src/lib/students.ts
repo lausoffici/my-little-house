@@ -5,7 +5,8 @@ import { InvoiceState } from '@prisma/client';
 import { SearchParams } from '@/types';
 
 import prisma from './prisma';
-import { getPaginationClause } from './utils';
+import { formatCurrency, getMonthName, getPaginationClause } from './utils';
+import { getDiscountedAmount } from './utils/invoices.utils';
 import { discountsFormSchema, studentFormSchema } from './validations/form';
 import { studentInvoiceListSearchParamsSchema, studentListSearchParamsSchema } from './validations/params';
 
@@ -29,7 +30,7 @@ export const getStudentById = async (id: number) => {
 };
 
 export const getStudentList = async (searchParams: SearchParams) => {
-  const { page, size, sortBy, sortOrder, studentByCourse, lastName } =
+  const { page, size, sortBy, sortOrder, studentByCourse, lastName, withInactiveStudents } =
     studentListSearchParamsSchema.parse(searchParams);
 
   const pageNumber = Number(page);
@@ -39,7 +40,7 @@ export const getStudentList = async (searchParams: SearchParams) => {
   const courseIds = studentByCourse?.split('.').map(Number) ?? [];
 
   const whereClause = {
-    active: true,
+    active: withInactiveStudents ? undefined : true,
     studentByCourse: courseIds.length > 0 ? { some: { courseId: { in: courseIds } } } : undefined,
     firstName: {
       not: ''
@@ -205,24 +206,54 @@ export const editStudent = async (_: unknown, editedStudent: FormData) => {
 };
 
 export const getStudentNamesByTerm = async (term: string) => {
+  // Split the search term into words
+  const searchTerms = term
+    .trim()
+    .split(/\s+/)
+    .filter((word) => word.length > 0);
+
   const students = await prisma.student.findMany({
     where: {
       OR: [
+        // Search in firstName only
         {
           firstName: {
             contains: term,
             mode: 'insensitive' as const
-          },
-          active: true
+          }
         },
+        // Search in lastName only
         {
           lastName: {
             contains: term,
             mode: 'insensitive' as const
-          },
-          active: true
-        }
-      ]
+          }
+        },
+        // Multi-word search: each word must be found in either firstName or lastName
+        ...(searchTerms.length > 1
+          ? [
+              {
+                AND: searchTerms.map((word) => ({
+                  OR: [
+                    {
+                      firstName: {
+                        contains: word,
+                        mode: 'insensitive' as const
+                      }
+                    },
+                    {
+                      lastName: {
+                        contains: word,
+                        mode: 'insensitive' as const
+                      }
+                    }
+                  ]
+                }))
+              }
+            ]
+          : [])
+      ],
+      active: true
     },
     select: {
       id: true,
@@ -236,12 +267,74 @@ export const getStudentNamesByTerm = async (term: string) => {
 };
 
 export const deleteStudent = async (id: number) => {
+  return await prisma.$transaction(async (tx) => {
+    await tx.item.deleteMany({
+      where: {
+        receipt: {
+          studentId: id
+        }
+      }
+    });
+
+    await tx.item.deleteMany({
+      where: {
+        invoice: {
+          studentId: id
+        }
+      }
+    });
+
+    await tx.item.deleteMany({
+      where: {
+        additional: {
+          studentId: id
+        }
+      }
+    });
+
+    await tx.receipt.deleteMany({
+      where: { studentId: id }
+    });
+
+    await tx.invoice.deleteMany({
+      where: { studentId: id }
+    });
+
+    await tx.additional.deleteMany({
+      where: { studentId: id }
+    });
+
+    await tx.studentByCourse.deleteMany({
+      where: { studentId: id }
+    });
+    await tx.studentEnrollment.deleteMany({
+      where: { studentId: id }
+    });
+
+    return await tx.student.delete({
+      where: { id: id }
+    });
+  });
+};
+
+export const inactivateStudent = async (id: number) => {
   return await prisma.student.update({
     where: {
       id
     },
     data: {
       active: false
+    }
+  });
+};
+
+export const activateStudent = async (id: number) => {
+  return await prisma.student.update({
+    where: {
+      id
+    },
+    data: {
+      active: true
     }
   });
 };
@@ -332,4 +425,39 @@ export const addDiscount = async (_: unknown, discountData: FormData) => {
       message: 'Error al agregar el descuento'
     };
   }
+};
+
+export const getStudentSheetData = async () => {
+  const students = await prisma.student.findMany({
+    where: {
+      active: true
+    },
+    include: {
+      studentByCourse: {
+        include: {
+          course: true
+        }
+      },
+      invoices: true
+    },
+    orderBy: {
+      lastName: 'asc'
+    }
+  });
+
+  return students.map((student) => {
+    const courses = student.studentByCourse.map((c) => c.course);
+    const expiredInvoices = student.invoices.filter((i) => i.state === InvoiceState.I && i.expiredAt < new Date());
+
+    return {
+      Alumno: `${student.lastName} ${student.firstName}`,
+      Curso: courses.map((c) => c.name).join(', '),
+      Cuota: courses.map((c) => formatCurrency(c.amount)).join(', '),
+      Adeuda: expiredInvoices
+        .map(
+          (i) => `${getMonthName(i.month)}: ${formatCurrency(getDiscountedAmount(i.amount, i.discount) - i.balance)}`
+        )
+        .join(', ')
+    };
+  });
 };

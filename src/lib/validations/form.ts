@@ -58,8 +58,9 @@ export const scholarshipFormSchema = z.object({
 });
 
 export const enrollmentFormSchema = z.object({
-  year: z.string(),
-  amount: z.string()
+  year: z.optional(z.string()),
+  amount: z.string(),
+  id: z.optional(z.number())
 });
 
 export const discountsFormSchema = z.object({
@@ -88,4 +89,9 @@ export const deleteCourseEnrollmentSchema = z.object({
 export const editInvoiceFormSchema = z.object({
   invoiceId: z.number(),
   amount: z.string({ required_error: 'El importe es requerido' })
+});
+
+export const editReceiptFormSchema = z.object({
+  id: z.string(),
+  paymentMethod: z.nativeEnum(ReceiptPaymentMethod)
 });

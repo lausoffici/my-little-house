@@ -2,17 +2,25 @@
 
 import { Cross2Icon } from '@radix-ui/react-icons';
 import { Table } from '@tanstack/react-table';
+import { DownloadIcon } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import React from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 
 import { Button } from '@/components/ui/button';
 import { DataTableFacetedFilter, DataTableViewOptions } from '@/components/ui/data-table';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { useSearchParams } from '@/hooks/use-search-params';
+import { getStudentSheetData } from '@/lib/students';
+import { convertAndExportToXlsx, updateSearchParams } from '@/lib/utils';
 import { Option, StudentWithCourses } from '@/types';
 
 interface StudentsTableFilters {
   table: Table<StudentWithCourses>;
   courseOptions: Option[];
+  studentSheetDataPromise: ReturnType<typeof getStudentSheetData>;
 }
 
 const columnNamesMap = {
@@ -23,7 +31,12 @@ const columnNamesMap = {
   actions: 'Acciones'
 };
 
-export default function StudentsTableFilters({ table, courseOptions }: StudentsTableFilters) {
+export default function StudentsTableFilters({ table, courseOptions, studentSheetDataPromise }: StudentsTableFilters) {
+  const router = useRouter();
+  const studentSheetData = React.use(studentSheetDataPromise);
+
+  const { searchParams } = useSearchParams();
+
   const isFiltered = table.getState().columnFilters.length > 0;
 
   const [inputValue, setInputValue] = React.useState(
@@ -44,6 +57,22 @@ export default function StudentsTableFilters({ table, courseOptions }: StudentsT
     setInputValue('');
   }
 
+  function handleSwitchChange(checked: boolean) {
+    const currentParams = new URLSearchParams(searchParams.toString());
+
+    const updates = {
+      withInactiveStudents: checked ? 'true' : null,
+      page: '1'
+    };
+
+    const newQueryString = updateSearchParams(currentParams, updates);
+    router.push(`${window.location.pathname}?${newQueryString}`);
+  }
+
+  function handleDownload() {
+    convertAndExportToXlsx(studentSheetData, 'Estudiantes');
+  }
+
   return (
     <div className='flex items-center justify-between gap-2 w-full'>
       <div className='flex flex-1 items-center space-x-2'>
@@ -60,7 +89,17 @@ export default function StudentsTableFilters({ table, courseOptions }: StudentsT
             <Cross2Icon className='ml-2 h-4 w-4' />
           </Button>
         )}
+        <Switch
+          id='students-state'
+          checked={searchParams.get('withInactiveStudents') === 'true'}
+          onCheckedChange={handleSwitchChange}
+        />
+        <Label htmlFor='students-state'>Incluir Inactivos</Label>
       </div>
+      <Button variant='outline' onClick={handleDownload} size='sm'>
+        <DownloadIcon width={15} height={15} className='mr-2' />
+        Exportar
+      </Button>
       <DataTableViewOptions table={table} columnNamesMap={columnNamesMap} />
     </div>
   );

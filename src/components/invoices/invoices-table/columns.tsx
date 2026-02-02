@@ -17,8 +17,7 @@ export const columns: ColumnDef<InvoiceListItem>[] = [
       <div>
         {row.original.student.firstName} {row.original.student.lastName}
       </div>
-    ),
-    enableSorting: false
+    )
   },
   {
     accessorKey: 'description',
@@ -38,6 +37,24 @@ export const columns: ColumnDef<InvoiceListItem>[] = [
     accessorKey: 'total',
     header: ({ column }) => <DataTableColumnHeader column={column} title='Total' />,
     cell: ({ row }) => <span>{formatCurrency(getDiscountedAmount(row.original.amount, row.original.discount))}</span>
+  },
+  {
+    accessorKey: 'balance',
+    header: ({ column }) => <DataTableColumnHeader column={column} title='Pagó' />,
+    cell: ({ row }) => {
+      const balance = row.original.balance;
+      const number = row.original.state === 'P' ? '-' : formatCurrency(balance);
+      return <span className={balance !== 0 ? 'text-success' : 'text-black'}>{number}</span>;
+    }
+  },
+  {
+    accessorKey: 'rest',
+    header: ({ column }) => <DataTableColumnHeader column={column} title='Debe' />,
+    cell: ({ row }) => {
+      const discountBalance = getDiscountedAmount(row.original.amount, row.original.discount) - row.original.balance;
+      const number = row.original.state === 'P' ? '-' : formatCurrency(discountBalance);
+      return <span className={discountBalance === 0 ? 'text-black' : 'text-destructive'}>{number}</span>;
+    }
   },
   {
     accessorKey: 'state',

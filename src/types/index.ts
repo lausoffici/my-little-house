@@ -63,17 +63,8 @@ export type InvoiceDataType = {
 export type ErrorWithMessage = {
   message: string;
 };
-
-export type ExpiredInvoicesExcelData = {
-  nombre: string;
-  descripcion: string;
-  precio: number;
-  mes: string;
-  'ciclo lectivo': number;
-  curso: string | undefined;
-  telefono: string | null;
-  celular: string | null;
-  'celular madre': string | null;
-  'celular padre': string | null;
-  observaciones: string | null;
-};
+export interface MonthlyReceipts {
+  month: string;
+  cash: number;
+  transfer: number;
+}

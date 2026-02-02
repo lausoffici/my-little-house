@@ -7,7 +7,8 @@ export const studentListSearchParamsSchema = z.object({
   sortBy: z.string().default('lastName'),
   sortOrder: z.string().default('asc'),
   studentByCourse: z.string().optional(),
-  lastName: z.string().optional()
+  lastName: z.string().optional(),
+  withInactiveStudents: z.string().optional()
 });
 
 export const incomingListSearchParamsSchema = z.object({
@@ -60,4 +61,8 @@ export const dashboardSearchParamsSchema = z.object({
   day: z.string().optional(),
   month: z.string().optional(),
   year: z.string().optional()
+});
+
+export const balanceSearchParamsSchema = z.object({
+  balance_year: z.string().optional()
 });

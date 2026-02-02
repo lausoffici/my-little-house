@@ -3,7 +3,7 @@ import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import * as XLSX from 'xlsx';
 
-import { ErrorWithMessage, ExpiredInvoicesExcelData } from '@/types';
+import { ErrorWithMessage } from '@/types';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -62,7 +62,7 @@ export function getMonthName(monthNumber: number) {
     case 12:
       return 'Diciembre';
     default:
-      return '--';
+      return 'Matrícula';
   }
 }
 
@@ -124,9 +124,20 @@ export function getErrorMessage(error: unknown) {
   return toErrorWithMessage(error).message;
 }
 
-export const convertAndExportToXlsx = (data: ExpiredInvoicesExcelData[]) => {
+export const convertAndExportToXlsx = <T>(data: T[], fileName: string) => {
   const ws = XLSX.utils.json_to_sheet(data);
   const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'Vencimientos');
-  XLSX.writeFile(wb, 'vencimientos.xlsx');
+  XLSX.utils.book_append_sheet(wb, ws, fileName);
+  XLSX.writeFile(wb, `${fileName}.xlsx`);
 };
+
+export function updateSearchParams(currentParams: URLSearchParams, updates: Record<string, string | null>): string {
+  const newParams = new URLSearchParams(currentParams);
+
+  Object.entries(updates).forEach(([key, value]) => {
+    if (value === null) newParams.delete(key);
+    else newParams.set(key, value);
+  });
+
+  return newParams.toString();
+}

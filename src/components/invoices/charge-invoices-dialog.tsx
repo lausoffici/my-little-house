@@ -125,12 +125,14 @@ export default function ChargeInvoicesDialog({ unpaidInvoicesPromise }: ChargeIn
   function getInvoicesOptions(invoiceId: string) {
     const selectedIds = invoices.map(({ selectedId }) => Number(selectedId));
 
-    return invoicesOptions.filter((option) => {
-      const invoiceOptionId = Number(option.value);
-      const currentOptionId = Number(invoiceId);
-      // returns all invoices options except the ones that are selected by others inputs
-      return invoiceOptionId !== selectedIds.find((id) => id === invoiceOptionId && id !== currentOptionId);
-    });
+    return invoicesOptions
+      .filter((option) => {
+        const invoiceOptionId = Number(option.value);
+        const currentOptionId = Number(invoiceId);
+        // returns all invoices options except the ones that are selected by others inputs
+        return invoiceOptionId !== selectedIds.find((id) => id === invoiceOptionId && id !== currentOptionId);
+      })
+      .sort((a, b) => +a.value - +b.value);
   }
 
   useEffect(() => {
@@ -179,10 +181,10 @@ export default function ChargeInvoicesDialog({ unpaidInvoicesPromise }: ChargeIn
             <FormField
               control={form.control}
               name='paymentMethod'
-              render={({ field: { ref, ...fieldWithoutRef } }) => (
+              render={({ field }) => (
                 <FormItem>
                   <FormLabel>Modo de pago</FormLabel>
-                  <Select onValueChange={fieldWithoutRef.onChange} {...fieldWithoutRef}>
+                  <Select onValueChange={field.onChange} {...field}>
                     <SelectTrigger className='w-[min(100%,180px)]'>
                       <SelectValue />
                     </SelectTrigger>
@@ -203,15 +205,15 @@ export default function ChargeInvoicesDialog({ unpaidInvoicesPromise }: ChargeIn
                   <FormField
                     control={form.control}
                     name={`invoices.${index}.selectedId`}
-                    render={({ field: { ref, ...fieldWithoutRef } }) => (
+                    render={({ field }) => (
                       <FormItem className='w-11/12'>
                         <FormLabel>Cuota</FormLabel>
                         <Select
                           onValueChange={(value) => {
-                            fieldWithoutRef.onChange(value);
+                            field.onChange(value);
                             handleSelect(index, value);
                           }}
-                          {...fieldWithoutRef}
+                          {...field}
                         >
                           <SelectTrigger>
                             <SelectValue defaultValue={''} />
@@ -219,7 +221,7 @@ export default function ChargeInvoicesDialog({ unpaidInvoicesPromise }: ChargeIn
                           <SelectContent>
                             <SelectGroup>
                               <SelectLabel>Cuotas</SelectLabel>
-                              {getInvoicesOptions(fieldWithoutRef.value).map(({ value, label }) => (
+                              {getInvoicesOptions(field.value).map(({ value, label }) => (
                                 <SelectItem key={value} value={value.toString()}>
                                   {label}
                                 </SelectItem>
@@ -233,12 +235,12 @@ export default function ChargeInvoicesDialog({ unpaidInvoicesPromise }: ChargeIn
                   />
                   <FormField
                     name={`invoices.${index}.amount`}
-                    render={({ field: { ref, ...fieldWithoutRef } }) => (
+                    render={({ field }) => (
                       <FormItem>
                         <FormLabel>Importe</FormLabel>
 
                         <div className='flex items-center gap-1'>
-                          <Input type='number' placeholder='Importe' autoComplete='off' {...fieldWithoutRef} required />
+                          <Input type='number' placeholder='Importe' autoComplete='off' {...field} required />
                           <Button variant='ghost' size='sm' onClick={() => removeInvoice(index)}>
                             <X className='h-3 w-3 text-muted-foreground hover:text-foreground' />
                           </Button>
@@ -266,20 +268,20 @@ export default function ChargeInvoicesDialog({ unpaidInvoicesPromise }: ChargeIn
               <div className='flex gap-2 items-center' key={additional.id}>
                 <FormField
                   name={`additionals.${index}.description`}
-                  render={({ field: { ref, ...fieldWithoutRef } }) => (
+                  render={({ field }) => (
                     <FormItem className='w-11/12'>
                       <FormLabel>Adicional</FormLabel>
-                      <Input placeholder='Descripción' autoComplete='off' required {...fieldWithoutRef} />
+                      <Input placeholder='Descripción' autoComplete='off' required {...field} />
                     </FormItem>
                   )}
                 />
                 <FormField
                   name={`additionals.${index}.amount`}
-                  render={({ field: { ref, ...fieldWithoutRef } }) => (
+                  render={({ field }) => (
                     <FormItem>
                       <FormLabel>Importe</FormLabel>
                       <div className='flex items-center gap-1'>
-                        <Input type='number' placeholder='Importe' autoComplete='off' required {...fieldWithoutRef} />
+                        <Input type='number' placeholder='Importe' autoComplete='off' required {...field} />
                         <Button variant='ghost' size='sm' onClick={() => removeAdditional(index)}>
                           <X className='h-3 w-3 text-muted-foreground hover:text-foreground' />
                         </Button>

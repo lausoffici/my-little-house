@@ -11,6 +11,7 @@ import DiscountsFormDialog from '@/components/students/student-discounts-dialog'
 import StudentInvoicesFilters from '@/components/students/student-invoices-filters';
 import StudentInvoicesTable from '@/components/students/student-invoices-table/student-invoices-table';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
@@ -57,7 +58,23 @@ export default async function StudentPage({ params: { id }, searchParams }: Page
         </div>
 
         <div className='flex flex-col gap-1 justify-end'>
-          <DeleteStudentDialog studentWithCourses={student} />
+          <DeleteStudentDialog
+            studentWithCourses={student}
+            isInactivation
+            buttonTrigger={
+              <Button variant='outline' size='sm' className='w-full'>
+                Inactivar Estudiante
+              </Button>
+            }
+          />
+          <DeleteStudentDialog
+            studentWithCourses={student}
+            buttonTrigger={
+              <Button variant='outline' size='sm' className='w-full'>
+                Eliminar Estudiante
+              </Button>
+            }
+          />
           <div className='flex gap-1'>
             <EnrollStudentDialog courseOptionsPromise={courseOptionsPromise} enrolledCourses={courses} />
             {courses.length > 0 && (

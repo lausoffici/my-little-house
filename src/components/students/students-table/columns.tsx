@@ -16,8 +16,11 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { formatCurrency } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 import { StudentWithCourses } from '@/types';
+
+import ActivateStudentDialog from '../active-student-dialog';
+import DeleteStudentDialog from '../delete-student-dialog';
 
 export const columns: ColumnDef<StudentWithCourses>[] = [
   {
@@ -62,6 +65,20 @@ export const columns: ColumnDef<StudentWithCourses>[] = [
     enableSorting: false
   },
   {
+    accessorKey: 'active',
+    header: ({ column }) => <DataTableColumnHeader column={column} title='Estado' />,
+    cell: ({ row }) => (
+      <Badge
+        className={cn(
+          row.original.active ? 'bg-green-600 hover:bg-green-600' : 'bg-gray-500 hover:bg-gray-500',
+          'border-transparent'
+        )}
+      >
+        {row.original.active ? 'Activo' : 'Inactivo'}
+      </Badge>
+    )
+  },
+  {
     id: 'actions',
     cell: ({ row }) => {
       const student = row.original;
@@ -77,9 +94,27 @@ export const columns: ColumnDef<StudentWithCourses>[] = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align='end'>
             <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-            <DropdownMenuItem>
-              <Link href={`/students/${id}`}>Ver detalles</Link>
-            </DropdownMenuItem>
+            {row.original.active ? (
+              <DropdownMenuItem>
+                <Link href={`/students/${id}`}>Ver detalles</Link>
+              </DropdownMenuItem>
+            ) : (
+              <>
+                <DropdownMenuItem asChild>
+                  <ActivateStudentDialog studentWithCourses={student} />
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <DeleteStudentDialog
+                    studentWithCourses={student}
+                    buttonTrigger={
+                      <Button variant='ghost' className='p-0 w-full'>
+                        Eliminar
+                      </Button>
+                    }
+                  />
+                </DropdownMenuItem>
+              </>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       );
