@@ -26,7 +26,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { getUnpaidInvoicesByStudent } from '@/lib/invoices';
 import { generateReceipt } from '@/lib/receipts';
 import { formatCurrency, getMonthName } from '@/lib/utils';
-import { getDiscountedAmount } from '@/lib/utils/invoices.utils';
+import { getDiscountedAmount, getMonthsOverdue } from '@/lib/utils/invoices.utils';
 import { receiptFormSchema } from '@/lib/validations/form';
 import { Option } from '@/types';
 
@@ -116,11 +116,34 @@ export default function ChargeInvoicesDialog({ unpaidInvoicesPromise }: ChargeIn
     };
   });
 
+  type Surcharge = { invoiceIndex: number; displayDescription: string; receiptDescription: string; amount: number };
+
+  const surcharges = useMemo<Surcharge[]>(() => {
+    return invoices.flatMap((invoice, index) => {
+      if (!invoice.selectedId) return [];
+      const fullInvoice = unpaidInvoices.find(({ id }) => id === Number(invoice.selectedId));
+      if (!fullInvoice) return [];
+      const monthsOverdue = getMonthsOverdue(fullInvoice.month, fullInvoice.year);
+      if (monthsOverdue === 0) return [];
+      const baseAmount = getDiscountedAmount(fullInvoice.amount, fullInvoice.discount);
+      const percentage = monthsOverdue * 10;
+      return [
+        {
+          invoiceIndex: index,
+          displayDescription: `Recargo ${percentage}%`,
+          receiptDescription: `Recargo ${percentage}% - ${getMonthName(fullInvoice.month)} ${fullInvoice.year}`,
+          amount: baseAmount * monthsOverdue * 0.1
+        }
+      ];
+    });
+  }, [invoices, unpaidInvoices]);
+
   const total = useMemo(() => {
     const totalInvoicesAmount = invoices.reduce((acc, invoice) => acc + Number(invoice.amount), 0) ?? 0;
     const totalAdditionalsAmount = additionals.reduce((acc, additional) => acc + Number(additional.amount), 0) ?? 0;
-    return totalInvoicesAmount + totalAdditionalsAmount;
-  }, [additionals, invoices]);
+    const totalSurchargesAmount = surcharges.reduce((acc, s) => acc + s.amount, 0);
+    return totalInvoicesAmount + totalAdditionalsAmount + totalSurchargesAmount;
+  }, [additionals, invoices, surcharges]);
 
   function getInvoicesOptions(invoiceId: string) {
     const selectedIds = invoices.map(({ selectedId }) => Number(selectedId));
@@ -184,7 +207,7 @@ export default function ChargeInvoicesDialog({ unpaidInvoicesPromise }: ChargeIn
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Modo de pago</FormLabel>
-                  <Select onValueChange={field.onChange} {...field}>
+                  <Select onValueChange={field.onChange} value={field.value} name={field.name}>
                     <SelectTrigger className='w-[min(100%,180px)]'>
                       <SelectValue />
                     </SelectTrigger>
@@ -201,54 +224,67 @@ export default function ChargeInvoicesDialog({ unpaidInvoicesPromise }: ChargeIn
             />
             {invoiceFields.map((invoice, index) => {
               return (
-                <div className='flex gap-2 items-center' key={invoice.id}>
-                  <FormField
-                    control={form.control}
-                    name={`invoices.${index}.selectedId`}
-                    render={({ field }) => (
-                      <FormItem className='w-11/12'>
-                        <FormLabel>Cuota</FormLabel>
-                        <Select
-                          onValueChange={(value) => {
-                            field.onChange(value);
-                            handleSelect(index, value);
-                          }}
-                          {...field}
-                        >
-                          <SelectTrigger>
-                            <SelectValue defaultValue={''} />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectGroup>
-                              <SelectLabel>Cuotas</SelectLabel>
-                              {getInvoicesOptions(field.value).map(({ value, label }) => (
-                                <SelectItem key={value} value={value.toString()}>
-                                  {label}
-                                </SelectItem>
-                              ))}
-                            </SelectGroup>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    name={`invoices.${index}.amount`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Importe</FormLabel>
+                <React.Fragment key={invoice.id}>
+                  <div className='flex gap-2 items-center'>
+                    <FormField
+                      control={form.control}
+                      name={`invoices.${index}.selectedId`}
+                      render={({ field }) => (
+                        <FormItem className='w-11/12'>
+                          <FormLabel>Cuota</FormLabel>
+                          <Select
+                            onValueChange={(value) => {
+                              field.onChange(value);
+                              handleSelect(index, value);
+                            }}
+                            value={field.value}
+                            name={field.name}
+                          >
+                            <SelectTrigger>
+                              <SelectValue defaultValue={''} />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectGroup>
+                                <SelectLabel>Cuotas</SelectLabel>
+                                {getInvoicesOptions(field.value).map(({ value, label }) => (
+                                  <SelectItem key={value} value={value.toString()}>
+                                    {label}
+                                  </SelectItem>
+                                ))}
+                              </SelectGroup>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      name={`invoices.${index}.amount`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Importe</FormLabel>
 
-                        <div className='flex items-center gap-1'>
-                          <Input type='number' placeholder='Importe' autoComplete='off' {...field} required />
-                          <Button variant='ghost' size='sm' onClick={() => removeInvoice(index)}>
-                            <X className='h-3 w-3 text-muted-foreground hover:text-foreground' />
-                          </Button>
-                        </div>
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                          <div className='flex items-center gap-1'>
+                            <Input type='number' placeholder='Importe' autoComplete='off' {...field} value={field.value ?? ''} required />
+                            <Button variant='ghost' size='sm' onClick={() => removeInvoice(index)}>
+                              <X className='h-3 w-3 text-muted-foreground  hover:text-foreground' />
+                            </Button>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  {(() => {
+                    const surcharge = surcharges.find((s) => s.invoiceIndex === index);
+                    if (!surcharge) return null;
+                    return (
+                      <div className='flex justify-between items-center text-sm text-muted-foreground pl-1 pr-12'>
+                        <span>{surcharge.displayDescription}</span>
+                        <span>{formatCurrency(surcharge.amount)}</span>
+                      </div>
+                    );
+                  })()}
+                </React.Fragment>
               );
             })}
             <Button
@@ -263,6 +299,13 @@ export default function ChargeInvoicesDialog({ unpaidInvoicesPromise }: ChargeIn
             </Button>
             <input type='hidden' name='studentId' value={studentId} />
             <input type='hidden' name='receiptTotal' value={total.toString()} />
+
+            {surcharges.map((surcharge, i) => (
+              <React.Fragment key={`recargo-${i}`}>
+                <input type='hidden' name={`recargos.${i}.description`} value={surcharge.receiptDescription} />
+                <input type='hidden' name={`recargos.${i}.amount`} value={surcharge.amount.toString()} />
+              </React.Fragment>
+            ))}
 
             {additionalFields.map((additional, index) => (
               <div className='flex gap-2 items-center' key={additional.id}>
