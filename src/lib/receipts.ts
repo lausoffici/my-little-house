@@ -94,15 +94,20 @@ const processFormData = (formData: FormData, maxInputsAllowed: number) => {
   const selectedAmounts: string[] = [];
   const additionalDescriptions: string[] = [];
   const additionalAmounts: string[] = [];
+  const surchargeDescriptions: string[] = [];
+  const surchargeAmounts: string[] = [];
 
   for (let i = 0; i <= maxInputsAllowed; i++) {
     const selectedId = formData.get(`invoices.${i}.selectedId`);
     const additionalDescription = formData.get(`additionals.${i}.description`);
     const selectedAmount = formData.get(`invoices.${i}.amount`);
     const additionalAmount = formData.get(`additionals.${i}.amount`);
+    const surchargeDescription = formData.get(`recargos.${i}.description`);
+    const surchargeAmount = formData.get(`recargos.${i}.amount`);
 
     const thereAreInvoices = selectedId && selectedAmount;
     const thereAreAdditionals = additionalDescription && additionalAmount;
+    const thereAreSurcharges = surchargeDescription && surchargeAmount;
 
     if (thereAreInvoices) {
       if (Number(selectedAmount) === 0) throw new Error('Complete los campos de la cuota');
@@ -123,15 +128,32 @@ const processFormData = (formData: FormData, maxInputsAllowed: number) => {
       additionalAmounts.push(additionalAmount.toString());
       additionalDescriptions.push(additionalDescription.toString());
     }
+
+    if (thereAreSurcharges) {
+      surchargeDescriptions.push(surchargeDescription.toString());
+      surchargeAmounts.push(surchargeAmount.toString());
+    }
   }
 
-  return { selectedIds, selectedAmounts, additionalDescriptions, additionalAmounts };
+  return {
+    selectedIds,
+    selectedAmounts,
+    additionalDescriptions,
+    additionalAmounts,
+    surchargeDescriptions,
+    surchargeAmounts
+  };
 };
 
 function combineAdditionals(descriptions: string[], amounts: string[]) {
   if (descriptions.length !== amounts.length) throw new Error('Arrays must have the same length');
 
   return descriptions.map((description, index) => ({ description, amount: amounts[index] }));
+}
+function combineRecargos(descriptions: string[], amounts: string[]) {
+  if (descriptions.length !== amounts.length) throw new Error('Arrays must have the same length');
+
+  return descriptions.map((description, index) => ({ description, amount: Number(amounts[index]) }));
 }
 function combineInvoices(ids: string[], amounts: string[]) {
   if (ids.length !== amounts.length) throw new Error('Arrays must have the same length');
@@ -157,13 +179,18 @@ export const generateReceipt = async (_: unknown, paidItems: FormData) => {
     }
 
     const { studentId, receiptTotal, paymentMethod } = parsedData.data;
-    const { selectedIds, selectedAmounts, additionalDescriptions, additionalAmounts } = processFormData(
-      paidItems,
-      MAX_INPUTS_ALLOWED
-    );
+    const {
+      selectedIds,
+      selectedAmounts,
+      additionalDescriptions,
+      additionalAmounts,
+      surchargeDescriptions,
+      surchargeAmounts
+    } = processFormData(paidItems, MAX_INPUTS_ALLOWED);
 
     const additionals = combineAdditionals(additionalDescriptions, additionalAmounts);
     const invoices = combineInvoices(selectedIds, selectedAmounts);
+    const surcharges = combineRecargos(surchargeDescriptions, surchargeAmounts);
 
     if (additionals.length === 0 && invoices.length === 0) {
       return {
@@ -257,6 +284,26 @@ export const generateReceipt = async (_: unknown, paidItems: FormData) => {
         })
       });
       await Promise.all(mappedAdditionals.map((additional) => tx.additional.create({ data: additional })));
+
+      if (surcharges.length > 0) {
+        const mappedRecargos = surcharges.map(({ description, amount }) => ({
+          description,
+          amount,
+          paymentDate: new Date(),
+          studentId: Number(studentId),
+          items: {
+            create: [
+              {
+                description,
+                amount,
+                receiptId: receipt.id
+              }
+            ]
+          }
+        }));
+        await Promise.all(mappedRecargos.map((recargo) => tx.additional.create({ data: recargo })));
+      }
+
       return receipt;
     });
 
