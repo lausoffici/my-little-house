@@ -54,6 +54,7 @@ interface ChargeInvoicesDialogProps {
 
 export default function ChargeInvoicesDialog({ unpaidInvoicesPromise }: ChargeInvoicesDialogProps) {
   const [openInvoiceDialog, setOpenInvoiceDialog] = useState(false);
+  const [dismissedSurchargeIndices, setDismissedSurchargeIndices] = useState<Set<number>>(new Set());
   const router = useRouter();
   const { toast } = useToast();
 
@@ -121,6 +122,7 @@ export default function ChargeInvoicesDialog({ unpaidInvoicesPromise }: ChargeIn
   const surcharges = useMemo<Surcharge[]>(() => {
     return invoices.flatMap((invoice, index) => {
       if (!invoice.selectedId) return [];
+      if (dismissedSurchargeIndices.has(index)) return [];
       const fullInvoice = unpaidInvoices.find(({ id }) => id === Number(invoice.selectedId));
       if (!fullInvoice) return [];
       const monthsOverdue = getMonthsOverdue(fullInvoice.month, fullInvoice.year);
@@ -136,7 +138,7 @@ export default function ChargeInvoicesDialog({ unpaidInvoicesPromise }: ChargeIn
         }
       ];
     });
-  }, [invoices, unpaidInvoices]);
+  }, [invoices, unpaidInvoices, dismissedSurchargeIndices]);
 
   const total = useMemo(() => {
     const totalInvoicesAmount = invoices.reduce((acc, invoice) => acc + Number(invoice.amount), 0) ?? 0;
@@ -187,10 +189,23 @@ export default function ChargeInvoicesDialog({ unpaidInvoicesPromise }: ChargeIn
     const discountedAmount = getDiscountedAmount(amount, discount);
 
     form.setValue(`invoices.${index}.amount`, discountedAmount - balance);
+
+    // Restore surcharge if it was dismissed and a new invoice is selected
+    setDismissedSurchargeIndices((prev) => {
+      const next = new Set(prev);
+      next.delete(index);
+      return next;
+    });
   }
 
   return (
-    <Dialog open={openInvoiceDialog} onOpenChange={setOpenInvoiceDialog}>
+    <Dialog
+      open={openInvoiceDialog}
+      onOpenChange={(open) => {
+        setOpenInvoiceDialog(open);
+        if (!open) setDismissedSurchargeIndices(new Set());
+      }}
+    >
       <DialogTrigger asChild>
         <Button size='sm'>Cobrar</Button>
       </DialogTrigger>
@@ -278,9 +293,21 @@ export default function ChargeInvoicesDialog({ unpaidInvoicesPromise }: ChargeIn
                     const surcharge = surcharges.find((s) => s.invoiceIndex === index);
                     if (!surcharge) return null;
                     return (
-                      <div className='flex justify-between items-center text-sm text-muted-foreground pl-1 pr-12'>
-                        <span>{surcharge.displayDescription}</span>
-                        <span>{formatCurrency(surcharge.amount)}</span>
+                      <div className='flex justify-between items-center text-sm text-muted-foreground pl-1 pr-1'>
+                        <span>{surcharge.displayDescription}:</span>
+                        <div className='flex items-center gap-1'>
+                          <span>{formatCurrency(surcharge.amount)}</span>
+                          <Button
+                            variant='ghost'
+                            size='sm'
+                            type='button'
+                            onClick={() =>
+                              setDismissedSurchargeIndices((prev) => new Set([...prev, surcharge.invoiceIndex]))
+                            }
+                          >
+                            <X className='h-3 w-3 text-muted-foreground hover:text-foreground' />
+                          </Button>
+                        </div>
                       </div>
                     );
                   })()}
