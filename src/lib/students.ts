@@ -428,17 +428,32 @@ export const addDiscount = async (_: unknown, discountData: FormData) => {
 };
 
 export const getStudentSheetData = async () => {
+  const currentYear = new Date().getFullYear();
+
   const students = await prisma.student.findMany({
     where: {
-      active: true
+      active: true,
+      studentEnrollments: {
+        some: {
+          year: currentYear
+        }
+      }
     },
     include: {
       studentByCourse: {
         include: {
           course: true
-        }
+        },
+        orderBy: {
+          createdAt: 'desc'
+        },
+        take: 1
       },
-      invoices: true
+      invoices: {
+        where: {
+          year: currentYear
+        }
+      }
     },
     orderBy: {
       lastName: 'asc'
