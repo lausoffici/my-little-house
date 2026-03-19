@@ -360,6 +360,14 @@ export const getStudentInvoices = async (id: number, searchParams: SearchParams)
 
   const invoices = await prisma.invoice.findMany({
     where: whereClause,
+    include: {
+      items: {
+        select: {
+          receiptId: true
+        },
+        take: 1
+      }
+    },
     orderBy: {
       [sortBy]: sortOrder
     },
@@ -441,6 +449,11 @@ export const getStudentSheetData = async () => {
     },
     include: {
       studentByCourse: {
+        where: {
+          course: {
+            active: true
+          }
+        },
         include: {
           course: true
         },
@@ -464,15 +477,21 @@ export const getStudentSheetData = async () => {
     const courses = student.studentByCourse.map((c) => c.course);
     const expiredInvoices = student.invoices.filter((i) => i.state === InvoiceState.I && i.expiredAt < new Date());
 
+    const totalDebt = expiredInvoices.reduce(
+      (sum, i) => sum + (getDiscountedAmount(i.amount, i.discount) - i.balance),
+      0
+    );
+
     return {
       Alumno: `${student.lastName} ${student.firstName}`,
       Curso: courses.map((c) => c.name).join(', '),
-      Cuota: courses.map((c) => formatCurrency(c.amount)).join(', '),
-      Adeuda: expiredInvoices
+      Cuota: courses.reduce((sum, c) => sum + c.amount, 0),
+      'Detalle deuda': expiredInvoices
         .map(
           (i) => `${getMonthName(i.month)}: ${formatCurrency(getDiscountedAmount(i.amount, i.discount) - i.balance)}`
         )
-        .join(', ')
+        .join(', '),
+      'Total deuda': totalDebt
     };
   });
 };

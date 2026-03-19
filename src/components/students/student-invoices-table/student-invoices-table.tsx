@@ -1,6 +1,5 @@
 'use client';
 
-import { Invoice } from '@prisma/client';
 import React from 'react';
 
 import DataTable from '@/components/ui/data-table/data-table';
@@ -16,7 +15,7 @@ type StudentInvoicesTableProps = {
 export default function StudentInvoicesTable({ invoicesPromise }: StudentInvoicesTableProps) {
   const { invoices, totalPages } = React.use(invoicesPromise);
 
-  const table = useURLManagedDataTable<Invoice>({
+  const table = useURLManagedDataTable({
     data: invoices,
     columns,
     pageCount: totalPages
