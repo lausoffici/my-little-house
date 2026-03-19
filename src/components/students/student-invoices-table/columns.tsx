@@ -2,6 +2,8 @@
 
 import { Invoice } from '@prisma/client';
 import { ColumnDef } from '@tanstack/react-table';
+
+type InvoiceWithReceipt = Invoice & { items: { receiptId: number }[] };
 import { MoreHorizontal } from 'lucide-react';
 
 import EditInvoiceDialog from '@/components/invoices/edit-invoice-dialog';
@@ -18,7 +20,7 @@ import {
 import { formatCurrency, formatPercentage, getMonthName } from '@/lib/utils';
 import { getDiscountedAmount } from '@/lib/utils/invoices.utils';
 
-export const columns: ColumnDef<Invoice>[] = [
+export const columns: ColumnDef<InvoiceWithReceipt>[] = [
   {
     accessorKey: 'description',
     header: ({ column }) => <DataTableColumnHeader column={column} title='Descripción' />
@@ -68,7 +70,10 @@ export const columns: ColumnDef<Invoice>[] = [
   {
     accessorKey: 'state',
     header: ({ column }) => <DataTableColumnHeader column={column} title='Estado' />,
-    cell: ({ row }) => <InvoiceStateBadge state={row.original.state} />
+    cell: ({ row }) => {
+      const receiptId = row.original.items?.[0]?.receiptId;
+      return <InvoiceStateBadge state={row.original.state} receiptId={receiptId} />;
+    }
   },
   {
     id: 'actions',

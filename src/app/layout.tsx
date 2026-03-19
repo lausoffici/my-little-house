@@ -31,7 +31,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
       <body className={`${inter.className} flex`}>
         <ThemeProvider attribute='class' defaultTheme='system' enableSystem disableTransitionOnChange>
           <div className='flex h-screen w-full'>
-            <Sidebar />
+            <Sidebar userEmail={session?.user?.email} />
             <div className='flex-1 flex flex-col overflow-hidden'>
               <TopNavigationBar user={session?.user} />
               <main className='p-6 overflow-auto'>{children}</main>

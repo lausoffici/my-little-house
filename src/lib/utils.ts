@@ -124,8 +124,30 @@ export function getErrorMessage(error: unknown) {
   return toErrorWithMessage(error).message;
 }
 
-export const convertAndExportToXlsx = <T>(data: T[], fileName: string) => {
+export const convertAndExportToXlsx = <T extends Record<string, unknown>>(
+  data: T[],
+  fileName: string,
+  currencyColumns?: string[]
+) => {
   const ws = XLSX.utils.json_to_sheet(data);
+
+  if (currencyColumns && data.length > 0) {
+    const headers = Object.keys(data[0]);
+    const currencyColIndices = currencyColumns
+      .map((col) => headers.indexOf(col))
+      .filter((idx) => idx !== -1);
+
+    for (const colIdx of currencyColIndices) {
+      for (let rowIdx = 1; rowIdx <= data.length; rowIdx++) {
+        const cellRef = XLSX.utils.encode_cell({ r: rowIdx, c: colIdx });
+        const cell = ws[cellRef];
+        if (cell && typeof cell.v === 'number') {
+          cell.z = '"$"#,##0';
+        }
+      }
+    }
+  }
+
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, fileName);
   XLSX.writeFile(wb, `${fileName}.xlsx`);

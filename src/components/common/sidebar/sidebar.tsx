@@ -7,6 +7,7 @@ import React from 'react';
 import { FiClipboard, FiDollarSign, FiLock, FiMonitor, FiSmile, FiTrendingUp } from 'react-icons/fi';
 import { TfiReceipt } from 'react-icons/tfi';
 
+import { dashboardAllowedEmails } from '@/lib/auth';
 import { cn } from '@/lib/utils';
 
 import Logo from './logo';
@@ -14,7 +15,7 @@ import Logo from './logo';
 const LinkItems = [
   { name: 'Estudiantes', icon: <FiSmile />, href: '/students' },
   { name: 'Cursos', icon: <FiMonitor />, href: '/courses' },
-  { name: 'Resumen', icon: <FiTrendingUp />, href: '/dashboard' },
+  { name: 'Resumen', icon: <FiTrendingUp />, href: '/dashboard', allowedEmails: dashboardAllowedEmails },
   { name: 'Caja', icon: <FiLock />, href: '/cash-register' },
   { name: 'Comprobantes', icon: <TfiReceipt />, href: '/receipts' },
   { name: 'Vencimientos', icon: <FiDollarSign />, href: '/expirations?sortBy=expiredAt&sortOrder=asc' },
@@ -57,8 +58,17 @@ const Ilustration = ({ path }: { path: string }) => {
   return <Image src={src} width={200} height={200} alt='Ilustration' />;
 };
 
-export default function Sidebar() {
+interface SidebarProps {
+  userEmail?: string | null;
+}
+
+export default function Sidebar({ userEmail }: SidebarProps) {
   const path = usePathname();
+
+  const visibleLinks = LinkItems.filter(
+    (item) => !item.allowedEmails || (userEmail && item.allowedEmails.includes(userEmail))
+  );
+
   return (
     <div className='w-60 flex flex-col border-r bg-gray-100/40 dark:bg-gray-800/40 items-center justify-between'>
       <div className='w-full'>
@@ -66,7 +76,7 @@ export default function Sidebar() {
           <Logo />
         </div>
         <nav className='grid items-start px-4 py-6 text-sm font-medium'>
-          {LinkItems.map(({ name, icon, href }) => (
+          {visibleLinks.map(({ name, icon, href }) => (
             <NavItem key={name} icon={icon} href={href} path={path}>
               {name}
             </NavItem>

@@ -1,12 +1,21 @@
+import { getServerSession } from 'next-auth';
+import { notFound } from 'next/navigation';
 import React from 'react';
 
 import DashboardKpis from '@/components/dashboard/dashboard-kpis';
 import DatePickerWithURLParams from '@/components/ui/date-picker/date-picker-with-url-params';
+import { authOptions, dashboardAllowedEmails } from '@/lib/auth';
 import { getDashboard } from '@/lib/dashboards';
 import { getReceiptsBalancePerYear } from '@/lib/receipts';
 import { PageProps } from '@/types';
 
-export default function Dashboard({ searchParams }: PageProps) {
+export default async function Dashboard({ searchParams }: PageProps) {
+  const session = await getServerSession(authOptions);
+  const userEmail = session?.user?.email;
+
+  if (!userEmail || !dashboardAllowedEmails.includes(userEmail)) {
+    notFound();
+  }
   const dashboardPromise = getDashboard(searchParams);
   const receiptsPromise = getReceiptsBalancePerYear(searchParams);
 
