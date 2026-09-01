@@ -244,6 +244,13 @@ export const generateReceipt = async (_: unknown, paidItems: FormData) => {
         })
       );
 
+      if (invoices.length > 0) {
+        await tx.student.update({
+          where: { id: Number(studentId) },
+          data: { isDebtor: false }
+        });
+      }
+
       const receipt = await tx.receipt.create({
         data: {
           studentId: Number(studentId),
@@ -308,6 +315,8 @@ export const generateReceipt = async (_: unknown, paidItems: FormData) => {
     });
 
     revalidatePath(`/students/${studentId}`);
+    revalidatePath('/expirations');
+    revalidatePath('/debtors');
 
     return {
       error: false,

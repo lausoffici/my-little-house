@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React from 'react';
-import { FiClipboard, FiDollarSign, FiLock, FiMonitor, FiSmile, FiTrendingUp } from 'react-icons/fi';
+import { FiAlertTriangle, FiClipboard, FiDollarSign, FiLock, FiMonitor, FiSmile, FiTrendingUp } from 'react-icons/fi';
 import { TfiReceipt } from 'react-icons/tfi';
 
 import { dashboardAllowedEmails } from '@/lib/auth';
@@ -19,6 +19,7 @@ const LinkItems = [
   { name: 'Caja', icon: <FiLock />, href: '/cash-register' },
   { name: 'Comprobantes', icon: <TfiReceipt />, href: '/receipts' },
   { name: 'Vencimientos', icon: <FiDollarSign />, href: '/expirations?sortBy=expiredAt&sortOrder=asc' },
+  { name: 'Deudores', icon: <FiAlertTriangle />, href: '/debtors', allowedEmails: dashboardAllowedEmails },
   { name: 'Matriculas', icon: <FiClipboard />, href: '/enrollments' }
 ];
 

@@ -21,7 +21,8 @@ export const getExpiredInvoiceList = async (searchParams: SearchParams) => {
     state: InvoiceState.I,
     expiredAt: { lt: new Date().toISOString() },
     student: {
-      active: true
+      active: true,
+      isDebtor: false
     }
   };
 
@@ -33,11 +34,15 @@ export const getExpiredInvoiceList = async (searchParams: SearchParams) => {
   // Calculate total pages
   const totalPages = Math.ceil(totalInvoicesCount / pageSize);
 
-  const totalExpiredAmount = await prisma.$queryRaw<{ total: number }[]>`
-    SELECT SUM(amount * (1 - discount) - balance) AS total
-    FROM "Invoice" i INNER JOIN "Student" s ON i."studentId" = s.id AND s.active = true
-    WHERE state = 'I' AND "expiredAt" < current_timestamp
-  `;
+  const expiredInvoicesForTotal = await prisma.invoice.findMany({
+    where: whereClause,
+    select: { amount: true, discount: true, balance: true }
+  });
+
+  const totalExpiredAmount = expiredInvoicesForTotal.reduce(
+    (sum, invoice) => sum + (getDiscountedAmount(invoice.amount, invoice.discount) - invoice.balance),
+    0
+  );
 
   const pagination = getPaginationClause(pageNumber, pageSize);
 
@@ -72,7 +77,7 @@ export const getExpiredInvoiceList = async (searchParams: SearchParams) => {
       return {
         data: invoicesOrderedByStudent,
         totalPages,
-        totalExpiredAmount: totalExpiredAmount[0].total
+        totalExpiredAmount
       };
 
     case 'total':
@@ -99,7 +104,7 @@ export const getExpiredInvoiceList = async (searchParams: SearchParams) => {
       return {
         data: sortedInvoices,
         totalPages,
-        totalExpiredAmount: totalExpiredAmount[0].total
+        totalExpiredAmount
       };
 
     default:
@@ -113,7 +118,7 @@ export const getExpiredInvoiceList = async (searchParams: SearchParams) => {
       return {
         data: regularInvoices,
         totalPages,
-        totalExpiredAmount: totalExpiredAmount[0].total
+        totalExpiredAmount
       };
   }
 };
@@ -198,7 +203,8 @@ export const getExpiredInvoicesData = async (searchParams: SearchParams) => {
         state: InvoiceState.I,
         expiredAt: { lt: new Date() },
         student: {
-          active: true
+          active: true,
+          isDebtor: false
         }
       },
       include: {

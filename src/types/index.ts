@@ -1,6 +1,7 @@
 import { InvoiceState, type Prisma } from '@prisma/client';
 
 import { variants } from '@/components/ui/badge';
+import { getDebtorInvoiceList } from '@/lib/debtors';
 import { getExpiredInvoiceList } from '@/lib/invoices';
 import { getReceiptWithItemsById } from '@/lib/receipts';
 
@@ -46,6 +47,8 @@ export type ReceiptItems = Awaited<ReturnType<typeof getReceiptWithItemsById>>;
 export type InvoicesStatusType = Record<string, { text: string; color: keyof (typeof variants)['variant'] }>;
 
 export type InvoiceListItem = Awaited<ReturnType<typeof getExpiredInvoiceList>>['data'][0];
+
+export type DebtorInvoiceListItem = Awaited<ReturnType<typeof getDebtorInvoiceList>>['data'][0];
 
 export type InvoiceDataType = {
   month: number;

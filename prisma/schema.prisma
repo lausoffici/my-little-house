@@ -48,9 +48,11 @@ model Student {
   updatedAt          DateTime            @default(now()) @updatedAt
   active             Boolean             @default(true)
   email              String?
+  isDebtor           Boolean             @default(false)
 
   @@index(firstName)
   @@index(lastName)
+  @@index(isDebtor)
 }
 
 model StudentByCourse {
