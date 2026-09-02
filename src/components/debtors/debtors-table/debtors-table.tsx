@@ -3,6 +3,7 @@
 import { DownloadIcon } from 'lucide-react';
 import React from 'react';
 
+import BulkDebtorStatusDialog from '@/components/debtors/bulk-debtor-status-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import DataTable from '@/components/ui/data-table';
@@ -41,6 +42,7 @@ export default function DebtorsTable({ invoicesPromise, debtorInvoicesDataPromis
           {totalDebtAmount && <Badge variant='outline'>{formatCurrency(totalDebtAmount)}</Badge>}
         </div>
         <div className='flex items-center gap-2'>
+          <BulkDebtorStatusDialog table={table} mode='unmark' />
           <DebtorsTableFilters />
           <Button variant='outline' onClick={handleDownload}>
             <DownloadIcon width={15} height={15} className='mr-2' />
@@ -48,7 +50,7 @@ export default function DebtorsTable({ invoicesPromise, debtorInvoicesDataPromis
           </Button>
         </div>
       </div>
-      <DataTable table={table} columns={columns} withRowSelection={false} />
+      <DataTable table={table} columns={columns} withRowSelection />
     </>
   );
 }

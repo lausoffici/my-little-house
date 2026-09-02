@@ -1,10 +1,8 @@
-import { getServerSession } from 'next-auth';
 import React from 'react';
 
 import DeleteCourseEnrollmentDialog from '@/components/courses/delete-course-enrollment/delete-course-enrollment-dialog';
 import { AddEnrollmentInvoiceToStudentDialog } from '@/components/invoices/add-enrollment-invoice-to-student-dialog';
 import ChargeInvoicesDialog from '@/components/invoices/charge-invoices-dialog';
-import DebtorStatusDialog from '@/components/students/debtor-status-dialog';
 import DeleteStudentDialog from '@/components/students/delete-student-dialog';
 import EditStudentDialog from '@/components/students/edit-student-dialog';
 import EnrollStudentDialog from '@/components/students/enroll-student/enroll-student-dialog';
@@ -17,7 +15,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { authOptions, dashboardAllowedEmails } from '@/lib/auth';
 import { getCourseOptions } from '@/lib/courses';
 import { getEnrollments } from '@/lib/enrollment';
 import { getUnpaidInvoicesByStudent } from '@/lib/invoices';
@@ -31,9 +28,6 @@ export default async function StudentPage({ params: { id }, searchParams }: Page
   const invoicesPromise = getStudentInvoices(Number(id), searchParams);
   const unpaidInvoicesPromise = getUnpaidInvoicesByStudent(Number(id));
   const enrollmentsPromise = getEnrollments('desc');
-
-  const session = await getServerSession(authOptions);
-  const canManageDebtors = !!session?.user?.email && dashboardAllowedEmails.includes(session.user.email);
 
   if (!student) {
     return <div>Student not found</div>;
@@ -71,7 +65,6 @@ export default async function StudentPage({ params: { id }, searchParams }: Page
         </div>
 
         <div className='flex flex-col gap-1 justify-end'>
-          {canManageDebtors && <DebtorStatusDialog studentWithCourses={student} />}
           <DeleteStudentDialog
             studentWithCourses={student}
             isInactivation

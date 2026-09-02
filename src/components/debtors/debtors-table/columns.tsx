@@ -6,12 +6,13 @@ import { FiExternalLink } from 'react-icons/fi';
 
 import InvoiceStateBadge from '@/components/invoices/invoice-state-badge';
 import { Badge } from '@/components/ui/badge';
-import { DataTableColumnHeader } from '@/components/ui/data-table';
+import { DataTableColumnHeader, getRowSelectColumn } from '@/components/ui/data-table';
 import { cn, formatCurrency, formatDate, formatPercentage, getMonthName } from '@/lib/utils';
 import { getDiscountedAmount } from '@/lib/utils/invoices.utils';
 import { DebtorInvoiceListItem } from '@/types';
 
 export const columns: ColumnDef<DebtorInvoiceListItem>[] = [
+  getRowSelectColumn<DebtorInvoiceListItem>(),
   {
     accessorKey: 'student',
     header: ({ column }) => <DataTableColumnHeader column={column} title='Estudiante' />,
