@@ -21,8 +21,8 @@ export const SearchBar = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Ref para evitar actualizaciones después del desmontaje
-  const isMountedRef = useRef(true);
+  // Aborta el request anterior si llega uno nuevo antes de que termine
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   const debouncedFetchStudentNames = useDebouncedCallback(async (searchTerm: string) => {
     if (searchTerm.length < MINIMUM_CHARACTERS) {
@@ -32,30 +32,33 @@ export const SearchBar = () => {
       return;
     }
 
+    abortControllerRef.current?.abort();
+    const abortController = new AbortController();
+    abortControllerRef.current = abortController;
+
     setError('');
     setIsLoading(true);
 
     try {
-      const response = await fetch(`/api/students?query=${encodeURIComponent(searchTerm)}`);
+      const response = await fetch(`/api/students?query=${encodeURIComponent(searchTerm)}`, {
+        signal: abortController.signal
+      });
       if (!response.ok) throw new Error('Network response was not ok');
       const data = await response.json();
 
-      // Solo actualiza si el componente sigue montado
-      if (isMountedRef.current) {
-        setStudentNames(data.studentNames);
+      setStudentNames(data.studentNames);
 
-        if (data.studentNames.length === 0) {
-          setError('No se encontraron estudiantes');
-        }
+      if (data.studentNames.length === 0) {
+        setError('No se encontraron estudiantes');
       }
     } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') return;
+
       console.error('Failed to fetch student names:', error);
-      if (isMountedRef.current) {
-        setError('Error al buscar estudiantes');
-        setStudentNames([]);
-      }
+      setError('Error al buscar estudiantes');
+      setStudentNames([]);
     } finally {
-      if (isMountedRef.current) {
+      if (abortControllerRef.current === abortController) {
         setIsLoading(false);
       }
     }
@@ -77,7 +80,7 @@ export const SearchBar = () => {
 
   useEffect(() => {
     return () => {
-      isMountedRef.current = false;
+      abortControllerRef.current?.abort();
       debouncedFetchStudentNames.cancel();
     };
   }, [debouncedFetchStudentNames]);
