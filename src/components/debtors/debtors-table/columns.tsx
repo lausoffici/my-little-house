@@ -1,0 +1,98 @@
+'use client';
+
+import { ColumnDef } from '@tanstack/react-table';
+import Link from 'next/link';
+import { FiExternalLink } from 'react-icons/fi';
+
+import InvoiceStateBadge from '@/components/invoices/invoice-state-badge';
+import { Badge } from '@/components/ui/badge';
+import { DataTableColumnHeader } from '@/components/ui/data-table';
+import { cn, formatCurrency, formatDate, formatPercentage, getMonthName } from '@/lib/utils';
+import { getDiscountedAmount } from '@/lib/utils/invoices.utils';
+import { DebtorInvoiceListItem } from '@/types';
+
+export const columns: ColumnDef<DebtorInvoiceListItem>[] = [
+  {
+    accessorKey: 'student',
+    header: ({ column }) => <DataTableColumnHeader column={column} title='Estudiante' />,
+    cell: ({ row }) => (
+      <Link href={`/students/${row.original.studentId}`} className='flex items-center gap-1 hover:underline'>
+        {row.original.student.firstName} {row.original.student.lastName}
+        <FiExternalLink />
+      </Link>
+    )
+  },
+  {
+    accessorKey: 'studentActive',
+    header: ({ column }) => <DataTableColumnHeader column={column} title='Estado del Alumno' />,
+    cell: ({ row }) => (
+      <Badge
+        className={cn(
+          row.original.student.active ? 'bg-green-600 hover:bg-green-600' : 'bg-gray-500 hover:bg-gray-500',
+          'border-transparent'
+        )}
+      >
+        {row.original.student.active ? 'Activo' : 'Inactivo'}
+      </Badge>
+    ),
+    enableSorting: false
+  },
+  {
+    accessorKey: 'description',
+    header: ({ column }) => <DataTableColumnHeader column={column} title='Descripción' />
+  },
+  {
+    accessorKey: 'amount',
+    header: ({ column }) => <DataTableColumnHeader column={column} title='Importe' />,
+    cell: ({ row }) => <span>{formatCurrency(row.original.amount)}</span>
+  },
+  {
+    accessorKey: 'discount',
+    header: ({ column }) => <DataTableColumnHeader column={column} title='Descuento' />,
+    cell: ({ row }) => <span>{formatPercentage(row.original.discount ?? 0)}</span>
+  },
+  {
+    accessorKey: 'total',
+    header: ({ column }) => <DataTableColumnHeader column={column} title='Total' />,
+    cell: ({ row }) => <span>{formatCurrency(getDiscountedAmount(row.original.amount, row.original.discount))}</span>
+  },
+  {
+    accessorKey: 'balance',
+    header: ({ column }) => <DataTableColumnHeader column={column} title='Pagó' />,
+    cell: ({ row }) => {
+      const balance = row.original.balance;
+      const number = row.original.state === 'P' ? '-' : formatCurrency(balance);
+      return <span className={balance !== 0 ? 'text-success' : 'text-black'}>{number}</span>;
+    }
+  },
+  {
+    accessorKey: 'rest',
+    header: ({ column }) => <DataTableColumnHeader column={column} title='Debe' />,
+    cell: ({ row }) => {
+      const discountBalance = getDiscountedAmount(row.original.amount, row.original.discount) - row.original.balance;
+      const number = row.original.state === 'P' ? '-' : formatCurrency(discountBalance);
+      return <span className={discountBalance === 0 ? 'text-black' : 'text-destructive'}>{number}</span>;
+    }
+  },
+  {
+    accessorKey: 'state',
+    header: ({ column }) => <DataTableColumnHeader column={column} title='Estado' />,
+    cell: ({ row }) => <InvoiceStateBadge state={row.original.state} />,
+    enableSorting: false
+  },
+  {
+    accessorKey: 'month',
+    header: ({ column }) => <DataTableColumnHeader column={column} title='Mes' />,
+    cell: ({ row }) => <span>{getMonthName(row.original.month)}</span>,
+    enableSorting: false
+  },
+  {
+    accessorKey: 'year',
+    header: ({ column }) => <DataTableColumnHeader column={column} title='Año' />
+  },
+  {
+    accessorKey: 'expiredAt',
+    header: ({ column }) => <DataTableColumnHeader column={column} title='Vencimiento' />,
+    cell: ({ row }) => <span>{formatDate(row.original.expiredAt)}</span>
+  }
+];

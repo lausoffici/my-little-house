@@ -47,6 +47,14 @@ export const expiredInvoiceListSearchParamsSchema = z.object({
   sortOrder: z.string().default('asc')
 });
 
+export const debtorInvoiceListSearchParamsSchema = z.object({
+  page: z.string().default('1'),
+  size: z.string().default('10'),
+  sortBy: z.string().default('student'),
+  sortOrder: z.string().default('asc'),
+  withInactiveStudents: z.string().optional()
+});
+
 export const invoiceStateSchema = z.nativeEnum(InvoiceState);
 
 export const studentInvoiceListSearchParamsSchema = z.object({
