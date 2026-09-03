@@ -21,34 +21,34 @@ const assertDashboardAccess = async () => {
   }
 };
 
-export const markStudentAsDebtor = async (studentId: number) => {
+export const markStudentsAsDebtor = async (studentIds: number[]) => {
   await assertDashboardAccess();
 
-  const student = await prisma.student.update({
-    where: { id: studentId },
+  const result = await prisma.student.updateMany({
+    where: { id: { in: studentIds } },
     data: { isDebtor: true }
   });
 
-  revalidatePath(`/students/${studentId}`);
+  studentIds.forEach((id) => revalidatePath(`/students/${id}`));
   revalidatePath('/expirations');
   revalidatePath('/debtors');
 
-  return student;
+  return result;
 };
 
-export const unmarkStudentAsDebtor = async (studentId: number) => {
+export const unmarkStudentsAsDebtor = async (studentIds: number[]) => {
   await assertDashboardAccess();
 
-  const student = await prisma.student.update({
-    where: { id: studentId },
+  const result = await prisma.student.updateMany({
+    where: { id: { in: studentIds } },
     data: { isDebtor: false }
   });
 
-  revalidatePath(`/students/${studentId}`);
+  studentIds.forEach((id) => revalidatePath(`/students/${id}`));
   revalidatePath('/expirations');
   revalidatePath('/debtors');
 
-  return student;
+  return result;
 };
 
 export const getDebtorInvoiceList = async (searchParams: SearchParams) => {

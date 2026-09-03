@@ -1,10 +1,15 @@
+import { getServerSession } from 'next-auth';
 import React from 'react';
 
 import InvoicesTable from '@/components/invoices/invoices-table/invoices-table';
+import { authOptions, dashboardAllowedEmails } from '@/lib/auth';
 import { getExpiredInvoiceList, getExpiredInvoicesData } from '@/lib/invoices';
 import { PageProps } from '@/types';
 
 export default async function ExpirationsPage({ searchParams }: PageProps) {
+  const session = await getServerSession(authOptions);
+  const canManageDebtors = !!session?.user?.email && dashboardAllowedEmails.includes(session.user.email);
+
   const expiredInvoicesPromise = getExpiredInvoiceList(searchParams);
   const expiredInvoicesDataPromise = getExpiredInvoicesData(searchParams);
 
@@ -20,6 +25,7 @@ export default async function ExpirationsPage({ searchParams }: PageProps) {
         <InvoicesTable
           invoicesPromise={expiredInvoicesPromise}
           expiredInvoicesDataPromise={expiredInvoicesDataPromise}
+          canManageDebtors={canManageDebtors}
         />
       </React.Suspense>
     </div>

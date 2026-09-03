@@ -1,22 +1,26 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
+import Link from 'next/link';
+import { FiExternalLink } from 'react-icons/fi';
 
-import { DataTableColumnHeader } from '@/components/ui/data-table';
+import { DataTableColumnHeader, getRowSelectColumn } from '@/components/ui/data-table';
 import { formatCurrency, formatDate, formatPercentage, getMonthName } from '@/lib/utils';
 import { getDiscountedAmount } from '@/lib/utils/invoices.utils';
 import { InvoiceListItem } from '@/types';
 
 import InvoiceStateBadge from '../invoice-state-badge';
 
-export const columns: ColumnDef<InvoiceListItem>[] = [
+export const getColumns = (canManageDebtors: boolean): ColumnDef<InvoiceListItem>[] => [
+  ...(canManageDebtors ? [getRowSelectColumn<InvoiceListItem>()] : []),
   {
     accessorKey: 'student',
     header: ({ column }) => <DataTableColumnHeader column={column} title='Estudiante' />,
     cell: ({ row }) => (
-      <div>
+      <Link href={`/students/${row.original.studentId}`} className='flex items-center gap-1 hover:underline'>
         {row.original.student.firstName} {row.original.student.lastName}
-      </div>
+        <FiExternalLink />
+      </Link>
     )
   },
   {
