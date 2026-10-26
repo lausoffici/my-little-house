@@ -105,7 +105,7 @@ export default async function StudentPage({ params: { id }, searchParams }: Page
                 </React.Suspense>
                 {courses.length > 0 && <DiscountsFormDialog studentByCourse={student.studentByCourse} />}
                 <React.Suspense fallback='Cargando...'>
-                  <ChargeInvoicesDialog unpaidInvoicesPromise={unpaidInvoicesPromise} />
+                  <ChargeInvoicesDialog unpaidInvoicesPromise={unpaidInvoicesPromise} studentName={fullName} />
                 </React.Suspense>
               </div>
             </div>
