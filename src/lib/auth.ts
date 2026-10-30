@@ -6,10 +6,16 @@ const whitelist = [
   'julietapontino@gmail.com',
   'gsoffici@gmail.com',
   'secretariamlh@gmail.com',
-  'fsoffici01@gmail.com'
+  'fsoffici01@gmail.com',
+  'aliciamarianiar@gmail.com'
 ];
 
-export const dashboardAllowedEmails = ['lautarosoffici@gmail.com', 'julietapontino@gmail.com', 'gsoffici@gmail.com'];
+export const dashboardAllowedEmails = [
+  'lautarosoffici@gmail.com',
+  'julietapontino@gmail.com',
+  'gsoffici@gmail.com',
+  'aliciamarianiar@gmail.com'
+];
 
 export const authOptions: NextAuthOptions = {
   // Secret for Next-auth, without this JWT encryption/decryption won't work
